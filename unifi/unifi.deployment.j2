@@ -1,0 +1,93 @@
+
+{% set namespace="unifi" -%}
+{% set name = 'unifi-controller' -%}
+{% set volume_name = name+"-data" -%}
+{% set image = "linuxserver/unifi-controller:latest" -%}
+{% set label = name -%}
+{% set ports = [
+    { "name":"unifi-comms","port":8080,"protocol":"TCP"},
+    { "name":"browser-ui","port":8443,"protocol":"TCP","exposedPort":443},
+    { "name":"http-redir","port":8880,"protocol":"TCP"},
+    { "name":"https-redir","port":8843,"protocol":"TCP"},
+    { "name":"speed-test","port":6789,"protocol":"TCP"},
+    { "name":"dev-discovery","port":10001,"protocol":"UDP"},
+    { "name":"stun","port":3478,"protocol":"UDP"}
+  ]
+%}
+{#jacobalberty/unifi:latest#}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{namespace}}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{volume_name}}
+  namespace: {{namespace}}
+spec:
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ name }}-deployment
+  namespace: {{ namespace }}
+  labels:
+    app: {{ label }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ label }}
+  template:
+    metadata:
+
+      labels:
+        app: {{ label }}
+    spec:
+      hostname: {{name}}
+      containers:
+      - name: {{ name }}
+        image: {{ image }} 
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        ports:
+        {%- for port in ports %}
+        - name: {{port.name}}
+          containerPort: {{port.port}}
+          protocol: {{port.protocol|default("TCP")}}
+        {%- endfor %}        
+        volumeMounts:
+          - name: {{volume_name}}
+            mountPath: /config
+      volumes:
+        - name: {{ volume_name }}
+          persistentVolumeClaim:
+            claimName: {{ volume_name }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{name}}
+  namespace: {{namespace}}
+  annotations:
+spec:
+  selector:
+    app: {{label}}
+  ports:
+  {%- for port in ports %}
+  - name: {{port.name}}
+    port: {{port.exposedPort|default(port.port)}}
+    targetPort: {{port.port}}
+    protocol: {{port.protocol|default("TCP")}}
+  {%- endfor %} 
