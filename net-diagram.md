@@ -1,8 +1,8 @@
 ```mermaid
 graph TD
     V{{Verizon}} -->G{{"Gimli 🗄️"}}
-    V-->R{{R7000}}
     subgraph gimli-net
+    G-->R{{R7000}}
     G  --> XG(US-16-XG)
     XG --> U8(US-8-60W)
     XG --> M(Mikrotik)
