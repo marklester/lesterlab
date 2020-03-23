@@ -2,7 +2,7 @@
 graph TD
     V{{Verizon}} -->G{{"Gimli 🗄️"}}
     subgraph gimli-net
-    G-->R{{R7000}}
+
     G  --> XG(US-16-XG)
     XG --> U8(US-8-60W)
     XG --> M(Mikrotik)
@@ -14,6 +14,7 @@ graph TD
     M--> UP[Upstairs]
     end
     subgraph falcon-net
+    G-->R{{R7000}}
     R-->N8(Netgear)
     R-->NW((Wifi))
     NW-->PI1[PI-1]
