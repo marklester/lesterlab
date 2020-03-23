@@ -1,12 +1,12 @@
 ```mermaid
 graph TD
-    V{{Verizon}} -->G{{fa:fa-database Gimli}}
+    V{{Verizon}} -->G{{"Gimli 🗄️"}}
     V-->R{{R7000}}
     subgraph gimli-net
     G  --> XG(US-16-XG)
     XG --> U8(US-8-60W)
     XG --> M(Mikrotik)
-    XG -->L[fa:fa-hdd-o littlefoot]
+    XG -->L["👣littlefoot 🗄️"]
     U8 -->UAP((UAP))
     UAP-->PI2[PI-2]
     UAP-->D[User Devices]
