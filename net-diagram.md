@@ -23,7 +23,7 @@ graph TD
         NW-->G3[G0-3]
         NW-->G4[GA-1]
         NW-->OY[Onkyo]
-        NW-->V[Vizio]
+        NW-->VZ[Vizio]
         N8-->C[Camera 1]
         N8-->C2[Camera 2]
         R-->H[Hue]
