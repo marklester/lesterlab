@@ -30,25 +30,9 @@ sudo apt-get install ubuntu-drivers-common
 sudo ubuntu-drivers autoinstall
 ```
 ## setup interfaces
-* apply netplan:
-```yaml
-network:
-  version: 2
-  ethernets:
-    eno1:
-      dhcp4: no
-    eno2:
-      dhcp4: no
-    eno3:
-      addresses: [192.168.0.1/24]
-      dhcp4: no
-      nameservers:
-        addresses:
-          - 192.168.0.1
-        search: [home]
-    eno4:
-      dhcp4: yes
-```
+* ubuntu 18+ uses netplan to configure network interface. Using netplan is straight forward. create a yaml describing your network interfaces and then run netplan apply
+* gimli configuration: [/etc/netplan/50-cloud-init.yaml](network/netplan.conf)
+
 `netplan apply`
 
 ## setup dns and dhcp
@@ -113,12 +97,23 @@ set firehol to start in /etc/defaults/firehol.conf
 
 `START_FIREHOL=YES`
 
-setup : [/etc/firehole/firehol.conf](firewall/firehol.conf)
+setup : [/etc/firehole/firehol.conf](network/firehol.conf)
+TODO 
+1. port-forwarding:
+    http://manpages.ubuntu.com/manpages/bionic/man5/firehol-nat.5.html
+    examples:
+    ```
+    # Port forwarding HTTP
+    dnat4 to 192.0.2.2 proto tcp dport 80
 
+    # Port forwarding HTTPS on to a different port internally
+    dnat4 to 192.0.2.2:4443 proto tcp dport 443
+    ```
+1. narrow accept traffic to valid ip ranges
+https://firehol.org/guides/firehol-welcome/
 
 # install microk8s
 `snap install micro8s --classic`
 * enable dns,gpu
 `microk8s.enable dns gpu`
 ## install local provisioning
-

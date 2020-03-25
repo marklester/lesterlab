@@ -11,6 +11,7 @@ graph TD
         UAP-->D[User Devices]
         UAP-->SH[Shield]
         M--> UP[Upstairs]
+        U8-->B[Printer]
     end
     subgraph falcon-net
         G-->R{{R7000}}
@@ -27,6 +28,5 @@ graph TD
         N8-->C[Camera 1]
         N8-->C2[Camera 2]
         R-->H[Hue]
-        R-->B[Printer]
     end
 ```
