@@ -1,14 +1,8 @@
 # Gimli
 # How to setup a router/nas appliance in ubuntu 18.04
 
-## specs for nas
-* 128GB DDR 4 ECC Ram
-* ipmi
-* dualg 10G nics
-* 1030 low profile gpu
-* 4 8TB HDD
-* 2 256 SSD
-* 1 512 NVME
+## specs for NAS
+[specs](docs/router-specs.md)
 
 ## install ubuntu server
 ## setup zfs
@@ -80,37 +74,7 @@ Wants=network-online.target
 
 `systemctl enable dnsmasq`
 
-# install firewall
-* enable ip forward
-in /etc/sysctl.conf uncomment
-
-`net.ipv4.ip_forward=1`
-
-* disable and remove ufw
-
-`systemctl disable ufw`
-
-`apt purge ufw`
-
-`apt install firehol`
-set firehol to start in /etc/defaults/firehol.conf
-
-`START_FIREHOL=YES`
-
-setup : [/etc/firehole/firehol.conf](network/firehol.conf)
-TODO 
-1. port-forwarding:
-    http://manpages.ubuntu.com/manpages/bionic/man5/firehol-nat.5.html
-    examples:
-    ```
-    # Port forwarding HTTP
-    dnat4 to 192.0.2.2 proto tcp dport 80
-
-    # Port forwarding HTTPS on to a different port internally
-    dnat4 to 192.0.2.2:4443 proto tcp dport 443
-    ```
-1. narrow accept traffic to valid ip ranges
-https://firehol.org/guides/firehol-welcome/
+[Setup Firewall](docs/setup-firewall.md)
 
 # install microk8s
 `snap install micro8s --classic`
