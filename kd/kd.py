@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-from jinja2 import Environment, FileSystemLoader
 from mako.template import Template
 from mako.lookup import TemplateLookup
 import click
@@ -8,18 +7,12 @@ import os
 import yaml
 import subprocess
 
-def create_template(file):
-    parts = os.path.split(file);
-    file_loader = FileSystemLoader(parts[0])
-    env = Environment(loader=file_loader)
-    template = env.get_template(parts[1])
-    return template
-
 def create_mako_template(file):
     cwd = os.path.dirname(os.path.abspath(__file__))
     mylookup = TemplateLookup(directories=[cwd])
     template = Template(filename=file,lookup=mylookup)
     return template
+
 @click.group()
 def cli():
   pass
@@ -39,7 +32,6 @@ def apply(file):
 def print(file):
     template = create_mako_template(file)
     click.echo(template.render())
-
 
 if __name__ == "__main__":
     cli.add_command(print)
