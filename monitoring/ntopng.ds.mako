@@ -8,6 +8,8 @@
     cmd = k8s.attr.Command(cmd="ntopng",args=["--community",
     "-d","/var/lib/ntopng",
     "-i","eno3",
+    "-i","eno4",
+    "-i","cni0",
     "-r","redis.monitoring.svc.cluster.local:6379",
     "--http-port", "3000",
     "--disable-login","1"])
@@ -37,6 +39,5 @@
 
    
 %>\
-## ${k8s.configmap(config)}
 ${k8s.deployment(redis.name,namespace,[redis])}
 ${k8s.daemonset(ntopng.name,namespace,[ntopng],host_network=True,configmaps=[])}
