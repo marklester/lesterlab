@@ -20,13 +20,28 @@ def cli():
 @click.command()
 @click.argument('file',"file")
 def apply(file):
-    config.load_kube_config()
-    template = create_template(file)
-    crd = yaml.load_all(template.render())
-    # p = subprocess.Popen('kubectl apply 0f - ', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    # for line in p.stdout.readlines():
-    # print line,
-    # retval = p.wait()
+    template = create_mako_template(file)
+    raster = template.render()
+    result = subprocess.run(["kubectl","apply","-f","-"],stdout=subprocess.PIPE,input=raster.encode())
+    click.echo(result.stdout)
+
+@click.command()
+@click.argument('file',"file")
+def diff(file):
+    green = '\033[92m'
+    red = '\033[31m'
+    end = '\033[0m'
+
+    template = create_mako_template(file)
+    raster = template.render()
+    result = subprocess.run(["kubectl","diff","-f","-"],stdout=subprocess.PIPE,input=raster.encode())
+    for line in result.stdout.decode().splitlines():
+        if line.startswith("+"):
+            click.echo(f"{green}{line}{end}")
+        elif line.startswith("-"):
+            click.echo(f"{red}{line}{end}")
+        else:
+            click.echo(line)
 @click.command()
 @click.argument('file',"file")
 def print(file):
@@ -36,4 +51,5 @@ def print(file):
 if __name__ == "__main__":
     cli.add_command(print)
     cli.add_command(apply)
+    cli.add_command(diff)
     cli()
