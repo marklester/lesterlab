@@ -34,7 +34,7 @@ def diff(file):
 
     template = create_mako_template(file)
     raster = template.render()
-    result = subprocess.run(["kubectl","diff","-f","-"],stdout=subprocess.PIPE,input=raster.encode())
+    result = subprocess.run(["kubectl","diff","-f","-"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,input=raster.encode())
     for line in result.stdout.decode().splitlines():
         if line.startswith("+"):
             click.echo(f"{green}{line}{end}")
