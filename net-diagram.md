@@ -1,6 +1,7 @@
 ```mermaid
 graph TD
     V{{Verizon}} -->G{{"Gimli 🗄️"}}
+    V-->R{{R7000}}
     subgraph gimli-net
         G  --192.168.0.0/24--> XG(US-16-XG)
         XG --> U8(US-8-60W)
@@ -17,7 +18,6 @@ graph TD
         U8-->B[Printer]
     end
     subgraph falcon-net
-        V-->R{{R7000}}
         R-->N8(Netgear)
         R-->NW((Wifi))
         NW-->PI1[PI-1]
