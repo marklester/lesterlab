@@ -51,9 +51,9 @@ Dnsmasq can function both as dns and dhcp. It also works well for local dns. Con
 
 * `systemctl enable dnsmasq`
 
-[Setup Firewall](docs/setup-firewall.md)
+## 6. [Setup Firewall](docs/setup-firewall.md)
 
-# install microk8s
+## 7. Install Microk8s
 `snap install micro8s --classic`
 * enable dns,gpu
 
