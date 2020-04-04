@@ -26,7 +26,9 @@ metadata:
   volumes = all_volumes(containers)
 %>
 % for vol in volumes:
+%if "hostPath" not in vol:
 ${pvc(vol,namespace)}
+%endif
 % endfor
 %for cm in configmaps:
 ${configmap(cm)}
@@ -58,11 +60,22 @@ spec:
     % endfor
       volumes:
         % for vol in volumes:
-        - name: ${vol["name"]}
-          persistentVolumeClaim:
-            claimName: ${vol["name"]}
+        ${volume(vol)}
         % endfor 
 ---\
+</%def>
+
+<%def name="volume(vol)">\
+- name: ${vol["name"]}
+% if "hostPath" in vol:
+          hostPath:
+            path: ${vol["hostPath"]}
+            type: Directory
+% else:
+          persistentVolumeClaim:
+            claimName: ${vol["name"]}
+% endif
+
 </%def>
 
 <%def name="service(name,namespace,label,ports)">\
@@ -171,11 +184,9 @@ spec:
     ${container(cspec)}\
     % endfor
       volumes:
-      % for vol in volumes:
-      - name: ${vol["name"]}
-        persistentVolumeClaim:
-          claimName: ${vol["name"]}
-      % endfor
+    % for vol in volumes:
+    ${volume(vol)}
+    % endfor 
       % for cm in configmaps:
       - name: ${cm.name}
         configMap:
