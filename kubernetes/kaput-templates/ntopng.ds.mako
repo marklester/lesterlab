@@ -9,6 +9,7 @@
     "-d","/var/lib/ntopng",
     "-i","eno3",
     "-i","eno4",
+    "-i","vlan10",
     "-i","cni0",
     "-r","redis.monitoring.svc.cluster.local:6379",
     "--http-port", "3000",

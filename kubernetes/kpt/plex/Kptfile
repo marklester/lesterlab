@@ -1,0 +1,8 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: plex
+packageMetadata:
+  tags:
+  - kpt.dev/app=plex
+  shortDescription: plex kpt package
