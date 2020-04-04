@@ -60,7 +60,7 @@ spec:
     % endfor
       volumes:
         % for vol in volumes:
-        ${volume(vol)}
+        ${volume(vol)}\
         % endfor 
 ---\
 </%def>
@@ -75,7 +75,6 @@ spec:
           persistentVolumeClaim:
             claimName: ${vol["name"]}
 % endif
-
 </%def>
 
 <%def name="service(name,namespace,label,ports)">\
