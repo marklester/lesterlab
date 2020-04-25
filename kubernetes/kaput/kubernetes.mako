@@ -26,7 +26,7 @@ metadata:
   volumes = all_volumes(containers)
 %>
 % for vol in volumes:
-%if "hostPath" not in vol:
+%if "hostPath" not in vol and "emptyDir" not in vol:
 ${pvc(vol,namespace)}
 %endif
 % endfor
@@ -62,12 +62,20 @@ spec:
         % for vol in volumes:
         ${volume(vol)}\
         % endfor 
+        % for cm in configmaps:
+        - name: ${cm.name}
+          configMap:
+            name: ${cm.name}            
+        % endfor
 ---\
 </%def>
 
 <%def name="volume(vol)">\
 - name: ${vol["name"]}
-% if "hostPath" in vol:
+% if "emptyDir" in vol:
+          emptyDir:
+            medium: Memory
+% elif "hostPath" in vol:
           hostPath:
             path: ${vol["hostPath"]}
             type: Directory
@@ -107,6 +115,7 @@ spec:
   %>\
 - name: ${container.name}
         image: ${container.image} 
+        imagePullPolicy: Always
         % if command:
         command: ["${command.cmd}"]
         args:
@@ -140,7 +149,7 @@ spec:
           mountPath: ${cm.mountPath}${key}
           subPath: ${key}
         %  endfor
-        % endfor         
+        % endfor       
 </%def>
 
 <%def name="daemonset(name,namespace,containers,configmaps=[],host_network=False)">\

@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cams # {"$ref":"#/definitions/io.k8s.cli.setters.namespace"}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shinobi-mysql-data
+  namespace: cams # {"$ref":"#/definitions/io.k8s.cli.setters.namespace"}
+spec:
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi # {"$ref":"#/definitions/io.k8s.cli.setters.storage-size"}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shinobi # {"$ref":"#/definitions/io.k8s.cli.setters.app"}
+  namespace: cams # {"$ref":"#/definitions/io.k8s.cli.setters.namespace"}
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: shinobi.home
+spec:
+  selector:
+    app: shinobi # {"$ref":"#/definitions/io.k8s.cli.setters.app"}
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shinobi # {"$ref":"#/definitions/io.k8s.cli.setters.app"}
+  namespace: cams # {"$ref":"#/definitions/io.k8s.cli.setters.namespace"}
+  labels:
+    app: shinobi # {"$ref":"#/definitions/io.k8s.cli.setters.app"}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shinobi # {"$ref":"#/definitions/io.k8s.cli.setters.app"}
+  template:
+    metadata:
+      labels:
+        app: shinobi # {"$ref":"#/definitions/io.k8s.cli.setters.app"}
+    spec:
+      containers:
+        - name: shinobi # {"$ref":"#/definitions/io.k8s.cli.setters.app"}
+          image: registry.gitlab.com/migoller/shinobidocker:nvidia # {"$ref":"#/definitions/io.k8s.cli.setters.image"}
+          imagePullPolicy: Always
+          env:
+            - name: APP_BRANCH
+              value: "dev"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: videos
+              mountPath: /opt/shinobi/videos
+            - name: shinobi-mysql-data
+              mountPath: /var/lib/mysql
+            - name: shinobi-shm
+              mountPath: /dev/shm/
+      volumes:
+        - name: videos
+          hostPath:
+            path: /media/media/cctv
+            type: Directory
+        - name: shinobi-mysql-data
+          persistentVolumeClaim:
+            claimName: shinobi-mysql-data
+        - name: shinobi-shm
+          emptyDir:
+            medium: Memory
