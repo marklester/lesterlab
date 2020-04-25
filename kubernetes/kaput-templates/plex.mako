@@ -29,5 +29,5 @@
         },
         cmd=[],
         configmaps=[])
-%>\
-${k8s.deployment(plex.name,namespace,[plex])}\
+%>
+${k8s.deployment(plex.name,namespace,[plex])}
