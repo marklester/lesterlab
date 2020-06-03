@@ -21,7 +21,8 @@ modprobe zfs
 
 #### set up nfs shares for zfs
 ```bash
-zfs set sharenfs="rw=@192.168.0.0/24,no_subtree_check,no_root_squash" tank/appdata" tank/media
+zfs set sharenfs="rw=@192.168.0.0/24,no_subtree_check,no_root_squash" tank/appdata"
+...
 ```
 
 ### create zfs reposity for vms
@@ -30,7 +31,7 @@ the sr being created has to be empty and have the write permissions
 `xe host-list`
 
 ```bash
-xe sr-create host-uuid=fd3d883d-4448-4f0e-a929-75115851edb8 name-label=gimli-zfs-vms type=file other-config:o_direct=false device-config:location=/tank/vms
+xe sr-create host-uuid=<hostid> name-label=gimli-zfs-vms type=file other-config:o_direct=false device-config:location=/tank/vms
 ```
 
 ### create iso repository
