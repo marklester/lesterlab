@@ -7,11 +7,23 @@ zfs will be used for local storage of vm disks
 nfs will be used for remote storage
 
 ### import zfs
-zfs set sharenfs="rw=@192.168.0.0/24" tank/media
+* install zfs
+
+```
+yum install zfs
+modprobe zfs
+```
+
 ### install nfs
 * firewall
 * permissions
 * how to mount
+
+#### set up nfs shares for zfs
+```bash
+zfs set sharenfs="rw=@192.168.0.0/24,no_subtree_check,no_root_squash" tank/appdata" tank/media
+```
+
 ### create zfs reposity for vms
 the sr being created has to be empty and have the write permissions
 * retrieve host uuid
