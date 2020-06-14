@@ -1,0 +1,8 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: unifi-controller
+packageMetadata:
+  tags:
+  - kpt/unifi-controller
+  shortDescription: deployment of the unifi controller software
