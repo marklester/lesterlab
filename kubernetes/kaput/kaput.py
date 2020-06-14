@@ -18,7 +18,7 @@ def cli():
   pass
 
 @click.command()
-@click.argument('file',"file")
+@click.argument('file')
 def apply(file):
     template = create_mako_template(file)
     raster = template.render()
@@ -26,7 +26,7 @@ def apply(file):
     click.echo(result.stdout)
 
 @click.command()
-@click.argument('file',"file")
+@click.argument('file')
 def diff(file):
     green = '\033[92m'
     red = '\033[31m'
@@ -43,7 +43,7 @@ def diff(file):
         else:
             click.echo(line)
 @click.command()
-@click.argument('file',"file")
+@click.argument('file')
 def print(file):
     template = create_mako_template(file)
     click.echo(template.render())
