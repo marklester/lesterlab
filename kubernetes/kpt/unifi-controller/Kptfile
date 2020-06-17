@@ -6,3 +6,10 @@ packageMetadata:
   tags:
   - kpt/unifi-controller
   shortDescription: deployment of the unifi controller software
+openAPI:
+  definitions:
+    io.k8s.cli.setters.unifi-inform:
+      x-k8s-cli:
+        setter:
+          name: unifi-inform
+          value: "8080"
