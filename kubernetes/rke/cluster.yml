@@ -1,0 +1,8 @@
+ssh_agent_auth: true
+nodes:
+  - address: gimli.home
+    user: gimli
+    role:
+      - controlplane
+      - etcd
+      - worker
