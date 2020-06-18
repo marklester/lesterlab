@@ -50,10 +50,10 @@ spec:
         env:
         - name: TZ
           value: "America/New_York"
-        # - name: NVIDIA_VISIBLE_DEVICES
-        #   value: all
-        # - name: "NVIDIA_DRIVER_CAPABILITIES"
-        #   value: "compute,video,utility"
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: all
+        - name: "NVIDIA_DRIVER_CAPABILITIES"
+          value: "compute,video,utility"
         ports:
         - name: rest
           containerPort: 8080
