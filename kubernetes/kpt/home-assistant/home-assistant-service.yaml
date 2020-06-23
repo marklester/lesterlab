@@ -11,8 +11,8 @@ spec:
   type: LoadBalancer
   ports:
     - name: api
-      port: 8123
-      targetPort: 8123
+      port: 8123 #todo change to port 80
+      targetPort: 8123 
       protocol: TCP
   selector:
     app: home-assistant
