@@ -65,5 +65,5 @@ spec:
       - name: recordings
         nfs:
           server: gimli.home
-          path: /tank/recordings
+          path: /recordings
 
