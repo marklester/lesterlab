@@ -3,7 +3,7 @@ graph TD
     V{{Verizon}} -->G{{"router.home 🗄️"}}
     subgraph gimli-net
         G  --192.168.0.0/24--> XG(US-16-XG)
-        XG --> U8(US-8-60W)
+        XG --> U8(US-16-150W)
         XG --> M(Mikrotik)
         XG -->L["👣littlefoot 🗄️"]
         U8 -->UAP((UAP))
@@ -20,11 +20,10 @@ graph TD
         AZ-->G4[GA-1]
         M--> UP[Upstairs]
         U8-->B[Printer]
-        U8-->N8(Netgear)
         AZ-->PI1[PI-1]
         AZ-->OY[Onkyo]
         AZ-->VZ[Vizio]
-        N8-->C[Camera 1]
-        N8-->C2[Camera 2]
+        U8-->C[Camera 1]
+        U8-->C2[Camera 2]
     end
 ```
