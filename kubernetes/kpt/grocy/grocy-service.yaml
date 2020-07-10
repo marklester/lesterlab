@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: grocy
-  namespace: grocy
+  namespace: grocy # {"$kpt-set":"namespace"}
   annotations:
     metallb.universe.tf/allow-shared-ip: grocy
 spec:
@@ -10,7 +10,15 @@ spec:
   ports:
   - name: http
     port: 80
-    targetPort: 9283 # {"$kpt-set":"http-port"}
+    targetPort: 80 # {"$kpt-set":"http-port"}
+    protocol: TCP
+  - name: https
+    port: 443
+    targetPort: 443 
+    protocol: TCP
+  - name: other
+    port: 9000
+    targetPort: 9000 
     protocol: TCP
   selector:
     app: grocy

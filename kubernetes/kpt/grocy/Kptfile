@@ -13,3 +13,8 @@ openAPI:
         setter:
           name: http-port
           value: "9283"
+    io.k8s.cli.setters.namespace:
+      x-k8s-cli:
+        setter:
+          name: namespace
+          value: grocy
