@@ -1,0 +1,15 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: grocy
+packageMetadata:
+  tags:
+  - kpt.dev/app=grocy
+  shortDescription: kpt grocy package
+openAPI:
+  definitions:
+    io.k8s.cli.setters.http-port:
+      x-k8s-cli:
+        setter:
+          name: http-port
+          value: "9283"
