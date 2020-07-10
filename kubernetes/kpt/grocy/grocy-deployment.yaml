@@ -7,7 +7,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grocy
-  namespace: grocy
+  namespace: grocy # {"$kpt-set":"namespace"}
   labels:
     app: grocy
 spec:
@@ -25,9 +25,12 @@ spec:
         image: "linuxserver/grocy"
         imagePullPolicy: Always
         ports:
-        - name: web
-          containerPort: 9283 # {"$kpt-set":"http-port"}
-          protocol: TCP
+        - name: http
+          containerPort: 80 # {"$kpt-set":"http-port"}
+        - name: https
+          containerPort: 443
+        - name: other
+          containerPort: 9000
         env:
         - name: TZ
           value: "America/New_York"
