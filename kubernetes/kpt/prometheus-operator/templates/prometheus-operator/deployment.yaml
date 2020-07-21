@@ -1,0 +1,77 @@
+# Source: prometheus-operator/templates/prometheus-operator/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-operator-operator
+  namespace: default # {"$kpt-set":"namespace"}
+  labels:
+    app: prometheus-operator-operator
+    chart: prometheus-operator-9.1.0
+    release: "prometheus-operator"
+    heritage: "Helm"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-operator-operator
+      release: "prometheus-operator"
+  template:
+    metadata:
+      labels:
+        app: prometheus-operator-operator
+        chart: prometheus-operator-9.1.0
+        release: "prometheus-operator"
+        heritage: "Helm"
+    spec:
+      containers:
+      - name: prometheus-operator
+        image: "quay.io/coreos/prometheus-operator:v0.38.1"
+        imagePullPolicy: "IfNotPresent"
+        args:
+        - --manage-crds=true
+        - --kubelet-service=kube-system/prometheus-operator-kubelet
+        - --logtostderr=true
+        - --localhost=127.0.0.1
+        - --prometheus-config-reloader=quay.io/coreos/prometheus-config-reloader:v0.38.1
+        - --config-reloader-image=docker.io/jimmidyson/configmap-reload:v0.3.0
+        - --config-reloader-cpu=100m
+        - --config-reloader-memory=25Mi
+        ports:
+        - containerPort: 8080
+          name: http
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+      - name: tls-proxy
+        image: squareup/ghostunnel:v1.5.2
+        imagePullPolicy: IfNotPresent
+        args:
+        - server
+        - --listen=:8443
+        - --target=127.0.0.1:8080
+        - --key=cert/key
+        - --cert=cert/cert
+        - --disable-authentication
+        resources: {}
+        volumeMounts:
+        - name: tls-proxy-secret
+          mountPath: /cert
+          readOnly: true
+        ports:
+        - containerPort: 8443
+          name: https
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+      volumes:
+      - name: tls-proxy-secret
+        secret:
+          defaultMode: 420
+          secretName: prometheus-operator-admission
+      securityContext:
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: prometheus-operator-operator

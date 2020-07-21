@@ -1,0 +1,23 @@
+# Source: prometheus-operator/templates/alertmanager/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: prometheus-operator-alertmanager
+  namespace: default # {"$kpt-set":"namespace"}
+  labels:
+    app: prometheus-operator-alertmanager
+    chart: prometheus-operator-9.1.0
+    release: "prometheus-operator"
+    heritage: "Helm"
+spec:
+  selector:
+    matchLabels:
+      app: prometheus-operator-alertmanager
+      release: "prometheus-operator"
+      self-monitor: "true"
+  namespaceSelector:
+    matchNames:
+    - "default" # {"$kpt-set":"namespace"}
+  endpoints:
+  - port: web
+    path: "/metrics"

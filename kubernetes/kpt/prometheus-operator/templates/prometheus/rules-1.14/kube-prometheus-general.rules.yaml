@@ -1,0 +1,19 @@
+# Source: prometheus-operator/templates/prometheus/rules-1.14/kube-prometheus-general.rules.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: prometheus-operator-kube-prometheus-general.rules
+  namespace: default # {"$kpt-set":"namespace"}
+  labels:
+    app: prometheus-operator
+    chart: prometheus-operator-9.1.0
+    release: "prometheus-operator"
+    heritage: "Helm"
+spec:
+  groups:
+  - name: kube-prometheus-general.rules
+    rules:
+    - expr: count without(instance, pod, node) (up == 1)
+      record: count:up1
+    - expr: count without(instance, pod, node) (up == 0)
+      record: count:up0
