@@ -1,0 +1,18 @@
+# Source: prometheus-operator/templates/prometheus-operator/psp-clusterrolebinding.yaml
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: prometheus-operator-operator-psp
+  labels:
+    app: prometheus-operator-operator
+    chart: prometheus-operator-9.1.0
+    release: "prometheus-operator"
+    heritage: "Helm"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus-operator-operator-psp
+subjects:
+- kind: ServiceAccount
+  name: prometheus-operator-operator
+  namespace: default # {"$kpt-set":"namespace"}

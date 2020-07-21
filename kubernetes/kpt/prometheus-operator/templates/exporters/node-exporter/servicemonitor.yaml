@@ -1,0 +1,19 @@
+# Source: prometheus-operator/templates/exporters/node-exporter/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: prometheus-operator-node-exporter
+  namespace: default # {"$kpt-set":"namespace"}
+  labels:
+    app: prometheus-operator-node-exporter
+    chart: prometheus-operator-9.1.0
+    release: "prometheus-operator"
+    heritage: "Helm"
+spec:
+  jobLabel: jobLabel
+  selector:
+    matchLabels:
+      app: prometheus-node-exporter
+      release: prometheus-operator
+  endpoints:
+  - port: metrics

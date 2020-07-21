@@ -1,0 +1,50 @@
+# Source: prometheus-operator/templates/prometheus/prometheus.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: prometheus-operator-prometheus
+  namespace: default # {"$kpt-set":"namespace"}
+  labels:
+    app: prometheus-operator-prometheus
+    chart: prometheus-operator-9.1.0
+    release: "prometheus-operator"
+    heritage: "Helm"
+spec:
+  alerting:
+    alertmanagers:
+    - namespace: default # {"$kpt-set":"namespace"}
+      name: prometheus-operator-alertmanager
+      port: web
+      pathPrefix: "/"
+      apiVersion: v2
+  baseImage: quay.io/prometheus/prometheus
+  version: v2.18.2
+  externalUrl: http://prometheus-operator-prometheus.default:9090
+  paused: false
+  replicas: 1
+  logLevel: info
+  logFormat: logfmt
+  listenLocal: false
+  enableAdminAPI: false
+  retention: "10d"
+  routePrefix: "/"
+  serviceAccountName: prometheus-operator-prometheus
+  serviceMonitorSelector:
+    matchLabels:
+      release: "prometheus-operator"
+  serviceMonitorNamespaceSelector: {}
+  podMonitorSelector:
+    matchLabels:
+      release: "prometheus-operator"
+  podMonitorNamespaceSelector: {}
+  securityContext:
+    fsGroup: 2000
+    runAsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+  ruleNamespaceSelector: {}
+  ruleSelector:
+    matchLabels:
+      app: prometheus-operator
+      release: "prometheus-operator"
+  portName: web
