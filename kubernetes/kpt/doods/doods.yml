@@ -11,7 +11,6 @@ metadata:
   namespace: doods
   annotations:
     metallb.universe.tf/allow-shared-ip: doods
-    external-dns.alpha.kubernetes.io/hostname: doods.home
 spec:
   type: LoadBalancer
   selector:
@@ -44,9 +43,9 @@ spec:
       - name: doods
         image: snowzach/doods:cuda
         imagePullPolicy: Always
-        # resources:
-        #   limits: 
-        #     nvidia.com/gpu: 1
+        resources:
+          limits: 
+            nvidia.com/gpu: 1
         env:
         - name: TZ
           value: "America/New_York"

@@ -38,9 +38,6 @@ spec:
             mountPath: /config
           - name: recordings
             mountPath: /recordings
-          securityContext:
-            # fsGroup: 1000
-            # runAsUser: 0
       volumes:
       - name: config
         nfs:
