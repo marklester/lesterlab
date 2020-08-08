@@ -12,7 +12,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-grafana
-  namespace: default # {"$kpt-set":"namespace"}
+  namespace: monitoring # {"$kpt-set":"namespace"}
 roleRef:
   kind: ClusterRole
   name: prometheus-operator-grafana-clusterrole

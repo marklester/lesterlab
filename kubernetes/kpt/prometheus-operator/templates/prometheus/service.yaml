@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: prometheus-operator-prometheus
-  namespace: default # {"$kpt-set":"namespace"}
+  namespace: monitoring # {"$kpt-set":"namespace"}
   labels:
     app: prometheus-operator-prometheus
     self-monitor: "true"
@@ -18,4 +18,4 @@ spec:
   selector:
     app: prometheus
     prometheus: prometheus-operator-prometheus
-  type: "ClusterIP"
+  type: "LoadBalancer"

@@ -3,14 +3,14 @@ apiVersion: monitoring.coreos.com/v1
 kind: Alertmanager
 metadata:
   name: prometheus-operator-alertmanager
-  namespace: default # {"$kpt-set":"namespace"}
+  namespace: monitoring # {"$kpt-set":"namespace"}
   labels:
     app: prometheus-operator-alertmanager
     chart: prometheus-operator-9.1.0
     release: "prometheus-operator"
     heritage: "Helm"
 spec:
-  baseImage: quay.io/prometheus/alertmanager
+  image: quay.io/prometheus/alertmanager
   version: v0.21.0
   replicas: 1
   listenLocal: false
@@ -22,8 +22,8 @@ spec:
   retention: "120h"
   routePrefix: "/"
   securityContext:
-    fsGroup: 2000
-    runAsGroup: 2000
+    fsGroup: 1000
+    runAsGroup: 1000
     runAsNonRoot: true
     runAsUser: 1000
   portName: web

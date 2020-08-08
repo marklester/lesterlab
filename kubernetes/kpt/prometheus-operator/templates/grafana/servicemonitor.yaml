@@ -3,7 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: prometheus-operator-grafana
-  namespace: default # {"$kpt-set":"namespace"}
+  namespace: monitoring # {"$kpt-set":"namespace"}
   labels:
     app: prometheus-operator-grafana
     chart: prometheus-operator-9.1.0
@@ -16,7 +16,7 @@ spec:
       app.kubernetes.io/instance: "prometheus-operator"
   namespaceSelector:
     matchNames:
-    - "default" # {"$kpt-set":"namespace"}
+    - "monitoring" # {"$kpt-set":"namespace"}
   endpoints:
   - port: service
     path: "/metrics"

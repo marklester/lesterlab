@@ -12,4 +12,16 @@ openAPI:
       x-k8s-cli:
         setter:
           name: namespace
-          value: default
+          value: monitoring
+          isSet: true
+    io.k8s.cli.setters.prom-image:
+      x-k8s-cli:
+        setter:
+          name: prom-image
+          value: quay.io/coreos/prometheus-operator:v0.41.0
+          isSet: true
+    io.k8s.cli.setters.grafana-image:
+      x-k8s-cli:
+        setter:
+          name: grafana-image
+          value: grafana/grafana:latest
