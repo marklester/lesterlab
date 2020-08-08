@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: prometheus-operator-prometheus-node-exporter
-  namespace: default # {"$kpt-set":"namespace"}
+  namespace: monitoring # {"$kpt-set":"namespace"}
   labels:
     app: prometheus-node-exporter
     heritage: Helm

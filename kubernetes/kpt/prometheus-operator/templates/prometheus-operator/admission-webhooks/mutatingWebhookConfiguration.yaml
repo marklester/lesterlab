@@ -23,6 +23,6 @@ webhooks:
     - UPDATE
   clientConfig:
     service:
-      namespace: default # {"$kpt-set":"namespace"}
+      namespace: monitoring # {"$kpt-set":"namespace"}
       name: prometheus-operator-operator
       path: /admission-prometheusrules/mutate

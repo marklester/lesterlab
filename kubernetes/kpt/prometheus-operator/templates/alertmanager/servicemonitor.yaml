@@ -3,7 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: prometheus-operator-alertmanager
-  namespace: default # {"$kpt-set":"namespace"}
+  namespace: monitoring # {"$kpt-set":"namespace"}
   labels:
     app: prometheus-operator-alertmanager
     chart: prometheus-operator-9.1.0
@@ -17,7 +17,7 @@ spec:
       self-monitor: "true"
   namespaceSelector:
     matchNames:
-    - "default" # {"$kpt-set":"namespace"}
+    - "monitoring" # {"$kpt-set":"namespace"}
   endpoints:
   - port: web
     path: "/metrics"

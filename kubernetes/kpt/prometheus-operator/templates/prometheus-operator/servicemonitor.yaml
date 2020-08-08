@@ -3,7 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: prometheus-operator-operator
-  namespace: default # {"$kpt-set":"namespace"}
+  namespace: monitoring # {"$kpt-set":"namespace"}
   labels:
     app: prometheus-operator-operator
     chart: prometheus-operator-9.1.0
@@ -19,4 +19,4 @@ spec:
       release: "prometheus-operator"
   namespaceSelector:
     matchNames:
-    - "default" # {"$kpt-set":"namespace"}
+    - "monitoring" # {"$kpt-set":"namespace"}

@@ -3,7 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: prometheus-operator-kubernetes-system-apiserver
-  namespace: default # {"$kpt-set":"namespace"}
+  namespace: monitoring # {"$kpt-set":"namespace"}
   labels:
     app: prometheus-operator
     chart: prometheus-operator-9.1.0
