@@ -30,5 +30,9 @@ spec:
   - name: mopidy-ui
     port: 80
     targetPort: 6680
+    protocol: TCP
+  - name: mopidy-mpd
+    port: 6600
+    targetPort: 6600
     protocol: TCP    
 ---
