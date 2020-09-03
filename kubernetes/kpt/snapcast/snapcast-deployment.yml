@@ -45,7 +45,7 @@ spec:
           - name: config
             mountPath: /etc/snapserver.conf
             subPath: snapserver.conf
-          - name: data
+          - name: snapserver-data
             mountPath: /var/lib/snapserver
           - name: tmp
             mountPath: /tmp
@@ -57,7 +57,7 @@ spec:
           containerPort: 5011
           protocol: TCP
       - name: mopidy
-        image: wernight/mopidy
+        image: starfusionmz/mopidy-pipfile:latest
         imagePullPolicy: Always
         ports:
         - name: http
@@ -72,13 +72,21 @@ spec:
              subPath: mopidy.conf
            - name: media
              mountPath: /var/lib/mopidy/media
+           - name: mopidy-data
+             mountPath: /var/lib/mopidy/local
+           - name: mopidy-data
+             mountPath: /var/lib/mopidy/playlists
            - name: tmp
              mountPath: /tmp
       volumes:
-      - name: data
+      - name: mopidy-data
         nfs:
           server: gimli.home
-          path: /appdata/snapcast/
+          path: /appdata/snapcast/mopidy
+      - name: snapserver-data
+        nfs:
+          server: gimli.home
+          path: /appdata/snapcast/snapserver
       - name: media
         nfs:
           server: gimli.home
