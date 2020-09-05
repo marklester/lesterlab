@@ -33,8 +33,6 @@ spec:
           value: "1000"
         - name: TZ
           value: "America/New_York"
-        - name: NVIDIA_VISIBLE_DEVICES
-          value: "all"
         - name: PLEX_CLAIM
           value: "claim-LjhnAAm1tB1x555wUxAG"
         ports:
