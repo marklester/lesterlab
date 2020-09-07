@@ -1,0 +1,84 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: logitech-media-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logitech-media-server
+  namespace: logitech-media-server
+spec:
+  type: LoadBalancer
+  selector:
+    app: logitech-media-server
+  ports:
+  - name: http
+    port: 9000
+    targetPort: 9000
+    protocol: TCP
+  - name: cli
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+  - name: squeezebox
+    port: 3483
+    targetPort: 3483
+    protocol: TCP
+  - name: chromecast
+    port: 49152
+    targetPort: 49152
+    protocol: TCP
+---
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logitech-media-server
+  namespace: logitech-media-server
+  labels:
+    app: logitech-media-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logitech-media-server
+  template:
+    metadata:
+      labels:
+        app: logitech-media-server
+    spec:
+      # hostNetwork: true
+      containers:
+      - name: logitech-media-server
+        image: apnar/logitech-media-server:latest
+        imagePullPolicy: Always
+        env:
+        ports:
+        - name: http
+          containerPort: 9000
+          protocol: TCP
+        - name: cli
+          containerPort: 9090
+          protocol: TCP
+        - name: squeezebox
+          containerPort: 3483
+          protocol: TCP
+        - name: chromecast
+          containerPort: 49152
+          protocol: TCP
+        volumeMounts:
+        - name: config
+          mountPath: /srv/squeezebox
+        - name: media
+          mountPath: /srv/music
+      volumes:
+      - name: config
+        nfs:
+          server: gimli.home
+          path: /appdata/logitech-media-server
+      - name: media
+        nfs:
+          server: gimli.home
+          path: /media/media/Music
