@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: transmission
+  namespace: transmission
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: transmission.home
+spec:
+  selector:
+    app: transmission
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9091
+  type: LoadBalancer
