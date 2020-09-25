@@ -1,0 +1,57 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sonarr
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarr
+  namespace: sonarr
+  labels:
+    app: sonarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarr
+  template:
+    metadata:
+      name: sonarr
+      labels:
+        app: sonarr
+    spec:
+      containers:
+      - name: sonarr
+        image: linuxserver/sonarr:latest
+        imagePullPolicy: Always
+        env:
+        - name: PUID
+          value: "65534"
+        - name: PGID
+          value: "65534"
+        volumeMounts:
+        - name: downloads
+          mountPath: /downloads
+        - name: config
+          mountPath: /config
+        - name: tv
+          mountPath: /tv
+        ports:
+        - name: web
+          containerPort: 8989
+          protocol: TCP
+      volumes: 
+      - name: downloads
+        nfs:
+          server: gimli.home
+          path: /media/media/downloads
+      - name: config
+        nfs:
+          server: gimli.home
+          path: /appdata/sonarr
+      - name: tv
+        nfs:
+          server: gimli.home
+          path: /media/media/TV

@@ -41,8 +41,11 @@ spec:
     spec:
       containers:
         - name: shinobi # {"$ref":"#/definitions/io.k8s.cli.setters.app"}
-          image: registry.gitlab.com/migoller/shinobidocker:nvidia # {"$ref":"#/definitions/io.k8s.cli.setters.image"}
+          image: starfusionmz/shinobi-gpu # {"$ref":"#/definitions/io.k8s.cli.setters.image"}
           imagePullPolicy: Always
+          resources:
+          limits: 
+            nvidia.com/gpu: 1
           env:
             - name: APP_BRANCH
               value: "dev"

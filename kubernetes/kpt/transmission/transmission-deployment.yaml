@@ -29,6 +29,7 @@ spec:
       containers:
       - name: transmission
         image: haugene/transmission-openvpn:latest-alpine
+        imagePullPolicy: Always
         securityContext:
           capabilities:
             add:
@@ -70,10 +71,19 @@ spec:
           value: "192.168.0.0/24"
         - name: "TRANSMISSION_RPC_HOST_WHITELIST_ENABLED"
           value: "true"
+        - name: "TRANSMISSION_DOWNLOAD_DIR"
+          value: "/downloads/completed"
+        - name: "TRANSMISSION_INCOMPLETE_DIR"
+          value: "/downloads/incomplete"
+        - name: "TRANSMISSION_WATCH_DIR"
+          value: "/downloads/watch"   
         - name: "TRANSMISSION_RPC_HOST_WHITELIST"
           value: "127.0.0.1,192.168.0.*,10.42.0.*"
         volumeMounts:
         - name: downloads
+          mountPath: /downloads
+        volumeMounts:
+        - name: config
           mountPath: /data
         ports:
         - name: web
@@ -84,3 +94,7 @@ spec:
         nfs:
           server: gimli.home
           path: /media/media/downloads
+      - name: config
+        nfs:
+          server: gimli.home
+          path: /appdata/transmission

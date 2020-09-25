@@ -13,6 +13,7 @@ metadata:
     metallb.universe.tf/allow-shared-ip: doods
 spec:
   type: LoadBalancer
+  loadBalancerIP: 192.168.0.210
   selector:
     app: doods
   ports:
@@ -53,6 +54,8 @@ spec:
           value: all
         - name: "NVIDIA_DRIVER_CAPABILITIES"
           value: "compute,video,utility"
+        - name: "LOGGER_LEVEL"
+          value: "debug"
         ports:
         - name: rest
           containerPort: 8080
