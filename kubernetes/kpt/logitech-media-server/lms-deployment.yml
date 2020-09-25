@@ -11,6 +11,7 @@ metadata:
   namespace: logitech-media-server
 spec:
   type: LoadBalancer
+  loadBalancerIP: 192.168.0.207
   selector:
     app: logitech-media-server
   ports:
@@ -64,7 +65,6 @@ spec:
           protocol: TCP
         - name: squeezebox
           containerPort: 3483
-          protocol: TCP
         - name: chromecast
           containerPort: 49152
           protocol: TCP

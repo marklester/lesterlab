@@ -11,6 +11,7 @@ metadata:
     app: home-assistant
 spec:
   type: LoadBalancer
+  loadBalancerIP: 192.168.0.203
   ports:
     - name: api
       port: 80

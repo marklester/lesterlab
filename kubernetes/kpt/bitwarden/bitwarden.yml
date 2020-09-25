@@ -11,6 +11,7 @@ metadata:
   namespace: bitwarden
 spec:
   type: LoadBalancer
+  loadBalancerIP: 192.168.0.208
   selector:
     app: bitwarden
   ports:

@@ -19,3 +19,5 @@ spec:
     app: prometheus
     prometheus: prometheus-operator-prometheus
   type: "LoadBalancer"
+  loadBalancerIP: 192.168.0.202
+  
