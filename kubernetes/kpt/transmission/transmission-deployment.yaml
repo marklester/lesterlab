@@ -78,11 +78,10 @@ spec:
         - name: "TRANSMISSION_WATCH_DIR"
           value: "/downloads/watch"   
         - name: "TRANSMISSION_RPC_HOST_WHITELIST"
-          value: "127.0.0.1,192.168.0.*,10.42.0.*"
+          value: "127.0.0.1,192.168.0.*,10.42.0.*,transmission.home"
         volumeMounts:
         - name: downloads
           mountPath: /downloads
-        volumeMounts:
         - name: config
           mountPath: /data
         ports:
