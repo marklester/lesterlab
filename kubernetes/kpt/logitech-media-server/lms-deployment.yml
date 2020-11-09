@@ -15,7 +15,11 @@ spec:
   selector:
     app: logitech-media-server
   ports:
-  - name: http
+  - name: ui
+    port: 80
+    targetPort: 9000
+    protocol: TCP
+  - name: lms
     port: 9000
     targetPort: 9000
     protocol: TCP
