@@ -55,7 +55,7 @@ spec:
         - name: "NVIDIA_DRIVER_CAPABILITIES"
           value: "compute,video,utility"
         - name: "LOGGER_LEVEL"
-          value: "debug"
+          value: "info"
         ports:
         - name: rest
           containerPort: 8080
