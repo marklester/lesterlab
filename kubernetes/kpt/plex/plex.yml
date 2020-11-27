@@ -70,6 +70,12 @@ spec:
           mountPath: /config
         - name: recordings
           mountPath: /recordings
+        livenessProbe:
+          httpGet:
+            path: /identity
+            port: 32400
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
       volumes:
         - name: media
           nfs:
@@ -83,4 +89,5 @@ spec:
           nfs:
             server: gimli.home
             path: /appdata/plex         
+
 ---
