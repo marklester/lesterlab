@@ -28,7 +28,7 @@ spec:
           - "8.8.8.8"
       containers:
       - name: transmission
-        image: haugene/transmission-openvpn:latest-alpine
+        image: haugene/transmission-openvpn:latest
         imagePullPolicy: Always
         securityContext:
           capabilities:
@@ -37,10 +37,8 @@ spec:
         env:
         - name: OPENVPN_PROVIDER
           value: "NORDVPN"
-        - name: OPENVPN_CONFIG
-          value: US
         - name: NORDVPN_COUNTRY
-          value: US
+          value: us
         - name: NORDVPN_CATEGORY
           value: legacy_p2p
         - name: NORDVPN_PROTOCOL
