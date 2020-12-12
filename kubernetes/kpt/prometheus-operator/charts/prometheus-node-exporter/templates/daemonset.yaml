@@ -36,7 +36,7 @@ spec:
         runAsUser: 65534
       containers:
       - name: node-exporter
-        image: "quay.io/prometheus/node-exporter:v1.0.0"
+        image: "quay.io/prometheus/node-exporter:v1.0.1"
         imagePullPolicy: IfNotPresent
         args:
         - --path.procfs=/host/proc
@@ -44,6 +44,7 @@ spec:
         - --web.listen-address=$(HOST_IP):9100
         - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+)($|/)
         - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|cgroup|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|mqueue|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|sysfs|tracefs)$
+        - "--collector.textfile.directory=/run/prometheus"
         env:
         - name: HOST_IP
           value: 0.0.0.0
@@ -67,6 +68,17 @@ spec:
         - name: sys
           mountPath: /host/sys
           readOnly: true
+        - name: collector-textfiles
+          mountPath: /run/prometheus
+          readOnly: true
+      - image: nvidia/dcgm-exporter:1.4.3
+        name: nvidia-dcgm-exporter
+        securityContext:
+          runAsNonRoot: false
+          runAsUser: 0
+        volumeMounts:
+        - name: collector-textfiles
+          mountPath: /run/prometheus      
       hostNetwork: true
       hostPID: true
       tolerations:
@@ -79,3 +91,6 @@ spec:
       - name: sys
         hostPath:
           path: /sys
+      - name: collector-textfiles
+        emptyDir:
+          medium: Memory        
