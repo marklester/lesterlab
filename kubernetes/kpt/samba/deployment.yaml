@@ -33,6 +33,8 @@ spec:
           value: "backups;/backups/;yes;no;yes;"
         - name: SHARE2
           value: "home-share;/home-share/;yes;no;yes;"
+        - name: SHARE3
+          value: "media;/media-share/;yes;no;yes;"
         - name: NMBD
           value: "true"
         - name: USERID
@@ -48,6 +50,8 @@ spec:
           mountPath: /backups
         - name: home-share
           mountPath: /home-share
+        - name: media-share
+          mountPath: /media-share
         ports:
         - name: netbios-session
           containerPort: 139          
@@ -74,6 +78,10 @@ spec:
         nfs:
           server: gimli.home
           path: /tank/home
+      - name: media-share
+        nfs:
+          server: gimli.home
+          path: /media/media
 ---
 # apiVersion: v1
 # kind: Service
