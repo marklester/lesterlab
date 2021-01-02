@@ -1,0 +1,75 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: filerun
+  namespace: filerun
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.0.214
+  selector:
+    app: filerun
+  ports:
+  - name: filerun
+    port: 80
+    targetPort: 80
+    protocol: TCP
+---
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: filerun
+  namespace: filerun
+  labels:
+    app: filerun
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: filerun
+  template:
+    metadata:
+      labels:
+        app: filerun
+    spec:
+      containers:
+      - name: filerun
+        image: afian/filerun:latest
+        imagePullPolicy: Always
+        env:
+        - name: FR_DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: app_pass
+        - name: APACHE_RUN_USER
+          value: nobody
+        - name: APACHE_RUN_GROUP
+          value: nogroup
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        volumeMounts:
+        - name: media
+          mountPath: /user-files/media
+        - name: recordings
+          mountPath: /user-files/recordings
+          readOnly: true
+        - name: backups
+          mountPath: /user-files/backups
+          readOnly: true
+      volumes:
+      - name: media
+        nfs:
+          server: gimli.home
+          path: /media/media/
+      - name: recordings
+        nfs:
+          server: gimli.home
+          path: /recordings/
+      - name: backups
+        nfs:
+          server: gimli.home
+          path: /tank/backup    
