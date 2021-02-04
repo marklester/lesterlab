@@ -10,4 +10,4 @@ ingress:
   extra_args:
       enable-ssl-passthrough: "true"
 
-kubernetes_version: "v1.19.4-rancher1-1"
+kubernetes_version: "v1.19.7-rancher1-1"
