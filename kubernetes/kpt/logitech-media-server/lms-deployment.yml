@@ -57,7 +57,7 @@ spec:
       # hostNetwork: true
       containers:
       - name: logitech-media-server
-        image: apnar/logitech-media-server:latest
+        image: lmscommunity/logitechmediaserver:latest
         imagePullPolicy: Always
         env:
         ports:
@@ -74,9 +74,9 @@ spec:
           protocol: TCP
         volumeMounts:
         - name: config
-          mountPath: /srv/squeezebox
+          mountPath: /config
         - name: media
-          mountPath: /srv/music
+          mountPath: /music
       volumes:
       - name: config
         nfs:
