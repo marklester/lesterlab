@@ -1,4 +1,6 @@
-# Router Specs
+# Node Specs
+
+## Gimli
 * 128GB DDR 4 ECC Ram
 * ipmi
 * dual 10Gbe nic
@@ -6,3 +8,6 @@
 * 4 8TB HDD
 * 2 256GB SSD
 * 1 512GB NVME
+
+## Littlefoot
+## node-3
