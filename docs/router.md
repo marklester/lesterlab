@@ -1,3 +1,12 @@
+# Install Suricata
+
+Follow:
+https://www.youtube.com/watch?v=S0-vsjhPDN0&feature=emb_logo
+
+If Pfsense box is >4GB.
+
+go to Services > Suricata > edit your interface. Click the Flow/Stream tab. Under Stream Engine Settings, you see Stream Memory Cap. This defaults to 67108864. Double it to 134217728, save, and attempt to restart interface.
+
 # How to Export syslog to Influxdb on PFSense
 
 With PFSense 2.4.5-RELEASE-p1 telegraf can't understand the output of the data sent via the built in syslog. To get around this I install syslog-ng and pull from the builtin and send it to telegraf in tcp mode.
@@ -46,7 +55,7 @@ Go to Services->Syslog-ng
     Description: log to telegraf
     ```
 
-## configure syslog
+## Configure syslog
 1. go to Status->System Logs->Settings
     ```
     Enable Remote Logging: Yes
