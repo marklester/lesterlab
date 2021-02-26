@@ -11,9 +11,15 @@ metadata:
   namespace: mqtt
 data:
   mosquitto.conf: |-
+    socket_domain ipv4
+    # listener 1883
+    # listener 9001
     persistence true
     persistence_location /mosquitto/data/
-    log_dest file /mosquitto/log/mosquitto.log
+    allow_anonymous true
+    log_timestamp true
+    log_timestamp_format %Y-%m-%dT%H:%M:%S
+    # log_dest file /mosquitto/log/mosquitto.log
 ---
 apiVersion: v1
 kind: Service
@@ -57,6 +63,9 @@ spec:
       - name: mqtt
         image: eclipse-mosquitto:latest
         imagePullPolicy: Always
+        securityContext:
+          runAsUser: 65534
+          runAsGroup: 65534
         ports:
         - name: mqtt
           containerPort: 1883
@@ -67,6 +76,8 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /mosquitto/data
+        - name: mqtt-conf
+          mountPath: /mosquitto/config
       volumes:
       - name: data
         nfs:
