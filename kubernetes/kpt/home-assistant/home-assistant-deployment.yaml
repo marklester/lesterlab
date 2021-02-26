@@ -38,6 +38,8 @@ spec:
             mountPath: /config
           - name: recordings
             mountPath: /recordings
+          - name: media
+            mountPath: /media
       volumes:
       - name: config
         nfs:
@@ -47,4 +49,8 @@ spec:
         nfs:
           server: gimli.home
           path: /recordings
+      - name: media
+        nfs:
+          server: gimli.home
+          path: /media/media
 
