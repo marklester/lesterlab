@@ -19,7 +19,7 @@ graph TD
         GW-->M2[Muse-2]
         AZ-->G3[G0-3]
         AZ-->G4[GA-1]
-        M--> NF[NightFox]        
+        M--> NF[Phantom]        
         U8-->B[Printer]
         AZ-->PI1[PI-1]
         AZ-->VZ[Vizio]
