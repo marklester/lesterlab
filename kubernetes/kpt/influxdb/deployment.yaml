@@ -22,7 +22,6 @@ spec:
       labels:
         app: influxdb
     spec:
-      hostNetwork: true
       containers:
       - name: influxdb
         image: influxdb:1.8.4-alpine
