@@ -20,7 +20,6 @@ spec:
                 mountPath: /recordings
           volumes:
           - name: recordings
-            nfs:
-              server: gimli.home
-              path: /recordings
+            hostPath: 
+              path: /mnt/gv0/recordings
           restartPolicy: OnFailure

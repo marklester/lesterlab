@@ -38,8 +38,7 @@ spec:
           mountPath: /config
       volumes:
       - name: unms-data
-        nfs:
-          server: gimli.home
-          path: /appdata/unms
+        hostPath:
+          path: /mnt/gv0/appdata/unms
 ---
 

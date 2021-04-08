@@ -9,15 +9,16 @@
 * 2 256GB SSD
 * 1 512GB NVME
 
-## Littlefoot
+## Helium
 * Athlon 200
-* 16GB
+* 32GB
 * 3x8 hdds
-* 1x10 hdd
-* 2xssd
+* 1xssd
+* 1x 128GB NVME
 
-## node-3
-* 64GB
+## Lithium
+* 32GB
+* ipmit
 * ryzen 3600
 * intel x540 10Gb nic
 * 2x 512 nvme

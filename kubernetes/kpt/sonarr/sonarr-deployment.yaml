@@ -44,14 +44,11 @@ spec:
           protocol: TCP
       volumes: 
       - name: downloads
-        nfs:
-          server: gimli.home
-          path: /media/media/downloads
+        hostPath:
+          path: /mnt/gv0/media/downloads
       - name: config
-        nfs:
-          server: gimli.home
-          path: /appdata/sonarr
+        hostPath:
+            path: /mnt/gv0/appdata/sonarr
       - name: tv
-        nfs:
-          server: gimli.home
-          path: /media/media/TV
+        hostPath:
+          path: /mnt/gv0/media/TV

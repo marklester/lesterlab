@@ -77,12 +77,11 @@ spec:
           mountPath: /config
         - name: media
           mountPath: /music
+          readOnly: true
       volumes:
       - name: config
-        nfs:
-          server: gimli.home
-          path: /appdata/logitech-media-server
+        hostPath:
+            path: /mnt/gv0/appdata/logitech-media-server
       - name: media
-        nfs:
-          server: gimli.home
-          path: /media/media/Music
+        hostPath:
+          path: /mnt/gv0/media/Music

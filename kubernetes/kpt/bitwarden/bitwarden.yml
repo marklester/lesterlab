@@ -52,7 +52,6 @@ spec:
           mountPath: /data
       volumes:
       - name: bitwarden-config
-        nfs:
-          server: gimli.home
-          path: /appdata/bitwarden
+        hostPath:
+            path: /mnt/gv0/appdata/bitwarden
 ---

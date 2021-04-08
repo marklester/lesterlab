@@ -80,9 +80,8 @@ spec:
           mountPath: /mosquitto/config
       volumes:
       - name: data
-        nfs:
-          server: gimli.home
-          path: /appdata/mqtt/data
+        hostPath:
+          path: /mnt/gv0/appdata/mqtt/data
       - name: mqtt-conf
         configMap:
           name: mosquitto-config
