@@ -56,6 +56,5 @@ spec:
           mountPath: /config
       volumes:
       - name: config
-        nfs:
-          server: gimli.home
-          path: /appdata/jackett
+        hostPath:
+          path: /mnt/gv0/appdata/jackett

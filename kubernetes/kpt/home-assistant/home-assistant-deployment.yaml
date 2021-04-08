@@ -42,15 +42,12 @@ spec:
             mountPath: /media
       volumes:
       - name: config
-        nfs:
-          server: gimli.home
-          path: /appdata/home-assistant
+        hostPath:
+          path: /mnt/gv0/appdata/home-assistant
       - name: recordings
-        nfs:
-          server: gimli.home
-          path: /recordings
+        hostPath:
+          path: /mnt/gv0/recordings
       - name: media
-        nfs:
-          server: gimli.home
-          path: /media/media
+        hostPath:
+            path: /mnt/gv0/media/
 
