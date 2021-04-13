@@ -65,7 +65,7 @@ spec:
           protocol: UDP
         volumeMounts:
         - name: media
-          mountPath: /media/media
+          mountPath: /media
         - name: plex-config
           mountPath: /config
         - name: recordings
@@ -78,25 +78,16 @@ spec:
           timeoutSeconds: 10
       volumes:
         - name: media
-          hostPath:
-            path: /mnt/gv0/media/
-        - name: plex-config
-          hostPath:
-            path: /mnt/gv0/appdata/plex
+          nfs:
+            server: gimli.home
+            path: /media
         - name: recordings
-          hostPath: 
-            path: /mnt/gv0/recordings    
-        # - name: media
-        #   nfs:
-        #     server: gimli.home
-        #     path: /media
-        # - name: recordings
-        #   nfs:
-        #     server: gimli.home
-        #     path: /recordings    
-        # - name: plex-config
-        #   nfs:
-        #     server: gimli.home
-        #     path: /appdata/plex         
+          nfs:
+            server: gimli.home
+            path: /recordings    
+        - name: plex-config
+          nfs:
+            server: gimli.home
+            path: /appdata/plex         
 
 ---

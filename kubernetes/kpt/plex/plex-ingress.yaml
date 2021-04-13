@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: plex-ingress
@@ -17,9 +17,6 @@ spec:
     http:
       paths:
       - path: /
-        pathType: Prefix
         backend:
-          service:
-            name: plex
-            port: 
-              number: 32400
+          serviceName: plex
+          servicePort: 32400

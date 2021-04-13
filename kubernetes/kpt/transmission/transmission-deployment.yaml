@@ -88,8 +88,10 @@ spec:
           protocol: TCP
       volumes: 
       - name: downloads
-        hostPath:
-          path: /mnt/gv0/media/downloads
+        nfs:
+          server: gimli.home
+          path: /media/media/downloads
       - name: config
-        hostPath:
-          path: /mnt/gv0/appdata/transmission
+        nfs:
+          server: gimli.home
+          path: /appdata/transmission

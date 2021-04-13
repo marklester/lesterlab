@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: home-assistant-ingress
@@ -18,9 +18,6 @@ spec:
     http:
       paths:
       - path: /
-        pathType: Prefix
         backend:
-          service:
-            name: home-assistant
-            port: 
-              number: 80
+          serviceName: home-assistant
+          servicePort: 80

@@ -12,7 +12,6 @@ metadata:
   namespace: jellyfin
 spec:
   type: LoadBalancer
-  loadBalancerIP: 192.168.0.215
   selector:
     app: jellyfin
   ports:
@@ -45,7 +44,7 @@ spec:
     spec:
       containers:
       - name: jellyfin
-        image: jellyfin/jellyfin:latest
+        image: linuxserver/jellyfin:latest 
         imagePullPolicy: Always
         env:
         - name: PUID
@@ -54,6 +53,8 @@ spec:
           value: "1000"
         - name: TZ
           value: "America/New_York"
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: "all"
         ports:
         - name: http
           containerPort: 8096
@@ -62,29 +63,24 @@ spec:
           containerPort: 8920
           protocol: TCP
         volumeMounts:
-        - name: music
-          mountPath: /music
-          readOnly: true
-        - name: movies
-          mountPath: /movies
-          readOnly: true
-        - name: tv
-          mountPath: /tv
-          readOnly: true
+        - name: media
+          mountPath: /data
         - name: jellyfin-config
           mountPath: /config
+        - name: recordings
+          mountPath: /recordings
       volumes:
-        - name: music
-          hostPath:
-            path: /mnt/gv0/media/Music
-        - name: movies
-          hostPath:
-            path: /mnt/gv0/media/Movies
-        - name: tv
-          hostPath:
-            path: /mnt/gv0/media/TV
+        - name: media
+          nfs:
+            server: gimli.home
+            path: /media
         - name: jellyfin-config
-          hostPath:
-            path: /mnt/gv0/appdata/jellyfin
-            type: DirectoryOrCreate
+          nfs: 
+            server: gimli.home
+            path: /appdata/jellyfin
+        - name: recordings
+          nfs:
+            server: gimli.home
+            path: /recordings
 ---
+
