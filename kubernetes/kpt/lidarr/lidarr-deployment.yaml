@@ -44,14 +44,17 @@ spec:
           protocol: TCP
       volumes: 
       - name: downloads
-        hostPath:
-          path: /mnt/gv0/media/downloads
+        nfs:
+          server: gimli.home
+          path: /media/media/downloads
       - name: config
-        hostPath:
-            path: /mnt/gv0/appdata/lidarr
+        nfs:
+          server: gimli.home
+          path: /appdata/lidarr
       - name: music
-        hostPath:
-          path: /mnt/gv0/media/Music
+        nfs:
+          server: gimli.home
+          path: /media/media/Music
 ---
 kind: Service
 apiVersion: v1

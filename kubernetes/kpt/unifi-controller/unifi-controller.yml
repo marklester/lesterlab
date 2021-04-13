@@ -59,5 +59,6 @@ spec:
           mountPath: /config
       volumes:
       - name: unifi-controller-data
-        hostPath:
-          path: /mnt/gv0/appdata/unifi-controller
+        nfs:
+          server: gimli.home
+          path: /appdata/unifi-controller
