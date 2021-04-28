@@ -45,13 +45,12 @@ spec:
       volumes: 
       - name: downloads
         nfs:
-          server: gimli.home
-          path: /media/media/downloads
+          server: ceph-nfs.home
+          path: /media/downloads
       - name: config
-        nfs:
-          server: gimli.home
-          path: /appdata/sonarr
+        persistentVolumeClaim:
+          claimName: sonarr-config
       - name: tv
         nfs:
-          server: gimli.home
-          path: /media/media/TV
+          server: ceph-nfs.home
+          path: /media/TV
