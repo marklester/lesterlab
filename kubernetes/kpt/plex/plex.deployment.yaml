@@ -65,7 +65,7 @@ spec:
           protocol: UDP
         volumeMounts:
         - name: media
-          mountPath: /media
+          mountPath: /media/media
         - name: plex-config
           mountPath: /config
         - name: recordings
@@ -79,15 +79,14 @@ spec:
       volumes:
         - name: media
           nfs:
-            server: gimli.home
+            server: ceph-nfs.home
             path: /media
         - name: recordings
           nfs:
-            server: gimli.home
+            server: ceph-nfs.home
             path: /recordings    
         - name: plex-config
-          nfs:
-            server: gimli.home
-            path: /appdata/plex         
+          persistentVolumeClaim:
+            claimName: plex-config 
 
 ---
