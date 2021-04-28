@@ -12,6 +12,7 @@ metadata:
   namespace: jellyfin
 spec:
   type: LoadBalancer
+  loadBalancerIP: 192.168.0.215
   selector:
     app: jellyfin
   ports:
@@ -65,22 +66,22 @@ spec:
         volumeMounts:
         - name: media
           mountPath: /data
+        # - name: recordings
+        #   mountPath: /recordings
         - name: jellyfin-config
           mountPath: /config
-        - name: recordings
-          mountPath: /recordings
+
       volumes:
         - name: media
           nfs:
-            server: gimli.home
+            server: ceph-nfs.home
             path: /media
         - name: jellyfin-config
-          nfs: 
-            server: gimli.home
-            path: /appdata/jellyfin
-        - name: recordings
-          nfs:
-            server: gimli.home
-            path: /recordings
+          persistentVolumeClaim:
+            claimName: cephfs-jellyfin
+        # - name: recordings
+        #   nfs:
+        #     server: gimli.home
+        #     path: /recordings
 ---
 
