@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
       - name: bitwarden
-        image: bitwardenrs/server:latest
+        image: vaultwarden/server:latest
         imagePullPolicy: Always
         env:
         ports:
