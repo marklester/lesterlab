@@ -1,9 +1,4 @@
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: lidarr
----
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -45,16 +40,15 @@ spec:
       volumes: 
       - name: downloads
         nfs:
-          server: gimli.home
-          path: /media/media/downloads
+          server: ceph-nfs.home
+          path: /cephfs/media/downloads
       - name: config
-        nfs:
-          server: gimli.home
-          path: /appdata/lidarr
+        persistentVolumeClaim:
+          claimName: lidarr-config
       - name: music
         nfs:
-          server: gimli.home
-          path: /media/media/Music
+          server: ceph-nfs.home
+          path: /cephfs/media/Music
 ---
 kind: Service
 apiVersion: v1
