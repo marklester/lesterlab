@@ -46,11 +46,11 @@ spec:
       - name: downloads
         nfs:
           server: ceph-nfs.home
-          path: /media/downloads
+          path: /cephfs/media/downloads
       - name: config
         persistentVolumeClaim:
           claimName: sonarr-config
       - name: tv
         nfs:
           server: ceph-nfs.home
-          path: /media/TV
+          path: /cephfs/media/TV
