@@ -1,10 +1,4 @@
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: plex
----
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,10 +21,10 @@ spec:
         image: linuxserver/plex:latest 
         imagePullPolicy: Always
         env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
+        # - name: PUID
+        #   value: "1000"
+        # - name: PGID
+        #   value: "1000"
         - name: TZ
           value: "America/New_York"
         - name: PLEX_CLAIM
@@ -65,7 +59,7 @@ spec:
           protocol: UDP
         volumeMounts:
         - name: media
-          mountPath: /media/media
+          mountPath: /media/
         - name: plex-config
           mountPath: /config
         - name: recordings
@@ -80,13 +74,12 @@ spec:
         - name: media
           nfs:
             server: ceph-nfs.home
-            path: /media
+            path: /cephfs/media
         - name: recordings
           nfs:
             server: ceph-nfs.home
-            path: /recordings    
+            path: /cephfs/recordings    
         - name: plex-config
           persistentVolumeClaim:
             claimName: plex-config 
-
 ---
