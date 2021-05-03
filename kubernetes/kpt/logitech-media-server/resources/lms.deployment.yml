@@ -1,9 +1,4 @@
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: logitech-media-server
----
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -79,10 +74,9 @@ spec:
           mountPath: /music
       volumes:
       - name: config
-        nfs:
-          server: gimli.home
-          path: /appdata/logitech-media-server
+        persistentVolumeClaim:
+          claimName: lms-config
       - name: media
         nfs:
-          server: gimli.home
-          path: /media/media/Music
+          server: ceph-nfs.home
+          path: /cephfs/media/Music
