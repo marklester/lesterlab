@@ -15,8 +15,7 @@ spec:
     app: rook-ceph-nfs
     ceph_daemon_id: a
     ceph_daemon_type: nfs
-    ceph_nfs: ceph-nfs
+    ceph_nfs: nfs-cluster
     instance: a
     nfs: a
     rook_cluster: rook-ceph
-
