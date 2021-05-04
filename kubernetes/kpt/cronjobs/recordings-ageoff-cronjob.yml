@@ -21,6 +21,6 @@ spec:
           volumes:
           - name: recordings
             nfs:
-              server: gimli.home
-              path: /recordings
+              server: ceph-nfs.home
+              path: /cephfs/recordings
           restartPolicy: OnFailure
