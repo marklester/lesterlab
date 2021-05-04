@@ -35,9 +35,13 @@ spec:
         volumeMounts:
         - name: unms-data
           mountPath: /config
+        - name: logs
+          mountPath: /config/logs
       volumes:
       - name: unms-data
         persistentVolumeClaim:
           claimName: unms-config
+      - name: logs
+        emptyDir: {}
 ---
 
