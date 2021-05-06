@@ -5,6 +5,8 @@ nodes:
       - controlplane
       - etcd
       - worker
+    labels:
+      accelerator: nvidia
   - address: helium.home
     user: atom
     role:
