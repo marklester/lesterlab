@@ -1,6 +1,5 @@
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 # helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -f values.yaml
-# helm install dcgm-exporter gpu-helm-charts/dcgm-exporter
 namespaceOverride: monitoring
 
 alertmanager:
@@ -16,6 +15,9 @@ grafana:
     accessModes:
     - ReadWriteMany
     size: 4Gi
+  service: 
+    type: LoadBalancer
+    loadBalancerIP: "192.168.0.209"
 
 prometheus:
   service: 
