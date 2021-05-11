@@ -1,9 +1,3 @@
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: radarr
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -44,14 +38,16 @@ spec:
           protocol: TCP
       volumes: 
       - name: downloads
-        hostPath:
-          path: /mnt/gv0/media/downloads
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/media/downloads
       - name: config
-        hostPath:
-          path: /mnt/gv0/appdata/radarr
+        persistentVolumeClaim:
+          claimName: radarr-config
       - name: movies
-        hostPath:
-          path: /mnt/gv0/media/Movies
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/media/Movies
 ---
 kind: Service
 apiVersion: v1
