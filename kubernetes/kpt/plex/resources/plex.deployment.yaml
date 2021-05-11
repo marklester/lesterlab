@@ -21,10 +21,10 @@ spec:
         image: linuxserver/plex:latest 
         imagePullPolicy: Always
         env:
-        # - name: PUID
-        #   value: "1000"
-        # - name: PGID
-        #   value: "1000"
+        - name: PUID
+          value: "65534"
+        - name: PGID
+          value: "65534"
         - name: TZ
           value: "America/New_York"
         - name: PLEX_CLAIM
