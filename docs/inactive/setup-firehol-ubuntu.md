@@ -1,4 +1,25 @@
-# install firewall
+## 5. setup DNS and DHCP
+Dnsmasq can function both as dns and dhcp. It also works well for local dns. Configuration is also pretty straight forward
+* install dnsmasq
+  * configure dhcp and dns
+`apt install dnsmasq`
+  * configure dnsmasq: see [/etc/dnsmasq.d/dnsmasq.conf](network/dnsmasq.conf)
+
+* turnoff systemd-resolved: `systemctl disable systemd-resolved`
+* make sure it starts after network is on
+
+    `systemctl edit dnsmasq`
+
+    add:
+
+    ```
+    After=network-online.target
+    Wants=network-online.target
+    ```
+
+* `systemctl enable dnsmasq`
+
+## install firewall
 * enable ip forward
 in /etc/sysctl.conf uncomment
 
