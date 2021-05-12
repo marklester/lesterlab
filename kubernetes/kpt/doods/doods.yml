@@ -60,13 +60,5 @@ spec:
         - name: rest
           containerPort: 8080
           protocol: TCP
-        # volumeMounts:
-        # - name: doods-config
-        #   mountPath: /opt/
-      # volumes:
-      # - name: doods-config
-      #   nfs:
-      #     server: gimli.home
-      #     path: /appdata/doods
 ---
 

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarr
+  namespace: sonarr
+  labels:
+    app: sonarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarr
+  template:
+    metadata:
+      name: sonarr
+      labels:
+        app: sonarr
+    spec:
+      containers:
+      - name: sonarr
+        image: linuxserver/sonarr:latest
+        imagePullPolicy: Always
+        env:
+        - name: PUID
+          value: "65534"
+        - name: PGID
+          value: "65534"
+        volumeMounts:
+        - name: downloads
+          mountPath: /downloads
+        - name: config
+          mountPath: /config
+        - name: tv
+          mountPath: /tv
+        ports:
+        - name: web
+          containerPort: 8989
+          protocol: TCP
+      volumes: 
+      - name: downloads
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/media/downloads
+      - name: config
+        persistentVolumeClaim:
+          claimName: sonarr-config
+      - name: tv
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/media/TV

@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radarr
+  namespace: radarr
+  labels:
+    app: radarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: radarr
+  template:
+    metadata:
+      name: radarr
+      labels:
+        app: radarr
+    spec:
+      containers:
+      - name: radarr
+        image: linuxserver/radarr:latest
+        imagePullPolicy: Always
+        env:
+        - name: PUID
+          value: "65534"
+        - name: PGID
+          value: "65534"
+        volumeMounts:
+        - name: downloads
+          mountPath: /downloads
+        - name: config
+          mountPath: /config
+        - name: movies
+          mountPath: /movies
+        ports:
+        - name: web
+          containerPort: 7878
+          protocol: TCP
+      volumes: 
+      - name: downloads
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/media/downloads
+      - name: config
+        persistentVolumeClaim:
+          claimName: radarr-config
+      - name: movies
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/media/Movies
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: radarr
+  namespace: radarr
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: radarr.home
+spec:
+  selector:
+    app: radarr
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 7878
+  type: LoadBalancer
+  loadBalancerIP: 192.168.0.213

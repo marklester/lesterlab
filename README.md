@@ -1,5 +1,4 @@
-# Gimli
-# How to setup a router/nas appliance in ubuntu 18.04
+# HomeLab Cluster
 
 ## [Specs](docs/router-specs.md)
 
@@ -22,7 +21,6 @@ sudo apt update
 sudo apt-get install ubuntu-drivers-common
 sudo ubuntu-drivers autoinstall
 ```
-### [Install Jupiter Hub](docs/notebooks.md)
 
 ## 4. Setup Interfaces
 * ubuntu 18+ uses netplan to configure network interface. Using netplan is straight forward. create a yaml describing your network interfaces and then run netplan apply
@@ -30,49 +28,6 @@ sudo ubuntu-drivers autoinstall
 
 `netplan apply`
 
-## 5. setup DNS and DHCP
-Dnsmasq can function both as dns and dhcp. It also works well for local dns. Configuration is also pretty straight forward
-* install dnsmasq
-  * configure dhcp and dns
-`apt install dnsmasq`
-  * configure dnsmasq: see [/etc/dnsmasq.d/dnsmasq.conf](network/dnsmasq.conf)
-
-* turnoff systemd-resolved: `systemctl disable systemd-resolved`
-* make sure it starts after network is on
-
-    `systemctl edit dnsmasq`
-
-    add:
-
-    ```
-    After=network-online.target
-    Wants=network-online.target
-    ```
-
-* `systemctl enable dnsmasq`
-
-## 6. [Setup Firewall](docs/setup-firewall.md)
-
-## 7. Install Microk8s
-`snap install micro8s --classic`
-* enable dns,gpu
-
-    `microk8s.enable dns gpu`
-* setup kubectl
-    ```bash
-    snap install kubectl
-    microk8s.config > ~/.kube/config
-    ```
-    check for the following:
-    ```
-    kubectl get nodes
-    NAME    STATUS   ROLES    AGE   VERSION
-    gimli   Ready    <none>   8d    v1.18.0
-    ```
-* install local provisioning 
-  * follow: https://github.com/rancher/local-path-provisioner
-
-  `kubectl apply -f storage/localpath.config.yaml`
 
 ## Setup Unattended Updates
 ```sh
@@ -81,38 +36,7 @@ sudo dpkg-reconfigure -plow unattended-upgrades
 # Enter yes
 ```
 
-## Setup gluster
-
-### Install Gluster
-
-```sh
-add-apt-repository ppa:gluster/glusterfs-9
-apt update
-apt install glusterfs-server
-```
-
-### Create ZFS Datasets
-`zfs create tank/gluster`
-`mkdir /tank/gluster/brick1`
-
-### Create Storage Pool
-```
-gluster peer probe <host>
-```
-### Create Volume
-```sh
-gluster volume create gv0 replica 3 lithium:/tank/gluster/brick1/ helium: tank/gluster/brick1/ gimli:/tank/gluster/brick1/ 
-
-gluster volume start gv0
-```
-### Mount Volume on All Nodes
-```sh
-vi /etc/fstab`
-#add to to end of fstab
-localhost:/gv0 /mnt/gv0 glusterfs defaults,_netdev 0 0
-```
-
-### Speed up Start up
+## Speed up Start up
 For ubuntu the system waits for every interface defined to start up which can slow things down
 For every interface that isn't needed add the optional flag
 example:
@@ -126,3 +50,39 @@ network:
       dhcp4: true
       optional: true
 ```
+Also good to lower timeout on shutdown
+
+## Setup space for ceph
+
+```sh
+zfs create tank/zblock0 -V 10tb
+```
+
+## Configure nfs default mount settings
+
+1. Set up nfs with ceph
+follow instructions here:
+https://docs.ceph.com/en/latest/cephfs/fs-nfs-exports/#create-cephfs-export
+
+1. All nodes need to be configured to use nfs 4.1
+create file: `/etc/nfsmount.conf`
+inside add:
+
+```ini
+[ NFSMount_Global_Options ]
+Defaultvers=4.1
+```
+
+1. NFS has to be configured to convert ids to numbers
+this can be done by creating a file with contents of:
+```
+NFSV4 {
+    Allow_Numeric_Owners = true;
+    Only_Numeric_Owners = true;
+}
+```
+and then applying that file with:
+
+https://docs.ceph.com/en/latest/cephfs/fs-nfs-exports/#set-customized-nfs-ganesha-configuration
+
+## rke setup
