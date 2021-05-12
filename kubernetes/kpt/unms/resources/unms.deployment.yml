@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unms
+  namespace: unifi
+  labels:
+    app: unms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unms
+  template:
+    metadata:
+      labels:
+        app: unms
+    spec:
+      containers:
+      - name: unms
+        image: nico640/docker-unms 
+        imagePullPolicy: Always
+        env:
+        - name: TZ
+          value: "America/New_York"
+        ports:
+        - name: unifi-comms
+          containerPort: 80
+          protocol: TCP
+        - name: browser-ui
+          containerPort: 443
+          protocol: TCP
+        - name: netflow
+          containerPort: 2055
+          protocol: UDP
+        volumeMounts:
+        - name: unms-data
+          mountPath: /config
+        - name: logs
+          mountPath: /config/logs
+      volumes:
+      - name: unms-data
+        persistentVolumeClaim:
+          claimName: unms-config
+      - name: logs
+        emptyDir: {}
+---
+

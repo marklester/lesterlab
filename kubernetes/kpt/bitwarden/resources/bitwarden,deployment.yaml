@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bitwarden
+  namespace: bitwarden
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.0.208
+  selector:
+    app: bitwarden
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+---
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bitwarden
+  namespace: bitwarden
+  labels:
+    app: bitwarden
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bitwarden
+  template:
+    metadata:
+      labels:
+        app: bitwarden
+    spec:
+      containers:
+      - name: bitwarden
+        image: vaultwarden/server:latest
+        imagePullPolicy: Always
+        env:
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        volumeMounts:
+        - name: bitwarden-config
+          mountPath: /data
+      volumes:
+      - name: bitwarden-config
+        persistentVolumeClaim:
+          claimName: bitwarden-config
+---

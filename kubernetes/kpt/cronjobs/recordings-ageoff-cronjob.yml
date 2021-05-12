@@ -20,6 +20,7 @@ spec:
                 mountPath: /recordings
           volumes:
           - name: recordings
-            hostPath: 
-              path: /mnt/gv0/recordings
+            nfs:
+              server: ceph-nfs.home
+              path: /cephfs/recordings
           restartPolicy: OnFailure

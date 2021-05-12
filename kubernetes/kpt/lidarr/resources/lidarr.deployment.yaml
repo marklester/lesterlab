@@ -1,0 +1,68 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lidarr
+  namespace: lidarr
+  labels:
+    app: lidarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lidarr
+  template:
+    metadata:
+      name: lidarr
+      labels:
+        app: lidarr
+    spec:
+      containers:
+      - name: lidarr
+        image: linuxserver/lidarr:latest
+        imagePullPolicy: Always
+        env:
+        - name: PUID
+          value: "65534"
+        - name: PGID
+          value: "65534"
+        volumeMounts:
+        - name: downloads
+          mountPath: /downloads
+        - name: config
+          mountPath: /config
+        - name: music
+          mountPath: /music
+        ports:
+        - name: web
+          containerPort: 8689
+          protocol: TCP
+      volumes: 
+      - name: downloads
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/media/downloads
+      - name: config
+        persistentVolumeClaim:
+          claimName: lidarr-config
+      - name: music
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/media/Music
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: lidarr
+  namespace: lidarr
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: lidarr.home
+spec:
+  selector:
+    app: lidarr
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8686
+  type: LoadBalancer
+  loadBalancerIP: 192.168.0.216

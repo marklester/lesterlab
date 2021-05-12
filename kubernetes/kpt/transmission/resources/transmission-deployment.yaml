@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transmission
+  namespace: transmission
+  labels:
+    app: transmission
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transmission
+  template:
+    metadata:
+      name: transmission
+      labels:
+        app: transmission
+    spec:
+      dnsPolicy: Default
+      dnsConfig:
+        nameservers:
+          - "8.8.8.8"
+      containers:
+      - name: transmission
+        image: haugene/transmission-openvpn:latest
+        imagePullPolicy: Always
+        securityContext:
+          capabilities:
+            add:
+              - NET_ADMIN
+        env:
+        - name: OPENVPN_PROVIDER
+          value: "NORDVPN"
+        - name: NORDVPN_COUNTRY
+          value: us
+        - name: NORDVPN_CATEGORY
+          value: legacy_p2p
+        - name: NORDVPN_PROTOCOL
+          value: tcp
+        - name: PUID
+          value: "65534"
+        - name: PGID
+          value: "65534"
+        - name: OPENVPN_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: vpn-credentials
+              key: username
+        - name: OPENVPN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: vpn-credentials
+              key: password
+        - name: WEBPROXY_ENABLED
+          value: "false"
+        - name: CREATE_TUN_DEVICE
+          value: "true"
+        # - name: TRANSMISSION_WEB_UI
+        #   value: combustion
+        - name: TRANSMISSION_IDLE_SEEDING_LIMIT_ENABLED
+          value: "true"
+        - name: "LOCAL_NETWORK"
+          value: "192.168.0.0/24"
+        - name: "TRANSMISSION_RPC_HOST_WHITELIST_ENABLED"
+          value: "true"
+        - name: "TRANSMISSION_DOWNLOAD_DIR"
+          value: "/downloads/completed"
+        - name: "TRANSMISSION_INCOMPLETE_DIR"
+          value: "/downloads/incomplete"
+        - name: "TRANSMISSION_WATCH_DIR"
+          value: "/downloads/watch"   
+        - name: "TRANSMISSION_RPC_HOST_WHITELIST"
+          value: "127.0.0.1,192.168.0.*,10.42.0.*,transmission.home"
+        volumeMounts:
+        - name: downloads
+          mountPath: /downloads
+        - name: config
+          mountPath: /data
+        ports:
+        - name: web
+          containerPort: 9091
+          protocol: TCP
+      volumes: 
+      - name: downloads
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/media/downloads
+      - name: config
+        persistentVolumeClaim:
+            claimName: transmission-config

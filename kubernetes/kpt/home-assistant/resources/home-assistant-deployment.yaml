@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: home-assistant
+  namespace: home-assistant
+  labels:
+    app: home-assistant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: home-assistant
+  template:
+    metadata:
+      labels:
+        app: home-assistant
+    spec:
+      containers:
+        - name: home-assistant
+          image: "homeassistant/home-assistant:stable"
+          imagePullPolicy: Always
+          ports:
+            - name: api
+              containerPort: 8123
+              protocol: TCP
+          env:
+          - name: TZ
+            value: "America/New_York"
+          volumeMounts:
+          - name: config
+            mountPath: /config
+          - name: recordings
+            mountPath: /recordings
+          - name: media
+            mountPath: /media
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: home-assistant-config
+      - name: recordings
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/recordings
+      - name: media
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/media/
+
