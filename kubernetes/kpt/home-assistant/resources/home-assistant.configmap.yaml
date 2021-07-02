@@ -20,6 +20,12 @@ data:
     script: !include scripts.yaml
     scene: !include scenes.yaml
 
+    http:
+      use_x_forwarded_for: true
+      trusted_proxies:
+        - 192.168.0.10
+        - 127.0.0.1 
+        - 10.42.2.99
     mqtt:
       broker: mqtt.mqtt
 
@@ -55,16 +61,6 @@ data:
             confidence: 80
           - name: cat
             confidence: 90
-      - platform: doods
-        url: "http://doods.doods:8080"
-        detector: tensorflow
-        source:
-          - entity_id: camera.amcrest_camera
-        file_out:
-          - "/recordings/{{ camera_entity.split('.')[1] }}_latest.jpg"  
-        labels:
-          - name: person
-            confidence: 80
     prometheus:
       namespace: hass
 

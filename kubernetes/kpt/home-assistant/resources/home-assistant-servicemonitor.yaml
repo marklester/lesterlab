@@ -26,5 +26,5 @@ metadata:
   name: hass-metrics-token
   namespace: monitoring
 type: Opaque
-stringData:
-  token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJmMDE4NDMwMTA0YTg0ZDBmOTlkNmExNTU4OWQyODM0MiIsImlhdCI6MTU5NTQ1ODA1NiwiZXhwIjoxOTEwODE4MDU2fQ.eHdgm-wFDyoevifivcqDmVtOu29W5ARMn16RDTmnnqw
+stringData: 
+  token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI5Yjg5Zjg4MjVlZjc0M2JmOTAzYWFiMDdkMTI2MzRlZiIsImlhdCI6MTYyMjY3ODA2NywiZXhwIjoxOTM4MDM4MDY3fQ.McZPNiSz6BXkQYa3cvMvq2fkGzoXGjkrv32jc22Ji-U
