@@ -13,6 +13,10 @@ spec:
     port: 80
     targetPort: 9117
     protocol: TCP
+  - name: flaresolverr
+    port: 8191
+    targetPort: 8191
+    protocol: TCP
 ---
 ---
 apiVersion: apps/v1
@@ -48,6 +52,14 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
+      - name: flaresolverr
+        image: flaresolverr/flaresolverr:latest
+        imagePullPolicy: Always
+        env:
+        ports:
+        - name: flaresolverr
+          containerPort: 8191
+          protocol: TCP
       volumes:
       - name: config
         persistentVolumeClaim:
