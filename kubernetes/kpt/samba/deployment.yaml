@@ -57,8 +57,8 @@ spec:
         # - name: GLOBAL11
         #   value: "guest account = nobody"          
         volumeMounts:
-        # - name: backups
-        #   mountPath: /backups
+        - name: backups
+          mountPath: /backups
         - name: home-share
           mountPath: /home-share
         - name: media-share
@@ -78,10 +78,6 @@ spec:
         - name: nb-datagram
           containerPort: 138
           protocol: UDP
-#        lifecycle:
-#          postStart:
- #           exec:
- #             command: ["chgrp -R users /shares/*"]
       volumes:
       - name: backups
         nfs:
