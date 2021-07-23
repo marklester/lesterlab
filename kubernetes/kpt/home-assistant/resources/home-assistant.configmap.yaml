@@ -25,7 +25,7 @@ data:
       trusted_proxies:
         - 192.168.0.10
         - 127.0.0.1 
-        - 10.42.2.99
+        - 10.42.0.0/16
     mqtt:
       broker: mqtt.mqtt
 
