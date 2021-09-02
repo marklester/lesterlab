@@ -1,5 +1,6 @@
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 # helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -f values.yaml
+# helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack -f values.yaml
 namespaceOverride: monitoring
 
 alertmanager:
@@ -18,6 +19,9 @@ grafana:
   service: 
     type: LoadBalancer
     loadBalancerIP: "192.168.0.209"
+prometheusOperator:
+  certManager:
+    enabled: true
 
 prometheus:
   service: 
@@ -53,4 +57,8 @@ prometheus:
           resources:
             requests:
               storage: 50Gi
+prometheus-node-exporter:
+  namespaceOverride: monitoring
 
+kube-state-metrics:
+  namespaceOverride: monitoring
