@@ -1,0 +1,64 @@
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+# helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -f values.yaml
+# helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack -f values.yaml
+namespaceOverride: monitoring
+
+alertmanager:
+  enabled: false
+
+grafana:
+  enabled: true
+  namespaceOverride: monitoring
+  persistence:
+    enabled: true
+    type: pvc
+    storageClassName: rook-cephfs-retain
+    accessModes:
+    - ReadWriteMany
+    size: 4Gi
+  service: 
+    type: LoadBalancer
+    loadBalancerIP: "192.168.0.209"
+prometheusOperator:
+  certManager:
+    enabled: true
+
+prometheus:
+  service: 
+    type: LoadBalancer
+    loadBalancerIP: "192.168.0.202"
+  
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    retention: 90d
+    additionalScrapeConfigs:
+    - job_name: gpu-metrics
+      scrape_interval: 1s
+      metrics_path: /metrics
+      scheme: http
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+          - gpu-operator-resources
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        action: replace
+        target_label: kubernetes_node    
+  
+    storageSpec: 
+      ## Using PersistentVolumeClaim
+      ##
+      volumeClaimTemplate:
+        spec:
+          storageClassName: rook-cephfs
+          accessModes: ["ReadWriteMany"]
+          resources:
+            requests:
+              storage: 50Gi
+prometheus-node-exporter:
+  namespaceOverride: monitoring
+
+kube-state-metrics:
+  namespaceOverride: monitoring
