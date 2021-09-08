@@ -64,12 +64,26 @@ spec:
           mountPath: /config
         - name: recordings
           mountPath: /recordings
+        - name: logs
+          mountPath: "/config/Library/Application Support/Plex Media Server/Logs"
         livenessProbe:
           httpGet:
             path: /identity
             port: 32400
           initialDelaySeconds: 10
           timeoutSeconds: 10
+      - name: plex-promtail
+        image: grafana/promtail:master
+        args: 
+          - "-config.file=/etc/promtail/promtail.yaml"
+          - "-client.url=http://loki.monitoring:3100/api/prom/push"
+        volumeMounts:
+          - name: logs
+            mountPath: "/config/Library/Application Support/Plex Media Server/Logs"
+          - name: promtail-config
+            mountPath: /etc/promtail/promtail.yaml
+            subPath: promtail.yaml
+            readOnly: true
       volumes:
         - name: media
           nfs:
@@ -82,4 +96,43 @@ spec:
         - name: plex-config
           persistentVolumeClaim:
             claimName: plex-config 
+        - name: logs
+          emptyDir: {}
+        - name: promtail-config
+          configMap:
+            name: plex-promtail
+---
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: plex-promtail
+  namespace: plex
+  labels:
+data:
+  promtail.yaml: |
+    server:
+      http_listen_port: 9080
+      grpc_listen_port: 0
+    positions:
+      filename: /tmp/positions.yaml
+    client:
+      url: http://loki.monitoring:3100/loki/api/v1/push
+    scrape_configs:
+    - job_name: promtail/plex
+      static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: promtail/plex
+          app: plex
+          __path__: "/config/Library/Application Support/Plex Media Server/Logs/*.log"
+    - job_name: promtail/plex/plugins
+      static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: promtail/plex/plugins
+          app: plex
+          __path__: "/config/Library/Application Support/Plex Media Server/Logs/PMS Plugin Logs/*.log"          
 ---
