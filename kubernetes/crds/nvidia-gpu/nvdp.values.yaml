@@ -1,4 +1,0 @@
-#helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
-#helm install --version=0.9.0 nvidia-device-plugin nvdp/nvidia-device-plugin -f nvdp.values.yaml
-nodeSelector:
-  accelerator: nvidia

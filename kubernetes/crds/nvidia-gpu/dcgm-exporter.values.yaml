@@ -1,6 +1,0 @@
-# helm install dcgm-exporter gpu-helm-charts/dcgm-exporter -f dcgm-exporter.values.yaml
-nodeSelector:
-  accelerator: nvidia
-extraEnv:
-  - name: "DCGM_EXPORTER_INTERVAL"
-    value: "5000"
