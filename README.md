@@ -1,6 +1,6 @@
 # HomeLab Cluster
 
-## [Specs](docs/router-specs.md)
+## [Specs](docs/node-specs.md)
 
 ## 1. Install Ubuntu Server
 ## 2. Setup ZFS
@@ -83,6 +83,13 @@ NFSV4 {
 ```
 and then applying that file with:
 
-https://docs.ceph.com/en/latest/cephfs/fs-nfs-exports/#set-customized-nfs-ganesha-configuration
+https://docs.ceph.com/en/octopus/cephfs/fs-nfs-exports/#set-customized-nfs-ganesha-configuration
+
+### Update Placement
+
+`ceph nfs cluster update <clusterid> <placementnumber>`
+
+so
+`ceph nfs cluster update nfs-cluster "3 gimli,helium,lithium"`
 
 ## rke setup
