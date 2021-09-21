@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aws-cli
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aws-cli
+  namespace: aws-cli
+  labels:
+    app: aws-cli
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aws-cli
+  template:
+    metadata:
+      name: aws-cli
+      labels:
+        app: aws-cli
+    spec:
+      containers:
+      - name: aws-cli
+        image: amazon/aws-cli:latest
+        command: [/bin/bash]
+        args: ["-c", "while true; do sleep 10;done"]
+        env:
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: glacier-credentials
+              key: secret_access_key
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: glacier-credentials
+              key: access_key
+        - name: AWS_DEFAULT_REGION
+          value: us-east-2
+        volumeMounts:
+        # - name: backups
+        #   mountPath: /backups
+      volumes:
+      # - name: backups
+      #   nfs:
+      #     server: ceph-nfs.home
+      #     path: /cephfs/backups

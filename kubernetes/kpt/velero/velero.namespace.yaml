@@ -1,0 +1,9 @@
+#velero install --provider aws --plugins velero/velero-plugin-for-aws:v1.2.1 --bucket velero-backup --secret-file velero-ceph-bucket.creds --use-volume-snapshots=false --backup-location-config region=minio,s3ForcePathStyle="true",s3Url=http://rook-ceph-rgw-objectstore.rook-ceph
+#velero backup create bitwarden --include-namespaces bitwarden
+#velero backup-location create glacier --provider aws --bucket backups --config region=us-east-1 --credential=velero-glacier-credentials=aws
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: velero
+---

@@ -1,8 +1,8 @@
 apiVersion: objectbucket.io/v1alpha1
 kind: ObjectBucketClaim
 metadata:
-  name: bitwarden-backup
-  namespace: bitwarden
+  name: velero-backups
+  namespace: velero
 spec:
-  bucketName: bitwarden-backup
+  bucketName: velero-backups
   storageClassName: rook-ceph-bucket
