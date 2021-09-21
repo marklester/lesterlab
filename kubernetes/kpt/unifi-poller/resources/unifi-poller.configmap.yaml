@@ -173,7 +173,7 @@ data:
       # 40 clients.  This adds a little bit of poller run time per interval and causes
       # more API requests to your controller(s). Don't let these "cons" sway you:
       # it's cool data. Please provide feedback on your experience with this feature.
-      save_dpi = false
+      save_dpi = true
 
       ## Enabling save_rogue stores even more data in your time series databases.
       ## This saves neighboring access point metrics in a dedicated table or namespace.
