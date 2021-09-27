@@ -5,12 +5,13 @@ metadata:
   namespace: mqtt
 data:
   mosquitto.conf: |-
+    listener 1883
+    allow_anonymous true
     socket_domain ipv4
-    # listener 1883
     # listener 9001
     persistence true
     persistence_location /mosquitto/data/
-    allow_anonymous true
+    
     log_timestamp true
     log_timestamp_format %Y-%m-%dT%H:%M:%S
     # log_dest file /mosquitto/log/mosquitto.log
