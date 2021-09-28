@@ -2,8 +2,8 @@
 
 | IP            | Service              |
 |---------------|----------------------|
-| 192.168.0.200 |unifi-controller      |
-| 192.168.0.201 |unms                  |
+| 192.168.0.200 |ingress-nginx         |
+| 192.168.0.201 |unifi-controller      |
 | 192.168.0.202 |prometheus            |
 | 192.168.0.203 |home-assistant        |
 | 192.168.0.204 |plex                  |
