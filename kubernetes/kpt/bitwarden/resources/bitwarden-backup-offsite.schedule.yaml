@@ -4,7 +4,7 @@ metadata:
   name: bitwarden-backup-offsite
   namespace: velero
 spec:
-  schedule: 0 * * * *
+  schedule: 0 0 * * *
   template:
     hooks: {}
     includedNamespaces:
