@@ -1,0 +1,43 @@
+apiVersion: ceph.rook.io/v1
+kind: CephNFS
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"ceph.rook.io/v1","kind":"CephNFS","metadata":{"annotations":{},"creationTimestamp":"2021-04-29T23:42:45Z","finalizers":["cephnfs.ceph.rook.io"],"generation":15,"labels":{"app":"cephnfs","ceph_version":"16.2.6-0-pacific"},"name":"nfs-cluster","namespace":"rook-ceph","resourceVersion":"144653682","uid":"52c8e31e-9f69-4adb-8e2d-1e345d75b396"},"spec":{"rados":{"namespace":"nfs-cluster","pool":"nfs-ganesha"},"server":{"active":3,"placement":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchExpressions":[{"key":"app","operator":"In","values":["cephnfs"]}]},"topologyKey":"topology.kubernetes.io/zone"},"weight":100}],"requiredDuringSchedulingIgnoredDuringExecution":[{"labelSelector":{"matchExpressions":[{"key":"app","operator":"In","values":["cephnfs"]}]},"topologyKey":"kubernetes.io/hostname"}]}},"resources":{}}},"status":{"phase":"Ready"}}
+  creationTimestamp: "2021-04-29T23:42:45Z"
+  finalizers:
+  - cephnfs.ceph.rook.io
+  generation: 16
+  labels:
+    ceph_version: 16.2.6-0-pacific
+  name: nfs-cluster
+  namespace: rook-ceph
+  resourceVersion: "144656262"
+  uid: 52c8e31e-9f69-4adb-8e2d-1e345d75b396
+spec:
+  rados:
+    namespace: nfs-cluster
+    pool: nfs-ganesha
+  server:
+    active: 3
+    placement:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - rook-ceph-nfs
+            topologyKey: topology.kubernetes.io/zone
+          weight: 100
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - rook-ceph-nfs
+          topologyKey: kubernetes.io/hostname
+    resources: {}
