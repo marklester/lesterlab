@@ -60,7 +60,7 @@ spec:
         - name: TRANSMISSION_IDLE_SEEDING_LIMIT_ENABLED
           value: "true"
         - name: "LOCAL_NETWORK"
-          value: "192.168.0.0/24"
+          value: "10.0.0.0/8"
         - name: "TRANSMISSION_RPC_HOST_WHITELIST_ENABLED"
           value: "true"
         - name: "TRANSMISSION_DOWNLOAD_DIR"
@@ -70,7 +70,7 @@ spec:
         - name: "TRANSMISSION_WATCH_DIR"
           value: "/downloads/watch"   
         - name: "TRANSMISSION_RPC_HOST_WHITELIST"
-          value: "127.0.0.1,192.168.0.*,10.42.0.*,transmission.home"
+          value: "127.0.0.1,192.168.0.*,transmission.*"
         volumeMounts:
         - name: downloads
           mountPath: /downloads
