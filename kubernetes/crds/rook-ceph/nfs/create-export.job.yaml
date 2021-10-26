@@ -1,24 +1,14 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: rook-ceph-tools
-  namespace: rook-ceph
-  labels:
-    app: rook-ceph-tools
+  name: create export
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: rook-ceph-tools
   template:
-    metadata:
-      labels:
-        app: rook-ceph-tools
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: rook-ceph-tools
-        image: rook/ceph:v1.7.6
+        image: rook/ceph:v1.7.5
         command: ["/tini"]
         args: ["-g", "--", "/usr/local/bin/toolbox.sh"]
         imagePullPolicy: IfNotPresent
