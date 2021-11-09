@@ -87,6 +87,7 @@ data:
           - service: mobile_app_pixel_3a
 
     homeassistant:
+      external_url: "https://home-assistant.lester.network"
       allowlist_external_dirs:
         - /recordings
       media_dirs:
