@@ -75,15 +75,28 @@ Defaultvers=4.1
 
 1. NFS has to be configured to convert ids to numbers
 this can be done by creating a file with contents of:
+`vi nfs.config`
 ```
 NFSV4 {
     Allow_Numeric_Owners = true;
     Only_Numeric_Owners = true;
 }
 ```
+
 and then applying that file with:
 
 https://docs.ceph.com/en/octopus/cephfs/fs-nfs-exports/#set-customized-nfs-ganesha-configuration
+
+`ceph nfs cluster config set nfs-cluster -i nfs.config`
+
+### Create Export
+`ceph nfs export create cephfs cephfs nfs-cluster /cephfs`
+
+## Debugging Configuration
+nfs puts config in rados in it's own pull here are some common commands
+
+`rados -p nfs-ganesha ls --all`
+`rados -p nfs-ganesha get -n nfs-cluster <objectname> <filetooutputto> --all`
 
 ### Update Placement
 
