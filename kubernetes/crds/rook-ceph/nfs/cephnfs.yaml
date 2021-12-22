@@ -6,9 +6,9 @@ metadata:
   name: nfs-cluster
   namespace: rook-ceph
 spec:
-  rados:
-    namespace: nfs-cluster
-    pool: nfs-ganesha
+  # rados:
+  #   namespace: nfs-cluster
+  #   pool: nfs-ganesha
   server:
     active: 3
     placement:
@@ -32,3 +32,17 @@ spec:
               - rook-ceph-nfs
           topologyKey: kubernetes.io/hostname
     resources: {}
+---
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: builtin-nfs
+  namespace: rook-ceph # namespace:cluster
+spec:
+  # The required pool name ".nfs" cannot be specified as a K8s resource name, thus we override
+  # the pool name created in Ceph with this name property
+  name: .nfs
+  failureDomain: host
+  replicated:
+    size: 3
+    requireSafeReplicaSize: true
