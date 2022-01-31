@@ -31,7 +31,7 @@ prometheus:
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
-    retention: 90d
+    retention: 60d
     additionalScrapeConfigs:
     - job_name: gpu-metrics
       scrape_interval: 1s
@@ -56,9 +56,11 @@ prometheus:
           accessModes: ["ReadWriteMany"]
           resources:
             requests:
-              storage: 50Gi
+              storage: 100Gi
 prometheus-node-exporter:
   namespaceOverride: monitoring
 
+kubeStateMetrics:
+  enabled: true
 kube-state-metrics:
   namespaceOverride: monitoring
