@@ -55,8 +55,8 @@ spec:
           value: "false"
         - name: CREATE_TUN_DEVICE
           value: "true"
-        # - name: TRANSMISSION_WEB_UI
-        #   value: combustion
+        - name: TRANSMISSION_WEB_UI
+          value: "flood-for-transmission"
         - name: TRANSMISSION_IDLE_SEEDING_LIMIT_ENABLED
           value: "true"
         - name: "LOCAL_NETWORK"
