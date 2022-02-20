@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sqlite-tookbox
+  namespace: plex
+  labels:
+    app: sqlite-tookbox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sqlite-tookbox
+  template:
+    metadata:
+      labels:
+        app: sqlite-tookbox
+    spec:
+      containers:
+      - name: sqlite-tookbox
+        image: debian:latest 
+        imagePullPolicy: Always
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do echo hello; sleep 10;done"]
+        volumeMounts:
+        - name: plex-config
+          mountPath: /plex
+      volumes:    
+        - name: plex-config
+          persistentVolumeClaim:
+            claimName: plex-config 
+---

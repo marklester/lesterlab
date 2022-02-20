@@ -1,0 +1,143 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex
+  namespace: plex
+  labels:
+    app: plex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plex
+  template:
+    metadata:
+      labels:
+        app: plex
+    spec:
+      containers:
+      - name: plex
+        image: linuxserver/plex:latest 
+        imagePullPolicy: Always
+        env:
+        - name: PUID
+          value: "65534"
+        - name: PGID
+          value: "65534"
+        - name: TZ
+          value: "America/New_York"
+        - name: PLEX_CLAIM
+          value: "claim-LjhnAAm1tB1x555wUxAG"
+        ports:
+        - name: http
+          containerPort: 32400
+          protocol: TCP
+        - name: plex-ht-control
+          containerPort: 3005
+          protocol: TCP
+        - name: dlna-tcp
+          containerPort: 32469
+          protocol: TCP
+        - name: dlna-udp
+          containerPort: 1900
+          protocol: UDP
+        - name: avahi
+          containerPort: 5353
+          protocol: UDP
+        - name: gdm1
+          containerPort: 32410
+          protocol: UDP
+        - name: gdm2
+          containerPort: 32412
+          protocol: UDP
+        - name: gdm3
+          containerPort: 32413
+          protocol: UDP
+        - name: gdm4
+          containerPort: 32414
+          protocol: UDP
+        volumeMounts:
+        - name: media
+          mountPath: /media/
+        - name: plex-config
+          mountPath: /config
+        - name: recordings
+          mountPath: /recordings
+        - name: logs
+          mountPath: "/config/Library/Application Support/Plex Media Server/Logs"
+        livenessProbe:
+          httpGet:
+            path: /identity
+            port: 32400
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
+        resources:
+          requests:
+            memory: "2Gi"
+          limits:
+            memory: "8Gi"
+      - name: plex-promtail
+        image: grafana/promtail:master
+        args: 
+          - "-config.file=/etc/promtail/promtail.yaml"
+          - "-client.url=http://loki.monitoring:3100/api/prom/push"
+        volumeMounts:
+          - name: logs
+            mountPath: "/config/Library/Application Support/Plex Media Server/Logs"
+          - name: promtail-config
+            mountPath: /etc/promtail/promtail.yaml
+            subPath: promtail.yaml
+            readOnly: true
+      volumes:
+        - name: media
+          nfs:
+            server: ceph-nfs.home
+            path: /cephfs/media
+        - name: recordings
+          nfs:
+            server: ceph-nfs.home
+            path: /cephfs/recordings    
+        - name: plex-config
+          persistentVolumeClaim:
+            claimName: plex-config 
+        - name: logs
+          emptyDir: {}
+        - name: promtail-config
+          configMap:
+            name: plex-promtail
+---
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: plex-promtail
+  namespace: plex
+  labels:
+data:
+  promtail.yaml: |
+    server:
+      http_listen_port: 9080
+      grpc_listen_port: 0
+    positions:
+      filename: /tmp/positions.yaml
+    client:
+      url: http://loki.monitoring:3100/loki/api/v1/push
+    scrape_configs:
+    - job_name: promtail/plex
+      static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: promtail/plex
+          app: plex
+          __path__: "/config/Library/Application Support/Plex Media Server/Logs/*.log"
+    - job_name: promtail/plex/plugins
+      static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: promtail/plex/plugins
+          app: plex
+          __path__: "/config/Library/Application Support/Plex Media Server/Logs/PMS Plugin Logs/*.log"          
+---

@@ -1,0 +1,58 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: unifi-poller
+  namespace: unifi
+  labels:
+    app: unifi-poller
+spec:
+  selector:
+    app: unifi-poller
+  ports:
+  - protocol: TCP
+    port: 9130
+    targetPort: 9130
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unifi-poller
+  namespace: unifi
+  labels:
+    app: unifi-poller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unifi-poller
+  template:
+    metadata:
+      labels:
+        app: unifi-poller
+    spec:
+      containers:
+      - name: unifi-poller
+        image: golift/unifi-poller:latest
+        imagePullPolicy: Always
+        env:
+        - name: UP_UNIFI_DEFAULT_USER
+          valueFrom:
+            secretKeyRef:
+              name: unifi-credentials
+              key: username
+        - name: UP_UNIFI_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: unifi-credentials
+              key: password        
+        ports:
+        - name: metrics
+          containerPort: 9130
+          protocol: TCP
+        volumeMounts:
+        - name: config
+          mountPath: /config
+      volumes:
+      - name: config
+        configMap:
+          name: unifi-poller-config

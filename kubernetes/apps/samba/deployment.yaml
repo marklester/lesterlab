@@ -1,0 +1,137 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: samba
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: samba
+  namespace: samba
+  labels:
+    app: samba
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: samba
+  template:
+    metadata:
+      name: samba
+      labels:
+        app: samba
+    spec:
+      containers:
+      - name: samba
+        image: dperson/samba
+        env:
+        - name: WORKGROUP
+          value: WORKGROUP
+        - name: SHARE
+          value: "backups;/backups/;yes;no;yes;"
+        - name: SHARE2
+          value: "home-share;/home-share/;yes;no;yes;"
+        - name: SHARE3
+          value: "media;/media-share/;yes;no;yes;"
+        - name: USERID
+          value: "65534"
+        - name: GROUPID
+          value: "65534"
+        - name: GLOBAL
+          value: "log level = 5"
+        - name: GLOBAL1
+          value: "auth method = guest"          
+        - name: GLOBAL2
+          value: "force user = nobody"
+        - name: GLOBAL3
+          value: "netbios name = samba"
+        # - name: GLOBAL4
+        #   value: "force group = nogroup"                    
+        # - name: GLOBAL5
+        #   value: "wins support = yes"
+        - name: GLOBAL7
+          value: "os level = 20"
+        # - name: GLOBAL10
+        #   value: "map to guest = Bad User"
+        # - name: GLOBAL11
+        #   value: "guest account = nobody"          
+        volumeMounts:
+        - name: backups
+          mountPath: /backups
+        - name: home-share
+          mountPath: /home-share
+        - name: media-share
+          mountPath: /media-share
+        # - name: ceph
+        #   mountPath: /ceph
+        ports:
+        - name: netbios-session
+          containerPort: 139          
+          protocol: TCP
+        - name: smb
+          containerPort: 445
+          protocol: TCP
+        - name: nb-name-service
+          containerPort: 137
+          protocol: UDP
+        - name: nb-datagram
+          containerPort: 138
+          protocol: UDP
+      volumes:
+      - name: backups
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/backups
+      - name: home-share
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/home
+      - name: media-share
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/media
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: samba
+  namespace: samba
+  annotations:
+    metallb.universe.tf/allow-shared-ip: samba
+spec:
+  ports:
+  - name: netbios-session
+    port: 139
+    targetPort: 139
+    protocol: TCP
+  - name: smb
+    port: 445
+    targetPort: 445
+    protocol: TCP
+  selector:
+    app: samba
+  type: LoadBalancer
+  loadBalancerIP: 192.168.0.217
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: samba-udp
+  namespace: samba
+  annotations:
+    metallb.universe.tf/allow-shared-ip: samba
+spec:
+  ports:
+  - name: netbios-name-service
+    port: 137
+    targetPort: 137
+    protocol: UDP
+  - name: netbios-datagram
+    port: 138
+    targetPort: 138
+    protocol: UDP
+  selector:
+    app: samba
+  type: LoadBalancer
+  loadBalancerIP: 192.168.0.217

@@ -1,0 +1,21 @@
+---
+# Source: home-assistant/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: home-assistant
+  namespace: home-assistant  
+  annotations:
+    metallb.universe.tf/allow-shared-ip: home-assistant
+  labels:
+    app: home-assistant
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.0.203
+  ports:
+    - name: api
+      port: 80
+      targetPort: 8123 
+      protocol: TCP
+  selector:
+    app: home-assistant
