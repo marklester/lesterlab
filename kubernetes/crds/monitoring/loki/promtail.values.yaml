@@ -1,4 +1,5 @@
 
-
+#helm upgrade --install loki --namespace=monitoring grafana/loki
+#helm upgrade --install promtail --namespace=monitoring grafana/promtail -f promtail.values.yaml
 config:
   lokiAddress: http://loki.monitoring:3100/loki/api/v1/push
