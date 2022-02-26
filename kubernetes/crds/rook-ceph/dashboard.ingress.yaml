@@ -5,12 +5,12 @@ metadata:
   namespace: rook-ceph
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
-  tls:
-  - hosts:
-    - "ceph.home"
+  # tls:
+  # - hosts:
+  #   - "ceph.home"
   rules:
   - host: ceph.home
     http:
@@ -21,4 +21,4 @@ spec:
           service:
             name: rook-ceph-mgr-dashboard
             port: 
-              number: 8443
+              number: 7000
