@@ -40,7 +40,7 @@ metadata:
   labels:
     app: logitech-media-server
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: logitech-media-server
@@ -52,7 +52,7 @@ spec:
       # hostNetwork: true
       containers:
       - name: logitech-media-server
-        image: lmscommunity/logitechmediaserver:latest
+        image: lmscommunity/logitechmediaserver:stable
         imagePullPolicy: Always
         env:
         ports:
