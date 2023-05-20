@@ -77,18 +77,18 @@ spec:
             memory: "2Gi"
           limits:
             memory: "8Gi"
-      - name: plex-promtail
-        image: grafana/promtail:master
-        args: 
-          - "-config.file=/etc/promtail/promtail.yaml"
-          - "-client.url=http://loki.monitoring:3100/api/prom/push"
-        volumeMounts:
-          - name: logs
-            mountPath: "/config/Library/Application Support/Plex Media Server/Logs"
-          - name: promtail-config
-            mountPath: /etc/promtail/promtail.yaml
-            subPath: promtail.yaml
-            readOnly: true
+      # - name: plex-promtail
+      #   image: grafana/promtail:master
+      #   args: 
+      #     - "-config.file=/etc/promtail/promtail.yaml"
+      #     - "-client.url=http://loki.monitoring:3100/api/prom/push"
+      #   volumeMounts:
+      #     - name: logs
+      #       mountPath: "/config/Library/Application Support/Plex Media Server/Logs"
+      #     - name: promtail-config
+      #       mountPath: /etc/promtail/promtail.yaml
+      #       subPath: promtail.yaml
+      #       readOnly: true
       volumes:
         - name: media
           nfs:
@@ -103,9 +103,9 @@ spec:
             claimName: plex-config 
         - name: logs
           emptyDir: {}
-        - name: promtail-config
-          configMap:
-            name: plex-promtail
+        # - name: promtail-config
+        #   configMap:
+        #     name: plex-promtail
 ---
 ---
 apiVersion: v1

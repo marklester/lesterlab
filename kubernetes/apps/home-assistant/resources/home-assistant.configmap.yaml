@@ -25,64 +25,51 @@ data:
       trusted_proxies:
         - 192.168.0.10
         - 127.0.0.1 
-        - 10.42.0.0/16
+        - 10.43.0.0/16
     mqtt:
       broker: mqtt.mqtt
 
     stream:
 
-    camera:
-        - platform: generic
-          name: basement
-          still_image_url: http://camera-2/snap.jpeg
-          stream_source: rtsp://camera-2:554/s0
-          verify_ssl: false
-        - platform: generic
-          name: front
-          still_image_url: http://192.168.10.2/cgi-bin/api.cgi?cmd=Snap&channel=0&rs=wuuPhkmUCeI9WG7C&user=admin&password=admin1
-          stream_source: rtsp://admin:admin1@camera-1:554//h264Preview_01_main
-          verify_ssl: false
-        - name: front-last-detection
-          platform: local_file
-          file_path: /recordings/front_latest.jpg
-        - name: doorbell-detection
-          platform: local_file
-          file_path: /recordings/amcrest_camera_latest.jpg  
-    image_processing:
-      - platform: doods
-        url: "http://doods.doods:8080"
-        detector: tensorflow
-        source:
-          - entity_id: camera.front
-        file_out:
-          - "/recordings/{{ camera_entity.split('.')[1] }}_latest.jpg"  
-        labels:
-          - name: person
-            confidence: 80
-          - name: cat
-            confidence: 90
+    # camera:
+    #     - platform: generic
+    #       name: basement
+    #       still_image_url: http://camera-2/snap.jpeg
+    #       stream_source: rtsp://camera-2:554/s0
+    #       verify_ssl: false
+    #     - name: front-last-detection
+    #       platform: local_file
+    #       file_path: /recordings/front_latest.jpg
+    # image_processing:
+    #   - platform: doods
+    #     url: "http://doods.doods:8080"
+    #     detector: tensorflow
+    #     source:
+    #       - entity_id: camera.front
+    #     file_out:
+    #       - "/recordings/{{ camera_entity.split('.')[1] }}_latest.jpg"  
+    #     labels:
+    #       - name: person
+    #         confidence: 80
+    #       - name: cat
+    #         confidence: 90
     prometheus:
       namespace: hass
 
-    amcrest:
-      host: front-door-doorbell
-      username: !secret amcrest_username
-      password: !secret amcrest_password
-
-    octoprint:
-      host: pi-2.home
-      api_key: F9A8B807F5404E7FB63AF0504686E6B6
+    # octoprint:
+    #   host: pi-2.home
+    #   api_key: F9A8B807F5404E7FB63AF0504686E6B6
 
     media_player:
       - name: shield
         platform: androidtv
         host: 192.168.0.113
-    notify:
-      - name: phones
-        platform: group
-        services:
-          - service: mobile_app_pixel_4a
-          - service: mobile_app_pixel_3a
+    # notify:
+    #   - name: phones
+    #     platform: group
+    #     services:
+    #       - service: mobile_app_pixel_4a
+    #       - service: mobile_app_pixel_3a
 
     homeassistant:
       external_url: "https://home-assistant.lester.network"
@@ -92,21 +79,16 @@ data:
         recording: /recordings
         media: /media
     sensor:
-      - platform: colordetection
-        source: media_player.shield
-        color_count: 3
-        quality: 8
-        scan_interval: 15
-      - platform: template
-        sensors:
-          doods_process_time:
-            friendly_name: Doods Process Time
-            unit_of_measurement: "s"
-            # Average temperature of sensors in room:
-            value_template: >-
-              {{state_attr("image_processing.doods_front", "process_time")}}
-    nest:
-      client_id: !secret nest_client_id
-      client_secret: !secret nest_client_secret
-      project_id: 20254003-1a8d-42b3-a6d6-8cc2f1b54bb8
-      subscriber_id: projects/home-assistant-1606949634839/subscriptions/nest 
+      # - platform: colordetection
+      #   source: media_player.shield
+      #   color_count: 3
+      #   quality: 8
+      #   scan_interval: 15
+      # - platform: template
+      #   sensors:
+      #     doods_process_time:
+      #       friendly_name: Doods Process Time
+      #       unit_of_measurement: "s"
+      #       # Average temperature of sensors in room:
+      #       value_template: >-
+      #         {{state_attr("image_processing.doods_front", "process_time")}}
