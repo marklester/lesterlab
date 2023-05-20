@@ -10,7 +10,7 @@ spec:
   #   namespace: nfs-cluster
   #   pool: nfs-ganesha
   server:
-    active: 3
+    active: 1
     placement:
       podAntiAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
