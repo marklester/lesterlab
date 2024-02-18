@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: govee2mqtt
+  namespace: mqtt
+  labels:
+    app: govee2mqtt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: govee2mqtt
+  template:
+    metadata:
+      labels:
+        app: govee2mqtt
+    spec:
+      hostNetwork: true
+      containers:
+      - name: govee2mqtt
+        image: ghcr.io/wez/govee2mqtt:latest
+        imagePullPolicy: Always
+        env:
+        - name: GOVEE_MQTT_HOST
+          value: "192.168.0.212"
+        - name: GOVEE_MQTT_PORT
+          value: "1883"
+        - name: RUST_LOG
+          value: "govee=trace"
+        - name: GOVEE_EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: govee-credentials
+              key: email 
+        - name: GOVEE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: govee-credentials
+              key: password            
+        - name: GOVEE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: govee-credentials
+              key: api-key
+        - name: "TZ"
+          value: "US/Eastern"
+        - name: "GOVEE_LAN_SCAN"
+          value: "192.168.0.40"          
+        ports:
+        - name: mqtt
+          containerPort: 1883
+          protocol: TCP
