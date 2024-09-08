@@ -24,7 +24,7 @@ ingress:
   extra_args:
       enable-ssl-passthrough: "true"
 
-kubernetes_version: "v1.27.10-rancher1-1"
+kubernetes_version: "v1.30.3-rancher1-1"
 enable_cri_dockerd: true
 
 kubelet:
