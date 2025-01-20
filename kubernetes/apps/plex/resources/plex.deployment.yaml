@@ -16,6 +16,7 @@ spec:
       labels:
         app: plex
     spec:
+      hostNetwork: true
       containers:
       - name: plex
         image: linuxserver/plex:latest 
@@ -25,6 +26,10 @@ spec:
           value: "65534"
         - name: PGID
           value: "65534"
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: all
+        - name: "NVIDIA_DRIVER_CAPABILITIES"
+          value: "compute,video,utility"          
         - name: TZ
           value: "America/New_York"
         - name: PLEX_CLAIM
@@ -62,10 +67,10 @@ spec:
           mountPath: /media/
         - name: plex-config
           mountPath: /config
-        - name: recordings
-          mountPath: /recordings
         - name: logs
           mountPath: "/config/Library/Application Support/Plex Media Server/Logs"
+        securityContext:
+          privileged: true          
         livenessProbe:
           httpGet:
             path: /identity
@@ -74,7 +79,7 @@ spec:
           timeoutSeconds: 10
         resources:
           requests:
-            memory: "2Gi"
+            memory: "4Gi"
           limits:
             memory: "8Gi"
       # - name: plex-promtail
@@ -94,15 +99,14 @@ spec:
           nfs:
             server: ceph-nfs.home
             path: /cephfs/media
-        - name: recordings
-          nfs:
-            server: ceph-nfs.home
-            path: /cephfs/recordings    
         - name: plex-config
           persistentVolumeClaim:
             claimName: plex-config 
         - name: logs
           emptyDir: {}
+        # - name: dri
+        #   hostPath:
+        #     path: /dev/dri
         # - name: promtail-config
         #   configMap:
         #     name: plex-promtail
