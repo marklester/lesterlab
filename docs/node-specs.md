@@ -10,8 +10,8 @@
 * 1 512GB NVME
 
 ## Helium
-* Athlon 200
-* 32GB
+* ryzen 3600gt
+* 64GB
 * 3x8 hdds
 * 1xssd
 * 1x 128GB NVME
