@@ -18,7 +18,7 @@
 
 ## Lithium
 * 32GB
-* ipmit
+* ipmi
 * ryzen 3600
 * intel x540 10Gb nic
 * 2x 512 nvme
