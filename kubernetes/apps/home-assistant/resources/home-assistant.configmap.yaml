@@ -26,69 +26,13 @@ data:
         - 192.168.0.10
         - 127.0.0.1 
         - 10.43.0.0/16
-    mqtt:
-      broker: mqtt.mqtt
-
-    stream:
-
-    # camera:
-    #     - platform: generic
-    #       name: basement
-    #       still_image_url: http://camera-2/snap.jpeg
-    #       stream_source: rtsp://camera-2:554/s0
-    #       verify_ssl: false
-    #     - name: front-last-detection
-    #       platform: local_file
-    #       file_path: /recordings/front_latest.jpg
-    # image_processing:
-    #   - platform: doods
-    #     url: "http://doods.doods:8080"
-    #     detector: tensorflow
-    #     source:
-    #       - entity_id: camera.front
-    #     file_out:
-    #       - "/recordings/{{ camera_entity.split('.')[1] }}_latest.jpg"  
-    #     labels:
-    #       - name: person
-    #         confidence: 80
-    #       - name: cat
-    #         confidence: 90
-    prometheus:
-      namespace: hass
-
-    # octoprint:
-    #   host: pi-2.home
-    #   api_key: F9A8B807F5404E7FB63AF0504686E6B6
-
-    media_player:
-      - name: shield
-        platform: androidtv
-        host: 192.168.0.113
-    # notify:
-    #   - name: phones
-    #     platform: group
-    #     services:
-    #       - service: mobile_app_pixel_4a
-    #       - service: mobile_app_pixel_3a
 
     homeassistant:
       external_url: "https://home-assistant.lester.network"
-      allowlist_external_dirs:
-        - /recordings
       media_dirs:
-        recording: /recordings
         media: /media
-    sensor:
-      # - platform: colordetection
-      #   source: media_player.shield
-      #   color_count: 3
-      #   quality: 8
-      #   scan_interval: 15
-      # - platform: template
-      #   sensors:
-      #     doods_process_time:
-      #       friendly_name: Doods Process Time
-      #       unit_of_measurement: "s"
-      #       # Average temperature of sensors in room:
-      #       value_template: >-
-      #         {{state_attr("image_processing.doods_front", "process_time")}}
+      time_zone: "US/Eastern"
+      currency: USD
+      country: US
+      latitude: "28.20590646290917"
+      longitude: "-82.49559411349301"
