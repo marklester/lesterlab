@@ -1,0 +1,13 @@
+kind: Deploy
+description: Deploy Nvidia Device Plugin
+type: helm
+name: nvidia-device-plugin
+spec:
+  namespace: nvidia-device-plugin
+  chart: 
+    name: nvidia-device-plugin
+    repo: https://nvidia.github.io/k8s-device-plugin
+    version: 0.17.1
+  values: 
+    nodeSelector:
+      accelerator: nvidia
