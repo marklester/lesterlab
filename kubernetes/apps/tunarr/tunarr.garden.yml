@@ -1,0 +1,10 @@
+kind: Deploy
+description: Deploy Tunarr
+type: kubernetes
+name: tunarr
+variables:
+  app-name: ${this.name}
+spec:
+  manifestTemplates:
+    - manifests/tunarr-config.pvc.yml
+    - manifests/tunarr.deployment.yml
