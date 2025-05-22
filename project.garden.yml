@@ -1,0 +1,11 @@
+apiVersion: garden.io/v2
+kind: Project
+name: lesterlabs
+environments:
+  - name: local
+    defaultNamespace: garden
+providers:
+  - name: local-kubernetes
+    setupIngressController: false
+    environments: [local]
+
