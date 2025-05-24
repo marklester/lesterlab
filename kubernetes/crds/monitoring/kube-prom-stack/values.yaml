@@ -14,11 +14,24 @@ grafana:
     type: pvc
     storageClassName: rook-cephfs-retain
     accessModes:
-    - ReadWriteMany
+      - ReadWriteMany
     size: 4Gi
   service: 
     type: LoadBalancer
     loadBalancerIP: "192.168.0.209"
+  grafana.ini:
+    smtp:
+      enabled: true
+      host: "smtp.gmail.com:587"
+      from_address: mlester+grafana@gmail.com
+      
+  smtp:
+    existingSecret: "grafana-smtp-credentials"
+    userKey: "user"
+    passwordKey: "password"
+  initChownData:
+    enabled: false 
+
 prometheusOperator:
   certManager:
     enabled: true
@@ -31,6 +44,7 @@ prometheus:
   prometheusSpec:
     scrapeInterval: 30s
     evaluationInterval: 30s
+    maximumStartupDurationSeconds: 600
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
     retention: 14d
