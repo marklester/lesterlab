@@ -205,7 +205,9 @@ spec:
       - name: "sdc"
     - name: "gimli.home"
       devices: # specific devices to use for storage can be specified for each node
-      - name: "zd0"
+      - name: "sda"
+      - name: "sdb"
+      - name: "sdc"   
     - name: "helium.home"
       devices: # specific devices to use for storage can be specified for each node
       - name: "sdb"
