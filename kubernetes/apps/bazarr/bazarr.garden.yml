@@ -1,0 +1,11 @@
+kind: Deploy
+description: |
+  Deploy Bizarr. Bizarr is app that handles downloading and managing subtitles
+type: kubernetes
+name: bazarr
+variables:
+  app-name: ${this.name}
+spec:
+  manifestTemplates:
+    - manifests/storage.pvc.yml
+    - manifests/app.deployment.yml

@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${var.app-name}
+  labels:
+    app: ${var.app-name}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${var.app-name}
+  template:
+    metadata:
+      labels:
+        app: ${var.app-name}
+    spec:
+      containers:
+        - name: ${var.app-name}
+          image: lscr.io/linuxserver/bazarr:latest
+          imagePullPolicy: Always
+          env:
+            - name: TZ
+              value: "America/New_York"
+            - name: PUID
+              value: "65534"
+            - name: PGID
+              value: "65534"             
+              ports:
+          ports:              
+            - name: http
+              containerPort: 6767
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: tv
+              mountPath: /tv 
+            - name: movies
+              mountPath: /movies
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: ${var.app-name}-config
+        - name: tv
+          nfs:
+            server: ceph-nfs.home
+            path: /cephfs/media/TV
+        - name: movies
+          nfs:
+            server: ceph-nfs.home
+            path: /cephfs/media/Movies              
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${var.app-name}
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.0.210
+  selector:
+    app: ${var.app-name}
+  ports:
+  - name: http
+    port: 80
+    targetPort: 6767

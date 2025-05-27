@@ -56,3 +56,7 @@ so
 `ceph nfs cluster update nfs-cluster "3 gimli,helium,lithium"`
 
 ## rke setup
+
+## Ceph Performance Tuning
+
+https://www.cloudraft.io/blog/rook-ceph-performance-tuning
