@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: unifi-poller
-        image: golift/unifi-poller:latest
+        image: ghcr.io/unpoller/unpoller:latest
         imagePullPolicy: Always
         env:
         - name: UP_UNIFI_DEFAULT_USER
@@ -51,7 +51,8 @@ spec:
           protocol: TCP
         volumeMounts:
         - name: config
-          mountPath: /config
+          mountPath: /etc/unpoller/up.conf
+          subPath: unifi-poller.conf 
       volumes:
       - name: config
         configMap:
