@@ -1,0 +1,20 @@
+kind: Deploy
+description: Victoria Logs
+type: helm
+name: victoria-logs
+dependencies: []
+spec:
+  namespace: monitoring
+  chart: 
+    name: victoria-logs-single
+    repo: https://victoriametrics.github.io/helm-charts/
+  values:
+    server:
+      persistentVolume:
+        storageClassName: rook-cephfs   
+        accessMode: ReadWriteMany
+      podSecurityContext:
+        runAsUser: 0
+        runAsNonRoot: false
+    vector:
+      enabled: true

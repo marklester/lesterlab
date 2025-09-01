@@ -1,0 +1,15 @@
+kind: Deploy
+description: |
+  Deploy Exporter for Smart Tools
+type: helm
+name: smartctl-exporter
+spec:
+  namespace: monitoring
+  chart: 
+    name: prometheus-smartctl-exporter
+    repo: https://prometheus-community.github.io/helm-charts
+  values:   
+    serviceMonitor:
+      enabled: true
+    hostNetwork: true
+    

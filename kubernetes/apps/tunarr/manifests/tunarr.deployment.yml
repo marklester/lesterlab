@@ -18,7 +18,7 @@ spec:
       nodeName: helium.home
       containers:
         - name: ${var.app-name}
-          image: chrisbenincasa/tunarr:latest-vaapi
+          image: ghcr.io/chrisbenincasa/tunarr:latest
           imagePullPolicy: Always
           env:
             - name: TZ
