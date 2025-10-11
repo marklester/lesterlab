@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${var.app-name}
+  labels:
+    app: ${var.app-name}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${var.app-name}
+  template:
+    metadata:
+      labels:
+        app: ${var.app-name}
+    spec:
+      imagePullSecrets:
+        - name: ghcr-login-secret
+      containers:
+      - name: ${var.app-name}
+        image: ghcr.io/marklester/pig-ebank:latest
+        imagePullPolicy: Always
+        env: 
+          - name: SPRING_DATASOURCE_URL
+            value: "jdbc:h2:file:/data/appdb"
+          - name: STORAGE_ROOTPATH
+            value: "/data"
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        volumeMounts: 
+          - name: ${var.app-storage}
+            mountPath: /data
+      volumes: 
+        - name: ${var.app-storage}
+          persistentVolumeClaim:
+            claimName: ${var.app-storage}

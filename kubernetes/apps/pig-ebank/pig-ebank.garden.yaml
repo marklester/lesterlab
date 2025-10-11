@@ -1,0 +1,13 @@
+kind: Deploy
+name: pig-ebank
+description: pig-ebank
+type: kubernetes
+variables:
+  app-name: ${this.name}
+  app-storage: ${this.name}-storage
+spec:
+  manifestTemplates:
+    - manifests/deployment.yaml
+    - manifests/service.yaml
+    - manifests/ingress.yaml
+    - manifests/pvc.yaml
