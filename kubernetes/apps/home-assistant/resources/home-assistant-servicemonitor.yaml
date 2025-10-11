@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: home-assistant
-  namespace: monitoring
+  namespace: home-assistant
   labels:
     app: home-assistant
     release: "prometheus-operator"
@@ -24,7 +24,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: hass-metrics-token
-  namespace: monitoring
+  namespace: home-assistant
 type: Opaque
 stringData: 
   token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI5Yjg5Zjg4MjVlZjc0M2JmOTAzYWFiMDdkMTI2MzRlZiIsImlhdCI6MTYyMjY3ODA2NywiZXhwIjoxOTM4MDM4MDY3fQ.McZPNiSz6BXkQYa3cvMvq2fkGzoXGjkrv32jc22Ji-U

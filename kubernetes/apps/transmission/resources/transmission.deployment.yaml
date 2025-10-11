@@ -41,6 +41,8 @@ spec:
           value: "65534"
         - name: PGID
           value: "65534"
+        - name: RUN_AS
+          value: "nobody"          
         - name: OPENVPN_USERNAME
           valueFrom:
             secretKeyRef:

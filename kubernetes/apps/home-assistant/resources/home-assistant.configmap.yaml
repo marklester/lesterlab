@@ -36,3 +36,5 @@ data:
       country: US
       latitude: "28.20590646290917"
       longitude: "-82.49559411349301"
+    
+    prometheus: {}

@@ -1,0 +1,11 @@
+kind: Deploy
+description: |
+  Deploy Bizarr. Bizarr is app that handles downloading and managing subtitles
+type: kubernetes
+name: home-assistant
+variables:
+  app-name: ${this.name}
+spec:
+  manifestTemplates:
+    - home-assistant.configmap.yaml
+    - home-assistant-servicemonitor.yaml

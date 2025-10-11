@@ -7,5 +7,7 @@ environments:
 providers:
   - name: local-kubernetes
     setupIngressController: false
+    imagePullSecrets:
+      - name: ghcr-login-secret      
     environments: [local]
 

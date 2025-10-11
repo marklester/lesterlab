@@ -30,7 +30,17 @@ grafana:
     userKey: "user"
     passwordKey: "password"
   initChownData:
-    enabled: false 
+    enabled: false
+  
+  plugins:
+    - victoriametrics-logs-datasource
+  
+  additionalDataSources: 
+    - name: VictoriaLogs
+      type: victoriametrics-logs-datasource
+      access: proxy
+      url: http://victoria-logs-victoria-logs-single-server:9428
+      isDefault: false
 
 prometheusOperator:
   certManager:
@@ -63,7 +73,13 @@ prometheus:
       - source_labels: [__meta_kubernetes_pod_node_name]
         action: replace
         target_label: kubernetes_node    
-  
+    - job_name: desktop-metrics
+      scrape_interval: 30s
+      static_configs:
+        - targets: ['phantom:4445']
+        - labels:
+            name: phantom
+            os: windows
     storageSpec: 
       ## Using PersistentVolumeClaim
       ##
