@@ -1,0 +1,13 @@
+kind: Deploy
+type: kubernetes
+name: transmission
+description: |
+  * transmission
+variables:
+  app-name: ${this.name}
+spec:
+  namespace: transmission
+  manifestTemplates:
+    - resources/transmission.deployment.yaml
+    - resources/transmission.service.yaml
+    - resources/transmission.ingress.yaml

@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: lidarr
-        image: linuxserver/lidarr:latest
+        image: ghcr.io/hotio/lidarr:pr-plugins
         imagePullPolicy: Always
         env:
         - name: PUID

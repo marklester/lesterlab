@@ -1,0 +1,9 @@
+kind: Deploy
+description: Deploy Samba
+type: kubernetes
+name: samba
+variables:
+  app-name: ${this.name}
+spec:
+  manifestTemplates:
+    - deployment.yaml

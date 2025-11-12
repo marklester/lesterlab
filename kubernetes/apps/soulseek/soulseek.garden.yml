@@ -1,0 +1,16 @@
+kind: Deploy
+type: kubernetes
+name: soulseek
+description: |
+  Deploy [Soulseek web app}(https://github.com/slskd/slskd)
+variables:
+  app-name: ${this.name}
+varfiles:
+  - ".vars.yml"
+spec:
+  namespace: transmission
+  manifestTemplates:
+    - manifests/soulseek.storage.pvc.yml
+    - manifests/soulseek.deployment.yml
+    - manifests/soulseek.service.yml
+    - manifests/soulseek.ingress.yml
