@@ -1,0 +1,23 @@
+kind: Deploy
+type: helm
+description: Deploy MetalLb
+name: metallb
+spec:
+  namespace: metallb-system
+  chart: 
+    name: metallb
+    repo: https://metallb.github.io/metallb
+    version: 0.15.2
+  values: {}
+---
+kind: Deploy
+type: kubernetes
+name: metallb-config
+description: |
+  Deploy the metallb config
+dependencies:
+  - deploy.metallb
+spec:
+  namespace: metallb-system
+  manifestTemplates:
+    - addresspool.yaml
