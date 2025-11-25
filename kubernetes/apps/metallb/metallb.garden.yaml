@@ -8,7 +8,11 @@ spec:
     name: metallb
     repo: https://metallb.github.io/metallb
     version: 0.15.2
-  values: {}
+  values: 
+    speaker:
+      frr:
+        enabled: false
+
 ---
 kind: Deploy
 type: kubernetes
@@ -20,4 +24,5 @@ dependencies:
 spec:
   namespace: metallb-system
   manifestTemplates:
+    - namespace.yaml
     - addresspool.yaml
