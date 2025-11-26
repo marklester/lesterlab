@@ -5,8 +5,6 @@ description: |
   Deploy [Soulseek web app}(https://github.com/slskd/slskd)
 variables:
   app-name: ${this.name}
-varfiles:
-  - ".vars.yml"
 spec:
   namespace: transmission
   manifestTemplates:

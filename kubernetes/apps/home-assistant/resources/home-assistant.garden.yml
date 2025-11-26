@@ -8,4 +8,7 @@ variables:
 spec:
   manifestTemplates:
     - home-assistant.configmap.yaml
-    - home-assistant-servicemonitor.yaml
+    - home-assistant-deployment.yaml
+    - home-assistant-service.yaml
+    - home-assistant-ingress.yaml
+    # - home-assistant-servicemonitor.yaml

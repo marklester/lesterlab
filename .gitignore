@@ -1,3 +1,4 @@
 *.rkestate
 .garden/*
 .vars.yml
+.garden.vars.yaml

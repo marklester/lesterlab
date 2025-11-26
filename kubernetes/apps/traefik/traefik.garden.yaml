@@ -1,0 +1,18 @@
+kind: Deploy
+type: helm
+description: Deploy [Traefik](https://doc.traefik.io/traefik/getting-started/install-traefik/#use-the-helm-chart)
+name: traefik
+spec:
+  namespace: traefik
+  chart: 
+    name: traefik
+    repo: https://traefik.github.io/charts
+    version: v37.4.0
+  values:
+    deployment:
+      kind: DaemonSet
+    providers:
+      kubernetesIngressNginx:
+        enabled: true
+    service:
+      loadBalancerIP: 192.168.0.200

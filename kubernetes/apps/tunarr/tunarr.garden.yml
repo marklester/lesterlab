@@ -4,7 +4,20 @@ type: kubernetes
 name: tunarr
 variables:
   app-name: ${this.name}
+dependencies:
+  - deploy.tunarr-storage
 spec:
+  namespace: tunarr
+  manifestTemplates:
+    - manifests/tunarr.deployment.yml
+---
+kind: Deploy
+description: Deploy Tunarr Storage
+type: kubernetes
+name: tunarr-storage
+variables:
+  app-name: tunarr
+spec:
+  namespace: tunarr
   manifestTemplates:
     - manifests/tunarr-config.pvc.yml
-    - manifests/tunarr.deployment.yml

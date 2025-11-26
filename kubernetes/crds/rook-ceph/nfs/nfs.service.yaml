@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: rook-ceph-nfs-ceph-nfs-lb
+  name: rook-ceph-nfs-lb
   namespace: rook-ceph
 spec:
   type: LoadBalancer
@@ -14,8 +14,8 @@ spec:
   selector:
     app: rook-ceph-nfs
     # ceph_daemon_id: a
-    ceph_daemon_type: nfs
-    ceph_nfs: nfs-cluster
-    # instance: a
-    # nfs: a
-    rook_cluster: rook-ceph
+    # ceph_daemon_type: nfs
+    # ceph_nfs: nfs-cluster
+    # # instance: a
+    # # nfs: a
+    # rook_cluster: rook-ceph

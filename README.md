@@ -60,3 +60,8 @@ so
 ## Ceph Performance Tuning
 
 https://www.cloudraft.io/blog/rook-ceph-performance-tuning
+
+## Ubuntu Updates
+```
+sudo apt update && sudo apt upgrade && sudo apt autoremove
+```

@@ -1,0 +1,30 @@
+kind: Deploy
+type: helm
+description: Deploy [Cert Manager](https://cert-manager.io/docs/installation/helm/)
+name: cert-manager
+spec:
+  namespace: cert-manager
+  chart: 
+    url: oci://quay.io/jetstack/charts/cert-manager
+    version: v1.19.1
+  values: 
+    crds:
+      enabled: true
+    # podDnsConfig:
+    #   nameservers:
+    #     - "1.1.1.1"
+    #     - "8.8.8.8"
+    
+---
+kind: Deploy
+type: kubernetes
+name: cert-manager-issuers
+description: deploy the issuers for certManager
+# dependencies:
+#   - deploy.cert-manager
+variables:
+  ingressClassName: nginx
+spec:
+  manifestTemplates:
+    - staging-issuer.yaml
+    - production-issuer.yaml

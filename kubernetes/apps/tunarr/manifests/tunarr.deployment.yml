@@ -15,7 +15,7 @@ spec:
       labels:
         app: ${var.app-name}
     spec:
-      nodeName: helium.home
+      nodeName: helium
       containers:
         - name: ${var.app-name}
           image: ghcr.io/chrisbenincasa/tunarr:latest
@@ -23,8 +23,6 @@ spec:
           env:
             - name: TZ
               value: "America/New_York"
-            - name: NVIDIA_VISIBLE_DEVICES
-              value: all
             - name: TUNARR_SERVER_TRUST_PROXY
               value: "true"                         
           ports:
@@ -32,6 +30,7 @@ spec:
               containerPort: 8000
               protocol: TCP
           volumeMounts:
+
             - name: ${var.app-name}-config
               mountPath: /config/tunarr
             - name: dri

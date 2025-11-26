@@ -1,0 +1,12 @@
+kind: Deploy
+type: kubernetes
+name: govee2mqtt
+description: |
+  deploy [govee2mqtt](https://github.com/wez/govee2mqtt) 
+variables:
+  app-name: ${this.name}
+spec:
+  namespace: mqtt
+  manifestTemplates:
+    - resources/govee2mqtt.deployment.yml
+    - resources/govee2mqtt.secret.yaml
