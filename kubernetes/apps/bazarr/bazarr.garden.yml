@@ -5,7 +5,21 @@ type: kubernetes
 name: bazarr
 variables:
   app-name: ${this.name}
+dependencies:
+  - deploy.bazarr-storage
 spec:
+  namespace: bazarr
+  manifestTemplates:
+    - manifests/app.deployment.yml
+---
+kind: Deploy
+description: |
+  Storage for bizarr
+type: kubernetes
+name: bazarr-storage
+variables:
+  app-name: bazarr
+spec:
+  namespace: bazarr
   manifestTemplates:
     - manifests/storage.pvc.yml
-    - manifests/app.deployment.yml

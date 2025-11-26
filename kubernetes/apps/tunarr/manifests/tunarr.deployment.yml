@@ -15,7 +15,7 @@ spec:
       labels:
         app: ${var.app-name}
     spec:
-      nodeName: helium.home
+      nodeName: helium
       containers:
         - name: ${var.app-name}
           image: ghcr.io/chrisbenincasa/tunarr:latest

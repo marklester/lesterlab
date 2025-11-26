@@ -2,12 +2,13 @@ kind: Deploy
 type: kubernetes
 name: transmission
 description: |
-  * transmission
+  deploy transmission 
 variables:
   app-name: ${this.name}
 spec:
   namespace: transmission
   manifestTemplates:
+    - resources/transmission.secret.yaml
     - resources/transmission.deployment.yaml
     - resources/transmission.service.yaml
     - resources/transmission.ingress.yaml
