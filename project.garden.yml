@@ -10,4 +10,4 @@ providers:
     imagePullSecrets:
       - name: ghcr-login-secret      
     environments: [local]
-
+varfile: ".garden.vars.yaml"
