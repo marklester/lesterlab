@@ -1,0 +1,16 @@
+---
+- name: rke setup
+  hosts: moon
+  become: yes  # Run as sudo
+  tasks:
+    - name: Install Nfs Common
+      apt:
+        name: nfs-common
+        state: present
+        update_cache: yes
+    - name: Update Nfs Mount Configuration
+      ansible.builtin.copy:
+        dest: /etc/nfsmount.conf
+        content: |
+          [ NFSMount_Global_Options ]
+          Defaultvers=4.1
