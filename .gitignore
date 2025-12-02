@@ -2,3 +2,4 @@
 .garden/*
 .vars.yml
 .garden.vars.yaml
+**/.garden
