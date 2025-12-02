@@ -7,6 +7,7 @@ variables:
   app-storage: ${this.name}-storage
 dependencies:
   - deploy.pig-ebank-storage
+  - deploy.pig-ebank-ghcr-credentials
 spec:
   namespace: pig-ebank
   manifestTemplates:
@@ -22,3 +23,13 @@ spec:
   namespace: pig-ebank
   manifestTemplates:
     - manifests/pvc.yaml
+---
+kind: RenderTemplate
+name: pig-ebank-ghcr-credentials
+template: docker-secret-template
+inputs:
+  registry: "https://ghcr.io"
+  username: ${var.ghcr.username}
+  password: ${var.ghcr.api-key}
+  email: ${var.email}
+  namespace: pig-ebank

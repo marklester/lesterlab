@@ -6,8 +6,7 @@ environments:
     defaultNamespace: garden
 providers:
   - name: local-kubernetes
-    setupIngressController: false
-    imagePullSecrets:
-      - name: ghcr-login-secret      
+    setupIngressController: false    
     environments: [local]
+    context: "main-cluster"
 varfile: ".garden.vars.yaml"
