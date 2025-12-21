@@ -1,0 +1,57 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openebs
+  namespace: argocd
+spec:
+  destination:
+    namespace: openebs
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: openebs
+    repoURL: https://openebs.github.io/openebs  # note: the oci:// syntax is not included.
+    targetRevision: 4.4.0
+    helm:
+      valuesObject: 
+        zfs-localpv.enabled: true
+        localpv-hostpath.enabled: false
+        lvm-localpv.enabled: false
+        mayastor.enabled: false
+        # cstor is typically disabled by default, but you can explicitly set it if needed
+        # openebs-cstor.enabled: false 
+        # Enable ZFS LocalPV
+
+  syncPolicy:
+    automated:
+      prune: true       # Automatically delete resources no longer in Git
+      selfHeal: true    # Correct manual changes made in the cluster (drift detection)
+    syncOptions:
+      - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
+      - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
+      - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
+      - ServerSideApply=true 
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openebs
+  namespace: argocd
+spec:
+  destination:
+    namespace: openebs
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: kubernetes/argocd/moonbase/manifests/openebs
+    repoURL: https://github.com/marklester/lesterlab
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true       # Automatically delete resources no longer in Git
+      selfHeal: true    # Correct manual changes made in the cluster (drift detection)
+    syncOptions:
+      - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
+      - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
+      - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
+      - ServerSideApply=true  

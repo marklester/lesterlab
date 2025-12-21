@@ -1,0 +1,8 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-zfs
+parameters:
+  poolname: "tank/openebs-persisent-volumes"
+  fstype: "zfs"
+provisioner: zfs.csi.openebs.io

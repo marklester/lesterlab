@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rook-ceph-cluster
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: rook-ceph-cluster
+    repoURL: https://charts.rook.io/release
+    targetRevision: 1.18.8
+    helm:
+      valuesObject: 
+        clusterName: ceph-backup
+        cephImage: v19.2.3
+        toolbox:
+          enabled: true
+        cephClusterSpec:
+          mon: 
+            count: 1
+          mgr:
+            count: 1
+          resources:
+            osd:
+              limits:
+                memory: "4Gi"
+            mgr: {}
+            mon: {}
+            operator: {}
+          storage:
+            useAllDevices: true
+            deviceFilter: "^sd."
+        cephBlockPools: {}  
+        cephObjectStores: {}
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: rook-ceph
+  syncPolicy:
+    automated:
+      prune: true       # Automatically delete resources no longer in Git
+      selfHeal: true    # Correct manual changes made in the cluster (drift detection)
+    syncOptions:
+      - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
+      - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
+      - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
+      - ServerSideApply=true  
