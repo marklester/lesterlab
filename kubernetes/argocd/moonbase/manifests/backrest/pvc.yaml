@@ -2,9 +2,9 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: backrest-data
+spec:
   accessModes:
     - ReadWriteOnce
-spec:
   resources:
     requests:
       storage: 1Gi
