@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backrest-ingress
+  annotations:
+spec:
+  rules:
+    - host: "backrest.home"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backrest
+                port:
+                  number: 80
