@@ -25,6 +25,8 @@ spec:
               value: "/data"
             - name: BACKREST_CONFIG
               value: "/data/config.json"              
+            - name: BACKREST_PORT
+              value: "0.0.0.0:9898"
           ports:
             - name: http
               containerPort: 9898
