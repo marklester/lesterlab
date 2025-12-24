@@ -1,26 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: local-path-provisioner
+  name: backrest
   namespace: argocd
 spec:
   destination:
-    namespace: local-path-provisioner
+    namespace: backrest
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: deploy/chart/local-path-provisioner
-    repoURL: https://github.com/rancher/local-path-provisioner.git
-    targetRevision: v0.0.32
-    helm:
-      valuesObject: 
-        storageClass:
-          defaultClass: true
-          reclaimPolicy: Retain
-        nodePathMap:
-          - node: DEFAULT_PATH_FOR_NON_LISTED_NODES
-            paths:
-              - /tank/local-path-provisioner
+    path: kubernetes/argocd/moonbase/manifests/backrest
+    repoURL: https://github.com/marklester/lesterlab.git
+    targetRevision: HEAD
   syncPolicy:
     automated:
       prune: true       # Automatically delete resources no longer in Git

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backrest
+  labels:
+    app: backrest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backrest
+  template:
+    metadata:
+      labels:
+        app: backrest
+    spec:
+      containers:
+        - name: backrest
+          image: garethgeorge/backrest:latest
+          imagePullPolicy: Always
+          env:
+            - name: TZ
+              value: "America/New_York"
+            - name: BACKREST_DATA
+              value: "/data"
+            - name: BACKREST_CONFIG
+              value: "/data/config.json"              
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          volumeMounts:
+            - name: backrest-data
+              mountPath: /data
+            - name: main-cephfs
+              mountPath: /userdata
+            - name: backups-volume
+              mountPath: /repos             
+      volumes:
+        - name: backrest-data
+          persistentVolumeClaim:
+            claimName: backrest-data
+        - name: main-cephfs
+          nfs:
+            server: ceph-nfs.home
+            path: /cephfs
+        - name: backups-volume
+          hostPath:
+            path: /tank/backups # directory location on host
+            type: Directory # this field is optional            
