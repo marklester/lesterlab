@@ -1,6 +1,6 @@
 ---
-- name: Moon Rke2 Setup
-  hosts: moon
+- name: Moonbase Rke2 Setup
+  hosts: moonbase
   vars_files:
     - secrets.yml
   become: yes  # Run as sudo
@@ -20,7 +20,9 @@
       ansible.builtin.copy:
         dest: /etc/sysctl.d/local.conf
         content: |
-          fs.inotify.max_user_watches = 524288          
+          fs.inotify.max_user_watches = 1048576          
+    - name: Reload all sysctl configuration using shell command
+      ansible.builtin.shell: sysctl -p --system
     - name: ensure rancher config dir exists
       file:
         path: /etc/rancher/rke2
@@ -30,10 +32,10 @@
       ansible.builtin.copy:
         dest: /etc/rancher/rke2/config.yaml
         content: |
-          # server: https://moon.home:9345
+          # server: https://moonbase.home:9345
           token: {{ moon_rke2_token }}
           tls-san:
-            - moon.home
+            - moonbase.home
           ingress-controller: none
     - name: install rke2 server
       ansible.builtin.shell: "curl -sfL https://get.rke2.io | sh -"

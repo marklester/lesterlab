@@ -9,8 +9,8 @@ elements:
     lithium.home:
   vars:
     ansible_user: atom
-moon:
+moonbase:
   hosts:
-    moon.home:
+    moonbase.home:
   vars:
-    ansible_user: atom
+    ansible_user: root
