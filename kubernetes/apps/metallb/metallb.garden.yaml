@@ -26,3 +26,30 @@ spec:
   manifestTemplates:
     - namespace.yaml
     - addresspool.yaml
+---
+kind: Deploy
+type: kubernetes
+name: metallb-admin-config
+description: |
+  Deploy the metallb for the admin cluster
+dependencies:
+  - deploy.metallb
+spec:
+  namespace: metallb-system
+  manifests:
+    - apiVersion: metallb.io/v1beta1
+      kind: IPAddressPool
+      metadata:
+        name: admin-ip-pool
+        namespace: metallb-system
+      spec:
+        addresses:
+        - 192.168.0.251-192.168.0.253
+    - apiVersion: metallb.io/v1beta1
+      kind: L2Advertisement
+      metadata:
+        name: default
+        namespace: metallb-system
+      spec:
+        ipAddressPools:
+          - admin-ip-pool

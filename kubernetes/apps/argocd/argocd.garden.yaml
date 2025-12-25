@@ -7,8 +7,16 @@ spec:
     name: argo-cd
     repo: https://argoproj.github.io/argo-helm
   values: 
+    global:
+      domain:
+        admin-cluster-argocd.home
+        
+    configs:
+      params:
+        server.insecure: true
+      cm:
+        ui.title: Admin-Cluster ArgoCD
     server:
-      service:
-        type: LoadBalancer
-        loadBalancerIP: 192.168.0.220
----
+      ingress:
+        enabled: true
+        ingressClassName: traefik

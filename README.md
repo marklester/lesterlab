@@ -1,67 +1,36 @@
-# HomeLab Cluster
+# LesterLab Homelab 
+
+This repo contains configuraiton and docs to setup my homelab.
+
+What do I use my homelab for:
+
+* media management
+* home-automation
+* self-hosted experiments
 
 ## [Specs](docs/node-specs.md)
 
-## Setup space for ceph
+## LesterLab History
 
-```sh
-zfs create tank/zblock0 -V 10tb
-```
+### v1: truenas
+pros;
+*easy to get started
+zfs is nice
+*cons:
+* can't scale maxed out by whas on the node
+* no resilency. If its down its down.
+### v2: ubuntu+rke
+Pros: 
+* easy to scale
+Cons:
+  * incomplete backup
+  * no longer supported
+### v3: ubuntu+rke2
 
-## Configure nfs default mount settings
+node setup: ansible
+kube node management: rke2
 
-1. Set up nfs with ceph
-follow instructions here:
-https://docs.ceph.com/en/latest/cephfs/fs-nfs-exports/#create-cephfs-export
+New: Have a Single Node Management Cluster
+* use flatcar with butane for setup
+* This will h
 
-1. All nodes need to be configured to use nfs 4.1
-create file: `/etc/nfsmount.conf`
-inside add:
-
-```ini
-[ NFSMount_Global_Options ]
-Defaultvers=4.1
-```
-
-1. NFS has to be configured to convert ids to numbers
-this can be done by creating a file with contents of:
-`vi nfs.config`
-```
-NFSV4 {
-    Allow_Numeric_Owners = true;
-    Only_Numeric_Owners = true;
-}
-```
-
-and then applying that file with:
-
-https://docs.ceph.com/en/octopus/cephfs/fs-nfs-exports/#set-customized-nfs-ganesha-configuration
-
-`ceph nfs cluster config set nfs-cluster -i nfs.config`
-
-### Create Export
-`ceph nfs export create cephfs cephfs nfs-cluster /cephfs`
-
-## Debugging Configuration
-nfs puts config in rados in it's own pull here are some common commands
-
-`rados -p nfs-ganesha ls --all`
-`rados -p nfs-ganesha get -n nfs-cluster <objectname> <filetooutputto> --all`
-
-### Update Placement
-
-`ceph nfs cluster update <clusterid> <placementnumber>`
-
-so
-`ceph nfs cluster update nfs-cluster "3 gimli,helium,lithium"`
-
-## rke setup
-
-## Ceph Performance Tuning
-
-https://www.cloudraft.io/blog/rook-ceph-performance-tuning
-
-## Ubuntu Updates
-```
-sudo apt update && sudo apt upgrade && sudo apt autoremove
-```

@@ -1,0 +1,15 @@
+kind: Deploy
+type: helm
+description: Deploy Rancher
+name: rancher
+dependencies:
+  - deploy.cert-manager
+spec:
+  namespace: cattle-system
+  chart: 
+    name: rancher
+    repo: https://releases.rancher.com/server-charts/stable
+    version: v2.13.0
+  values: 
+    hostname:
+      "rancher.home"
