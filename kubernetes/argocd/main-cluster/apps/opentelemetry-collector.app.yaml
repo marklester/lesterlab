@@ -1,0 +1,67 @@
+# This is used to collector and push metrics to moonbase
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: opentelemetry-collector
+  namespace: argocd
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: opentelemetry-collector
+    repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
+    targetRevision: 0.142.1
+    helm:
+      valuesObject:         
+        namespaceOverride: monitoring
+        mode: daemonset
+        image:
+          repository: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib"
+        # command:
+        #   name: otelcol-k8s
+        ports:
+          metrics:
+            enabled: true
+        serviceMonitor:
+          enabled: true
+        config:
+          receivers:
+            otlp:
+              protocols:
+                grpc:
+                  endpoint: 0.0.0.0:4317
+                http:
+                  endpoint: 0.0.0.0:4318
+            prometheus: {}
+          exporters:
+            prometheusremotewrite:
+              endpoint: "http://prometheus.moonbase.home/api/v1/write"
+              resource_to_telemetry_conversion:
+                enabled: true
+          processors:
+            batch: {}
+            resource:
+              attributes:
+              - key: environment
+                value: "main-cluster"
+                action: insert # Add if not present
+              - key: collector.instance.id
+                value: "otel-collector"
+                action: insert
+          service:
+            pipelines:
+              metrics:
+                receivers: [otlp, prometheus]
+                processors: [resource,batch]
+                exporters: [prometheusremotewrite]
+  syncPolicy:
+    automated:
+      prune: true       # Automatically delete resources no longer in Git
+      selfHeal: true    # Correct manual changes made in the cluster (drift detection)
+    syncOptions:
+      - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
+      - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
+      - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
+      - ServerSideApply=true  

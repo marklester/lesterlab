@@ -51,12 +51,20 @@ spec:
               enabled: true
 
         prometheus:
+          ingress:
+            enabled: true
+            hosts:
+              - prometheus.moonbase.home             
           prometheusSpec:
             scrapeInterval: 30s
             evaluationInterval: 30s
             maximumStartupDurationSeconds: 600
             serviceMonitorSelectorNilUsesHelmValues: false
             podMonitorSelectorNilUsesHelmValues: false
+            enableRemoteWriteReceiver: true
+            enableOTLPReceiver: true
+            enableFeatures:
+              - remote-write-receiver
             retention: 14d
             retentionSize: 85GB
             storageSpec: 
