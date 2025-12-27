@@ -1,0 +1,93 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: kube-prometheus-stack
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 80.7.0
+    helm:
+      valuesObject: 
+        namespaceOverride: monitoring
+
+        alertmanager:
+          enabled: false
+
+        grafana:
+          enabled: true
+          namespaceOverride: monitoring
+          ingress:
+            enabled: true
+            hosts:
+              - grafana.moonbase.home
+          persistence:
+            enabled: true
+            type: pvc
+            accessModes:
+              - ReadWriteOnce
+            size: 4Gi
+          admin:
+            existingSecret: kube-prometheus-stack-grafana
+          # grafana.ini:
+          #   smtp:
+          #     enabled: true
+          #     host: "smtp.gmail.com:587"
+          #     from_address: mlester+grafana@gmail.com
+
+          # smtp:
+          #   existingSecret: "grafana-smtp-credentials"
+          #   userKey: "user"
+          #   passwordKey: "password"
+          initChownData:
+            enabled: false
+          prometheusOperator:
+            certManager:
+              enabled: true
+
+        prometheus:
+          prometheusSpec:
+            scrapeInterval: 30s
+            evaluationInterval: 30s
+            maximumStartupDurationSeconds: 600
+            serviceMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelectorNilUsesHelmValues: false
+            retention: 14d
+            retentionSize: 85GB
+            storageSpec: 
+              ## Using PersistentVolumeClaim
+              ##
+              volumeClaimTemplate:
+                spec:
+                  # storageClassName: rook-cephfs
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 100Gi
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 2000
+              runAsNonRoot: true
+              fsGroup: 1000
+              seccompProfile:
+                type: RuntimeDefault              
+            # initContainers:
+        prometheus-node-exporter:
+          namespaceOverride: monitoring
+
+        kube-state-metrics:
+          namespaceOverride: monitoring
+  syncPolicy:
+    automated:
+      prune: true       # Automatically delete resources no longer in Git
+      selfHeal: true    # Correct manual changes made in the cluster (drift detection)
+    syncOptions:
+      - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
+      - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
+      - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
+      - ServerSideApply=true  
