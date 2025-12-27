@@ -24,22 +24,7 @@ spec:
     port: 32469
     targetPort: 32469
     protocol: TCP
----
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: plex-udp
-  namespace: plex
-  annotations:
-    metallb.universe.tf/allow-shared-ip: plex
-spec:
-  type: LoadBalancer
-  loadBalancerIP: 192.168.0.204
-  selector:
-    app: plex
-  ports:
+  # UDP Ports
   - name: dlna-udp
     port: 1900
     targetPort: 1900
@@ -64,4 +49,3 @@ spec:
     port: 32414
     targetPort: 32414
     protocol: UDP
----

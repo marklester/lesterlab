@@ -7,11 +7,10 @@ metadata:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
-  ingressClassName: nginx
   tls:
-  - hosts:
-    - plex.lester.network
-    secretName: plex-tls
+    - hosts:
+        - plex.lester.network
+      secretName: plex-tls
   rules:
   - host: plex.lester.network
     http:
@@ -22,4 +21,4 @@ spec:
           service:
             name: plex
             port: 
-              number: 32400
+              name: http
