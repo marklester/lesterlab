@@ -1,6 +1,5 @@
----
-- name: rke setup
-  hosts: moon
+- name: common node setup
+  hosts: gimli.home
   become: yes  # Run as sudo
   tasks:
     - name: Install Nfs Common
@@ -14,3 +13,10 @@
         content: |
           [ NFSMount_Global_Options ]
           Defaultvers=4.1
+    - name: update-sysctl-settings
+      ansible.builtin.copy:
+        dest: /etc/sysctl.d/local.conf
+        content: |
+          fs.inotify.max_user_watches = 1048576          
+    - name: Reload all sysctl configuration using shell command
+      ansible.builtin.shell: sysctl -p --system
