@@ -19,7 +19,7 @@ spec:
         mode: daemonset
         serviceAccount:
           create: false
-          name: opentelemetry-target-allocator-ta
+          name: otel-collector-sa
         presets:
           clusterMetrics:
             enabled: true
