@@ -20,13 +20,6 @@ spec:
         serviceAccount:
           create: false
           name: otel-collector-sa
-        presets:
-          clusterMetrics:
-            enabled: true
-          hostMetrics:
-            enabled: true
-          kubeletMetrics:
-            enabled: true
         image:
           repository: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib"
         config:
