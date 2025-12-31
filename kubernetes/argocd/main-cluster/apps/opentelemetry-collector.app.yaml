@@ -17,24 +17,34 @@ spec:
       valuesObject:         
         namespaceOverride: monitoring
         mode: daemonset
+        serviceAccount:
+          create: false
+          name: opentelemetry-target-allocator-ta
+        presets:
+          clusterMetrics:
+            enabled: true
+          hostMetrics:
+            enabled: true
+          kubeletMetrics:
+            enabled: true
         image:
           repository: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib"
-        # command:
-        #   name: otelcol-k8s
-        ports:
-          metrics:
-            enabled: true
-        serviceMonitor:
-          enabled: true
         config:
           receivers:
-            otlp:
-              protocols:
-                grpc:
-                  endpoint: 0.0.0.0:4317
-                http:
-                  endpoint: 0.0.0.0:4318
-            prometheus: {}
+            prometheus:                 
+              api_server:
+                enabled: true
+                server_config:
+                  endpoint: "localhost:9090"
+              config:
+                scrape_configs: 
+                - job_name: 'kubernetes-pods'
+                  kubernetes_sd_configs:
+                    - role: pod
+                  relabel_configs:
+                    - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+                      action: keep
+                      regex: true
           exporters:
             prometheusremotewrite:
               endpoint: "http://prometheus.moonbase.home/api/v1/write"
@@ -53,9 +63,9 @@ spec:
           service:
             pipelines:
               metrics:
-                receivers: [otlp, prometheus]
+                receivers: [prometheus]
                 processors: [resource,batch]
-                exporters: [prometheusremotewrite]
+                exporters: [debug,prometheusremotewrite]
   syncPolicy:
     automated:
       prune: true       # Automatically delete resources no longer in Git

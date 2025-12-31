@@ -29,8 +29,3 @@ Cons:
 
 node setup: ansible
 kube node management: rke2
-
-New: Have a Single Node Management Cluster
-* use flatcar with butane for setup
-* This will h
-
