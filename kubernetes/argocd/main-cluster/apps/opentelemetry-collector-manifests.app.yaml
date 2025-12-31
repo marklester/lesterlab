@@ -1,0 +1,25 @@
+# Used to deploy manifests need to run the otel-collector. RBAC for now but
+# maybe helm template the collector eventually
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: opentelemetry-collector-manifests
+  namespace: argocd
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: kubernetes/argocd/main-cluster/manifests/opentelemetry-collector
+    repoURL: https://github.com/marklester/lesterlab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true       # Automatically delete resources no longer in Git
+      selfHeal: true    # Correct manual changes made in the cluster (drift detection)
+    syncOptions:
+      - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
+      - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
+      - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
+      - ServerSideApply=true  
