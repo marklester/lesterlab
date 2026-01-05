@@ -37,12 +37,17 @@
           tls-san:
             - moonbase.home
           ingress-controller: none
+          etcd-expose-metrics: true
+          kube-controller-manager-arg:
+            - 'bind-address=0.0.0.0'
+          kube-scheduler-arg:
+            - 'bind-address=0.0.0.0'            
     - name: install rke2 server
       ansible.builtin.shell: "curl -sfL https://get.rke2.io | sh -"
     - name: Enable and start a rke2 server
       ansible.builtin.service:
         name: rke2-server
-        state: started
+        state: restarted
         enabled: yes
     - name: Fetch kubeconfig
       ansible.builtin.fetch:
