@@ -11,7 +11,7 @@ spec:
   source:
     chart: kube-prometheus-stack
     repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 80.7.0
+    targetRevision: 80.10.0
     helm:
       valuesObject: 
         namespaceOverride: monitoring
@@ -33,17 +33,17 @@ spec:
               - ReadWriteOnce
             size: 4Gi
           admin:
-            existingSecret: kube-prometheus-stack-grafana
-          # grafana.ini:
-          #   smtp:
-          #     enabled: true
-          #     host: "smtp.gmail.com:587"
-          #     from_address: mlester+grafana@gmail.com
+            # existingSecret: kube-prometheus-stack-grafana
+          grafana.ini:
+            smtp:
+              enabled: true
+              host: "smtp.gmail.com:587"
+              from_address: mlester+grafana@gmail.com
 
-          # smtp:
-          #   existingSecret: "grafana-smtp-credentials"
-          #   userKey: "user"
-          #   passwordKey: "password"
+          smtp:
+            existingSecret: "grafana-smtp-credentials"
+            userKey: "username"
+            passwordKey: "password"
           initChownData:
             enabled: false
           prometheusOperator:
@@ -87,6 +87,7 @@ spec:
             # initContainers:
         prometheus-node-exporter:
           namespaceOverride: monitoring
+          # extraArgs: []
 
         kube-state-metrics:
           namespaceOverride: monitoring
