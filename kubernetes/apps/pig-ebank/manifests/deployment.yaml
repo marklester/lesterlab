@@ -15,7 +15,7 @@ spec:
         app: ${var.app-name}
     spec:
       imagePullSecrets:
-        - name: ghcr-login-secret
+        - name: pig-ebank-ghcr-credentials
       containers:
       - name: ${var.app-name}
         image: ghcr.io/marklester/pig-ebank:main

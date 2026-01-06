@@ -4,7 +4,6 @@ metadata:
   name: ceph-dashboard-ingress
   namespace: rook-ceph
 spec:
-  ingressClassName: nginx
   rules:
   - host: ceph.home
     http:
