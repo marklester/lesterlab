@@ -2,6 +2,8 @@
 
 These are the ansible playbooks to setup the nodes for the LesterLabs Clusters
 
+[ ] - add docs on how to setup ansible
+
 ## Clusters
 
 ### Moonbase
