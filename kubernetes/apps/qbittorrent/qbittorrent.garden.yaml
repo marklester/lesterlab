@@ -1,0 +1,24 @@
+kind: Deploy
+type: kubernetes
+name: qbittorrent
+description: |
+  Deploy QBittorrent
+dependencies:
+  - deploy.qbittorrent-storage
+spec:
+  namespace: qbittorrent
+  manifestTemplates:
+    - manifests/app/qbittorrent.deployment.yaml
+    - manifests/app/qbittorrent.service.yaml
+    - manifests/app/qbittorrent.ingress.yaml
+    - manifests/app/qbittorrent.secret.yaml
+---
+kind: Deploy
+type: kubernetes
+name: qbittorrent-storage
+description: |
+  Deploy QBittorrent Storage
+spec:
+  namespace: qbittorrent
+  manifestTemplates:
+    - manifests/storage/qbittorrent.storage.pvc.yaml

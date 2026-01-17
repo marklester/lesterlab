@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qbittorrent
+  labels:
+    app: qbittorrent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qbittorrent
+  template:
+    metadata:
+      labels:
+        app: qbittorrent
+    spec:
+      securityContext:
+        sysctls:
+          - name: net.ipv4.conf.all.src_valid_mark
+            value: "1"
+          - name: net.ipv6.conf.all.disable_ipv6
+            value: "1"
+      containers:              
+        - name: qbittorrent
+          image: lscr.io/linuxserver/qbittorrent:latest
+          imagePullPolicy: Always            
+          env:
+            - name: PUID
+              value: "65534"
+            - name: PGID
+              value: "65534"
+            - name: TZ
+              value: "Etc/UTC"              
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: appdata
+              mountPath: /config
+            - name: downloads
+              mountPath: /downloads              
+        - name: vpn
+          image: qmcgaw/gluetun:v3.41
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          env: 
+            - name: VPN_SERVICE_PROVIDER
+              value: nordvpn
+            - name: VPN_TYPE
+              value: wireguard             
+            - name: SERVER_CATEGORIES
+              value: P2P
+            - name: SERVER_COUNTRIES
+              value: "United States"
+            - name: SERVER_CITIES
+              value: "New York"              
+            - name: FIREWALL_INPUT_PORTS
+              value: "8080"
+            - name: FIREWALL_OUTBOUND_SUBNETS
+              value: "192.168.0.0/24"
+            - name: OPENVPN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: vpn-credentials
+                  key: username
+            - name: OPENVPN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vpn-credentials
+                  key: password
+            - name: WIREGUARD_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vpn-credentials
+                  key: private-key
+
+      volumes:
+        - name: appdata
+          persistentVolumeClaim:
+            claimName: qbittorrent-appdata
+        - name: downloads
+          nfs:
+            server: ceph-nfs.home
+            path: /cephfs/media/downloads            
