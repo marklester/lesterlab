@@ -1,14 +1,16 @@
-ungrouped:
-  hosts:
-    gimli.home:
-  vars:
-    ansible_user: gimli
-elements:
+# ungrouped:
+#   hosts:
+#     gimli.home:
+#   vars:
+#     ansible_user: gimli
+main:
   hosts:  
+    gimli.home:
     helium.home:
     lithium.home:
   vars:
     ansible_user: atom
+    
 moonbase:
   hosts:
     moonbase.home:

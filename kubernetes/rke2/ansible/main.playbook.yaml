@@ -1,5 +1,6 @@
 - name: common node setup
-  hosts: helium.home
+  hosts: main
+  serial: 1
   vars_files:
   - secrets.yml
   become: yes  # Run as sudo
