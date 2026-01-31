@@ -18,7 +18,7 @@ spec:
       nodeName: helium
       containers:
         - name: ${var.app-name}
-          image: ghcr.io/chrisbenincasa/tunarr:0.22.18
+          image: ghcr.io/chrisbenincasa/tunarr:1.1.11
           imagePullPolicy: Always
           env:
             - name: TZ
@@ -30,16 +30,12 @@ spec:
               containerPort: 8000
               protocol: TCP
           volumeMounts:
-
             - name: ${var.app-name}-config
               mountPath: /config/tunarr
             - name: dri
               mountPath: /dev/dri
             - name: streams
-              mountPath: /streams              
-          # resources:
-          #   limits:
-          #     nvidia.com/gpu: 1 # requesting 1 GPU
+              mountPath: /config/tunarr/streams              
           securityContext:
             privileged: true                    
       volumes:
