@@ -28,5 +28,10 @@ This will
 * configure rke2 correctly
 
 ```
+# setup rke2 for the main cluster
 ansible-playbook main.playbook.yaml --ask-vault-pass -K
+
+# create a kube config for the main cluster
+ansible-playbook main-kubeconfig.playbook.yaml -K
+#
 ```
