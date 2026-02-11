@@ -1,0 +1,14 @@
+- name: Combine kubeconfigs
+  hosts: localhost
+  connection: local
+  become: false  # Run as sudo
+  tasks:
+    - name: Combine kubeconfigs
+      shell: |
+        KUBECONFIG=~/.kube/main.kubeconfig:~/.kube/moonbase.kubeconfig kubectl config view --flatten > ~/.kube/config
+
+
+
+
+
+
