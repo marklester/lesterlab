@@ -16,7 +16,7 @@ spec:
         app: tunarr
     spec:
       nodeSelector:
-          feature.node.kubernetes.io/amd-apu: true
+          "feature.node.kubernetes.io/amd-apu": "true"
       containers:
         - name: tunarr
           image: ghcr.io/chrisbenincasa/tunarr:1.1.12
