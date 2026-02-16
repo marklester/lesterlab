@@ -2,14 +2,14 @@
   hosts: main
   serial: 1
   vars_files:
-  - secrets.yml
+    - secrets.yml
   become: yes  # Run as sudo
   tasks:
     - name: Install Nfs Common
       apt:
         name: nfs-common
         state: present
-        update_cache: yes
+        update_cache: yes        
     - name: Update Nfs Mount Configuration
       ansible.builtin.copy:
         dest: /etc/nfsmount.conf
@@ -23,6 +23,30 @@
           fs.inotify.max_user_watches = 1048576          
     - name: Reload all sysctl configuration using shell command
       ansible.builtin.shell: sysctl -p --system
+    - name: Ensure systemd-networkd-wait-online.service drop-in directory exists
+      ansible.builtin.file:
+        path: /etc/systemd/system/systemd-networkd-wait-online.service.d
+        state: directory
+        mode: '0755'
+    - name: Create a drop-in file to set the timeout to 5 seconds
+      ansible.builtin.copy:
+        content: |
+          [Service]
+          ExecStart=
+          ExecStart=/lib/systemd/systemd-networkd-wait-online --any --timeout=5
+        dest: /etc/systemd/system/systemd-networkd-wait-online.service.d/10-timeout-override.conf
+        mode: '0644'
+      # The 'ExecStart=' line is necessary to clear the default ExecStart command before
+      # specifying the new one with the --timeout option.
+    - name: Reload systemd daemon to apply changes
+      ansible.builtin.systemd:
+        daemon_reload: true
+    - name: (Optional) Restart the service to verify the change immediately
+      # This is helpful for testing; on boot the change will be active automatically.
+      ansible.builtin.systemd:
+        name: systemd-networkd-wait-online.service
+        state: restarted
+      ignore_errors: true # The service might fail if the network condition isn't met, which is expected during testing      
     - name: ensure rancher config dir exists
       file:
         path: /etc/rancher/rke2
