@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tunarr
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.0.214
+  selector:
+    app: tunarr
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000

@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tunarr
+  labels:
+    app: tunarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tunarr
+  template:
+    metadata:
+      labels:
+        app: tunarr
+    spec:
+      selector:
+        matchLabels:
+          feature.node.kubernetes.io/amd-apu: true
+      containers:
+        - name: tunarr
+          image: ghcr.io/chrisbenincasa/tunarr:1.1.12
+          imagePullPolicy: Always
+          env:
+            - name: TZ
+              value: "America/New_York"
+            - name: TUNARR_SERVER_TRUST_PROXY
+              value: "true"                         
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          volumeMounts:
+            - name: tunarr-config
+              mountPath: /config/tunarr
+            - name: dri
+              mountPath: /dev/dri
+            - name: streams
+              mountPath: /config/tunarr/streams              
+          securityContext:
+            privileged: true                    
+      volumes:
+        - name: tunarr-config
+          persistentVolumeClaim:
+            claimName: tunarr-config 
+        - name: dri
+          hostPath:
+            path: /dev/dri
+        - name: streams
+          emptyDir:
+            medium: Memory
