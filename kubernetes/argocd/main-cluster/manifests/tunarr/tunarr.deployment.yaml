@@ -35,8 +35,8 @@ spec:
               mountPath: /config/tunarr
             - name: dri
               mountPath: /dev/dri
-            - name: streams
-              mountPath: /config/tunarr/streams              
+            # - name: streams
+            #   mountPath: /config/tunarr/streams              
           securityContext:
             privileged: true                    
       volumes:
@@ -46,6 +46,6 @@ spec:
         - name: dri
           hostPath:
             path: /dev/dri
-        - name: streams
-          emptyDir:
-            medium: Memory
+        # - name: streams
+        #   emptyDir:
+        #     medium: Memory
