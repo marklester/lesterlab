@@ -15,8 +15,7 @@ spec:
       labels:
         app: tunarr
     spec:
-      selector:
-        matchLabels:
+      nodeSelector:
           feature.node.kubernetes.io/amd-apu: true
       containers:
         - name: tunarr
