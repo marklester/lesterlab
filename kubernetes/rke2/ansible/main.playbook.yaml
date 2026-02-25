@@ -20,7 +20,9 @@
       ansible.builtin.copy:
         dest: /etc/sysctl.d/local.conf
         content: |
-          fs.inotify.max_user_watches = 1048576          
+          fs.inotify.max_user_watches=2099999999
+          fs.inotify.max_user_instances=2099999999
+          fs.inotify.max_queued_events=2099999999
     - name: Reload all sysctl configuration using shell command
       ansible.builtin.shell: sysctl -p --system
     - name: Ensure systemd-networkd-wait-online.service drop-in directory exists
