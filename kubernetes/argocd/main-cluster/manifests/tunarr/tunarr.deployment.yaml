@@ -33,8 +33,10 @@ spec:
           volumeMounts:
             - name: tunarr-config
               mountPath: /config/tunarr
-            - name: dri
-              mountPath: /dev/dri
+            - name: dri-card
+              mountPath: /dev/dri/card0
+            - name: dri-render
+              mountPath: /dev/dri/renderD128
             - name: streams
               mountPath: /config/tunarr/streams              
           securityContext:
@@ -43,9 +45,12 @@ spec:
         - name: tunarr-config
           persistentVolumeClaim:
             claimName: tunarr-config 
-        - name: dri
+        - name: dri-card
           hostPath:
-            path: /dev/dri
+            path: /dev/dri/by-path/pci-0000:30:00.0-card
+        - name: dri-render
+          hostPath:
+            path: /dev/dri/by-path/pci-0000:30:00.0-render
         - name: streams
           emptyDir:
             medium: Memory
