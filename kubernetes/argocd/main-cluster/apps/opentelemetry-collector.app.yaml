@@ -12,11 +12,14 @@ spec:
   source:
     chart: opentelemetry-collector
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
-    targetRevision: 0.142.1
+    targetRevision: 0.145.0
     helm:
       valuesObject:         
         namespaceOverride: monitoring
         mode: daemonset
+        presets:
+          kubeletMetrics:
+            enabled: true
         serviceAccount:
           create: false
           name: otel-collector-sa
@@ -31,14 +34,14 @@ spec:
                   endpoint: "localhost:9090"
               config:
                 scrape_configs: 
-                - job_name: 'kubernetes-pods'
-                  scrape_interval: 30s
-                  kubernetes_sd_configs:
-                    - role: pod
-                  relabel_configs:
-                    - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-                      action: keep
-                      regex: true
+                  - job_name: 'node-exporter'
+                    scrape_interval: 30s
+                    kubernetes_sd_configs:
+                      - role: pod
+                    relabel_configs:
+                      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+                        action: keep
+                        regex: true
           exporters:
             prometheusremotewrite:
               endpoint: "http://prometheus.moonbase.home/api/v1/write"
@@ -48,8 +51,8 @@ spec:
             batch: {}
             resource:
               attributes:
-              - key: environment
-                value: "main-cluster"
+              - key: cluster
+                value: "main"
                 action: insert # Add if not present
               - key: collector.instance.id
                 value: "otel-collector"

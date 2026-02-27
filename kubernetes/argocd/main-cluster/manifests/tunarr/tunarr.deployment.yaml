@@ -30,6 +30,14 @@ spec:
             - name: http
               containerPort: 8000
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           volumeMounts:
             - name: tunarr-config
               mountPath: /config/tunarr

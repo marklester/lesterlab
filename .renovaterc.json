@@ -1,0 +1,26 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "enableVeraport": false,
+  "dockerfile": true,
+  "docker": {
+    "enabled": true,
+    "automerge": false
+  },
+  "kubernetes": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "matchPackagePatterns": [
+        "ghcr.io/chrisbenincasa/tunarr"
+      ],
+      "labels": [
+        "renovate/tunarr"
+      ],
+      "groupName": "tunarr image"
+    }
+  ]
+}
