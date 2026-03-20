@@ -1,26 +1,18 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:base"
-  ],
-  "enableVeraport": false,
-  "dockerfile": true,
-  "docker": {
-    "enabled": true,
-    "automerge": false
-  },
   "kubernetes": {
-    "enabled": true
+    "fileMatch": [
+      "kubernetes/argocd/main-cluster/manifests/tunarr/tunarr\\.deployment\\.yaml"
+    ]
   },
   "packageRules": [
     {
-      "matchPackagePatterns": [
-        "ghcr.io/chrisbenincasa/tunarr"
-      ],
-      "labels": [
-        "renovate/tunarr"
-      ],
-      "groupName": "tunarr image"
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/chrisbenincasa/tunarr"],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "tunarr image"
     }
   ]
 }
