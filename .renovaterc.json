@@ -4,7 +4,8 @@
     "fileMatch": [
       "kubernetes/argocd/main-cluster/manifests/tunarr/tunarr\\.deployment\\.yaml",
       "kubernetes/argocd/main-cluster/manifests/bazarr/deployment\\.yml",
-      "kubernetes/argocd/main-cluster/manifests/bitwarden/bitwarden\\.deployment\\.yaml"
+      "kubernetes/argocd/main-cluster/manifests/bitwarden/bitwarden\\.deployment\\.yaml",
+      "kubernetes/argocd/main-cluster/manifests/jackett/jackett\\.deployment\\.yaml"
     ]
   },
   "packageRules": [
@@ -34,6 +35,15 @@
       "automerge": false,
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "bitwarden image"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["linuxserver/jackett", "lscr.io/linuxserver/jackett"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/jackett/jackett\\.deployment\\.yaml"],
+      "versioning": "docker",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "jackett image"
     }
   ]
 }
