@@ -2,17 +2,28 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "kubernetes": {
     "fileMatch": [
-      "kubernetes/argocd/main-cluster/manifests/tunarr/tunarr\\.deployment\\.yaml"
+      "kubernetes/argocd/main-cluster/manifests/tunarr/tunarr\\.deployment\\.yaml",
+      "kubernetes/argocd/main-cluster/manifests/bazarr/deployment\\.yml"
     ]
   },
   "packageRules": [
     {
       "matchDatasources": ["docker"],
       "matchPackageNames": ["ghcr.io/chrisbenincasa/tunarr"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/tunarr/tunarr\\.deployment\\.yaml"],
       "versioning": "semver",
       "automerge": false,
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "tunarr image"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/linuxserver/bazarr", "linuxserver/bazarr", "lscr.io/linuxserver/bazarr"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/bazarr/deployment\\.yml"],
+      "versioning": "docker",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "bazarr image"
     }
   ]
 }
