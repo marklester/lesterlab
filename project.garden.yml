@@ -8,5 +8,5 @@ providers:
   - name: local-kubernetes
     setupIngressController: false    
     environments: [local]
-    context: "main-cluster"
+    context: "main"
 varfile: ".garden.vars.yaml"
