@@ -3,7 +3,8 @@
   "kubernetes": {
     "fileMatch": [
       "kubernetes/argocd/main-cluster/manifests/tunarr/tunarr\\.deployment\\.yaml",
-      "kubernetes/argocd/main-cluster/manifests/bazarr/deployment\\.yml"
+      "kubernetes/argocd/main-cluster/manifests/bazarr/deployment\\.yml",
+      "kubernetes/argocd/main-cluster/manifests/bitwarden/bitwarden\\.deployment\\.yaml"
     ]
   },
   "packageRules": [
@@ -24,6 +25,15 @@
       "automerge": false,
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "bazarr image"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["vaultwarden/server"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/bitwarden/bitwarden\\.deployment\\.yaml"],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "bitwarden image"
     }
   ]
 }
