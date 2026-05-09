@@ -9,6 +9,9 @@
       "kubernetes/argocd/main-cluster/manifests/plex/plex\\.deployment\\.yaml"
     ]
   },
+  "argocd": {
+    "managerFilePatterns": ["/kubernetes/argocd/.+\\.app\\.yaml$/"]
+  },
   "packageRules": [
     {
       "matchDatasources": ["docker"],
