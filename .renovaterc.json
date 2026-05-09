@@ -5,7 +5,8 @@
       "kubernetes/argocd/main-cluster/manifests/tunarr/tunarr\\.deployment\\.yaml",
       "kubernetes/argocd/main-cluster/manifests/bazarr/deployment\\.yml",
       "kubernetes/argocd/main-cluster/manifests/bitwarden/bitwarden\\.deployment\\.yaml",
-      "kubernetes/argocd/main-cluster/manifests/jackett/jackett\\.deployment\\.yaml"
+      "kubernetes/argocd/main-cluster/manifests/jackett/jackett\\.deployment\\.yaml",
+      "kubernetes/argocd/main-cluster/manifests/plex/plex\\.deployment\\.yaml"
     ]
   },
   "packageRules": [
@@ -44,6 +45,15 @@
       "automerge": false,
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "jackett image"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["linuxserver/plex"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/plex/plex\\.deployment\\.yaml"],
+      "versioning": "docker",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "plex image"
     }
   ]
 }
