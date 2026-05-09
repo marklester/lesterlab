@@ -9,11 +9,6 @@
       "kubernetes/argocd/main-cluster/manifests/plex/plex\\.deployment\\.yaml"
     ]
   },
-  "helm": {
-    "fileMatch": [
-      "kubernetes/argocd/main-cluster/apps/traefik\\.app\\.yaml"
-    ]
-  },
   "packageRules": [
     {
       "matchDatasources": ["docker"],
@@ -64,6 +59,7 @@
       "matchDatasources": ["helm"],
       "matchPackageNames": ["traefik"],
       "matchFileNames": ["kubernetes/argocd/main-cluster/apps/traefik\\.app\\.yaml"],
+      "registryUrl": "https://traefik.github.io/charts",
       "versioning": "semver",
       "automerge": false,
       "labels": ["renovate", "dependencies"],
