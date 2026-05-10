@@ -20,7 +20,7 @@ spec:
           enabled: true
           isDefaultClass: true
         providers:
-          kubernetesIngressNginx:
+          kubernetesIngress:
             enabled: true
         service:
           loadBalancerIP: 192.168.0.200
