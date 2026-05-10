@@ -70,7 +70,7 @@
     {
       "matchDatasources": ["helm"],
       "matchPackageNames": ["local-path-provisioner"],
-      "matchFileNames": ["kubernetes/argocd/moonbase/apps/localpath-provisioner\\.application\\.yaml"],
+      "matchFileNames": ["kubernetes/argocd/moonbase/apps/localpath-provisioner\\.app\\.yaml"],
       "versioning": "semver",
       "automerge": false,
       "labels": ["renovate", "dependencies"],
