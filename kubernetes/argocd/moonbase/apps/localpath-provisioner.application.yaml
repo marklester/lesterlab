@@ -42,4 +42,4 @@ spec:
       - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
       - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
       # - ServerSideApply=true
-      - Force=true  
+      - Replace=true  
