@@ -41,4 +41,5 @@ spec:
       - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
       - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
       - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
-      - ServerSideApply=true  
+      - ServerSideApply=true
+      - Force=true  
