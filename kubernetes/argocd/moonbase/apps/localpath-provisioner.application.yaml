@@ -20,6 +20,7 @@ spec:
               create: true
               defaultClass: true
               reclaimPolicy: Delete
+              volumeBindingMode: WaitForFirstConsumer
             nodePathMap:
               - node: DEFAULT_PATH_FOR_NON_LISTED_NODES
                 paths:
@@ -29,6 +30,7 @@ spec:
               create: true
               defaultClass: false
               reclaimPolicy: Retain
+              volumeBindingMode: WaitForFirstConsumer
             nodePathMap:
               - node: DEFAULT_PATH_FOR_NON_LISTED_NODES
                 paths:
@@ -41,5 +43,4 @@ spec:
       - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
       - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
       - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
-      # - ServerSideApply=true
-      - Replace=true  
+      - ServerSideApply=true
