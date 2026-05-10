@@ -66,6 +66,24 @@
       "automerge": false,
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "traefik chart"
+    },
+    {
+      "matchDatasources": ["helm"],
+      "matchPackageNames": ["local-path-provisioner"],
+      "matchFileNames": ["kubernetes/argocd/moonbase/apps/localpath-provisioner\\.application\\.yaml"],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "local-path-provisioner chart"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["garethgeorge/backrest"],
+      "matchFileNames": ["kubernetes/argocd/moonbase/manifests/backrest/backrest\\.deployment\\.yaml"],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "backrest image"
     }
   ]
 }

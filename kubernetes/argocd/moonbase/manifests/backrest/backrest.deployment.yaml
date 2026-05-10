@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: backrest
-          image: garethgeorge/backrest:latest
+          image: garethgeorge/backrest:v1.13.0
           imagePullPolicy: Always
           env:
             - name: TZ
