@@ -19,7 +19,7 @@ spec:
       hostNetwork: true
       containers:
       - name: plex
-        image: linuxserver/plex:1.43.1
+        image: linuxserver/plex:1.43.2
         imagePullPolicy: Always
         env:
         - name: PUID
