@@ -38,7 +38,7 @@ spec:
     spec:
       containers:
       - name: jackett
-        image: linuxserver/jackett:0.24.1974
+        image: linuxserver/jackett:0.24.1985
         imagePullPolicy: Always
         env:
         - name: PUID
