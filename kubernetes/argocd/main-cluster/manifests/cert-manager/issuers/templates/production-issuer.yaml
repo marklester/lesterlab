@@ -8,7 +8,7 @@ spec:
     # The ACME server URL
     server: https://acme-v02.api.letsencrypt.org/directory
     # Email address used for ACME registration
-    email: {{ (lookup "v1" "Secret" "cert-manager" "cert-manager-secrets").data.email | b64dec | quote }}
+    email: {{ (lookup "v1" "Secret" "cert-manager" "cert-manager-secrets").data.email | b64dec | default .Values.email | quote }}
     # Name of a secret used to store the ACME account private key
     privateKeySecretRef:
       name: letsencrypt-prod

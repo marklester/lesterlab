@@ -1,4 +1,4 @@
-email: ""  # Set via secret reference in ClusterIssuers
+email: "placeholder@example.com"  # Override via ArgoCD helm parameters or Secret lookup
 
 certManager:
   namespace: cert-manager
