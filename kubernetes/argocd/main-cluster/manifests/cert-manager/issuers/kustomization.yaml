@@ -9,6 +9,7 @@ replacements:
   - source:
       kind: Secret
       name: cert-manager-secrets # Name of your K8s Secret
+      namespace: cert-manager
       fieldPath: data.email # Key holding the base64 encoded email string
     targets:
       - select:
