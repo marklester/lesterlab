@@ -1,0 +1,10 @@
+email: ""  # Set via secret reference in ClusterIssuers
+
+certManager:
+  namespace: cert-manager
+  
+issuers:
+  prod:
+    name: letsencrypt-prod
+  staging:
+    name: letsencrypt-staging
