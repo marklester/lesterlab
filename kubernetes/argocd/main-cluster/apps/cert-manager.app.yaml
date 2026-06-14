@@ -9,8 +9,8 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
+    repoURL: https://charts.jetstack.io
     chart: cert-manager
-    repoURL: oci://quay.io/jetstack/charts
     targetRevision: v1.19.1
     helm:
       valuesObject:
@@ -18,10 +18,10 @@ spec:
           enabled: true
   syncPolicy:
     automated:
-      prune: true       # Automatically delete resources no longer in Git
-      selfHeal: true    # Correct manual changes made in the cluster (drift detection)
+      prune: true
+      selfHeal: true
     syncOptions:
-      - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
-      - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
-      - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
-      - ServerSideApply=true  
+      - CreateNamespace=true
+      - PruneLast=true
+      - PrunePropagationPolicy=foreground
+      - ServerSideApply=true
