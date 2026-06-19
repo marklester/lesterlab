@@ -6,7 +6,8 @@
       "kubernetes/argocd/main-cluster/manifests/bazarr/deployment\\.yml",
       "kubernetes/argocd/main-cluster/manifests/bitwarden/bitwarden\\.deployment\\.yaml",
       "kubernetes/argocd/main-cluster/manifests/jackett/jackett\\.deployment\\.yaml",
-      "kubernetes/argocd/main-cluster/manifests/plex/plex\\.deployment\\.yaml"
+      "kubernetes/argocd/main-cluster/manifests/plex/plex\\.deployment\\.yaml",
+      "kubernetes/argocd/main-cluster/manifests/qbittorrent/qbittorrent\\.deployment\\.yaml"
     ]
   },
   "argocd": {
@@ -57,6 +58,24 @@
       "automerge": false,
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "plex image"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["lscr.io/linuxserver/qbittorrent"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/qbittorrent/qbittorrent\\.deployment\\.yaml"],
+      "versioning": "docker",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "qbittorrent image"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["qmcgaw/gluetun"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/qbittorrent/qbittorrent\\.deployment\\.yaml"],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "gluetun image"
     },
     {
       "matchDatasources": ["helm"],
