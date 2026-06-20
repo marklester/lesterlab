@@ -49,8 +49,8 @@ spec:
           env: 
             - name: VPN_SERVICE_PROVIDER
               value: nordvpn
-            # - name: VPN_TYPE
-            #   value: wireguard             
+            - name: VPN_TYPE
+              value: openvpn             
             - name: SERVER_CATEGORIES
               value: P2P
             - name: SERVER_COUNTRIES
