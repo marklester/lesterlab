@@ -50,7 +50,7 @@ spec:
             - name: VPN_SERVICE_PROVIDER
               value: nordvpn
             - name: VPN_TYPE
-              value: openvpn             
+              value: wireguard             
             - name: SERVER_CATEGORIES
               value: P2P
             - name: SERVER_COUNTRIES
