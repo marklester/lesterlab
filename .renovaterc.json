@@ -7,7 +7,9 @@
       "kubernetes/argocd/main-cluster/manifests/bitwarden/bitwarden\\.deployment\\.yaml",
       "kubernetes/argocd/main-cluster/manifests/jackett/jackett\\.deployment\\.yaml",
       "kubernetes/argocd/main-cluster/manifests/plex/plex\\.deployment\\.yaml",
-      "kubernetes/argocd/main-cluster/manifests/qbittorrent/qbittorrent\\.deployment\\.yaml"
+      "kubernetes/argocd/main-cluster/manifests/qbittorrent/qbittorrent\\.deployment\\.yaml",
+      "kubernetes/argocd/main-cluster/manifests/radarr/radarr\\.deployment\\.yaml",
+      "kubernetes/argocd/main-cluster/manifests/sonarr/sonarr\\.deployment\\.yaml"
     ]
   },
   "argocd": {
@@ -103,6 +105,24 @@
       "automerge": false,
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "backrest image"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["linuxserver/radarr", "lscr.io/linuxserver/radarr"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/radarr/radarr\\.deployment\\.yaml"],
+      "versioning": "docker",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "radarr image"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["linuxserver/sonarr", "lscr.io/linuxserver/sonarr"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/sonarr/sonarr\\.deployment\\.yaml"],
+      "versioning": "docker",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "sonarr image"
     }
   ]
 }
