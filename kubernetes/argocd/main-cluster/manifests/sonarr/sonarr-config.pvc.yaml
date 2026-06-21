@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: sonarr-config
   namespace: sonarr
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   accessModes:
   - ReadWriteMany
