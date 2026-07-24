@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: bitwarden
-        image: vaultwarden/server:1.36.0
+        image: vaultwarden/server:1.37.0
         imagePullPolicy: Always
         env:
         ports:
