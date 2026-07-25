@@ -71,6 +71,9 @@ rules:
   - apiGroups: [""]
     resources: ["events"]
     verbs: ["list", "watch", "create", "update", "patch"]
+  - apiGroups: ["events.k8s.io"]
+    resources: ["events"]
+    verbs: ["create", "patch", "update"]
   - apiGroups: ["storage.k8s.io"]
     resources: ["volumeattachments"]
     verbs: ["get", "list", "watch", "patch"]
@@ -129,6 +132,9 @@ rules:
   - apiGroups: [""]
     resources: ["secrets", "events"]
     verbs: ["get", "delete", "update", "create"]
+  - apiGroups: ["events.k8s.io"]
+    resources: ["events"]
+    verbs: ["create", "patch", "update"]
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
@@ -190,6 +196,9 @@ rules:
   - apiGroups: [""]
     resources: ["events"]
     verbs: ["list", "watch", "create", "update", "patch"]
+  - apiGroups: ["events.k8s.io"]
+    resources: ["events"]
+    verbs: ["create", "patch", "update"]
   - apiGroups: ["storage.k8s.io"]
     resources: ["volumeattachments"]
     verbs: ["get", "list", "watch", "patch"]
@@ -303,7 +312,6 @@ rules:
       - pods
       # Node access is needed for determining nodes where mons should run
       - nodes
-      - nodes/proxy
       # Rook watches secrets which it uses to configure access to external resources.
       # e.g., external Ceph cluster or object store
       - secrets
@@ -335,6 +343,10 @@ rules:
       - create
       - update
       - delete
+  # controller-runtime records events in events.k8s.io API group
+  - apiGroups: ["events.k8s.io"]
+    resources: ["events"]
+    verbs: ["create", "patch", "update"]
   - apiGroups:
       - storage.k8s.io
     resources:
@@ -364,6 +376,7 @@ rules:
       - cephblockpools
       - cephfilesystems
       - cephnfses
+      - cephnvmeofgateways
       - cephobjectstores
       - cephobjectstoreusers
       - cephobjectrealms
@@ -390,6 +403,7 @@ rules:
       - cephblockpools/status
       - cephfilesystems/status
       - cephnfses/status
+      - cephnvmeofgateways/status
       - cephobjectstores/status
       - cephobjectstoreusers/status
       - cephobjectrealms/status
@@ -413,6 +427,7 @@ rules:
       - cephblockpools/finalizers
       - cephfilesystems/finalizers
       - cephnfses/finalizers
+      - cephnvmeofgateways/finalizers
       - cephobjectstores/finalizers
       - cephobjectstoreusers/finalizers
       - cephobjectrealms/finalizers
@@ -505,7 +520,6 @@ rules:
     resources:
       - configmaps
       - nodes
-      - nodes/proxy
       - persistentvolumes
     verbs:
       - get
@@ -521,6 +535,9 @@ rules:
       - list
       - get
       - watch
+  - apiGroups: ["events.k8s.io"]
+    resources: ["events"]
+    verbs: ["create", "patch", "update"]
   - apiGroups:
       - storage.k8s.io
     resources:
@@ -671,8 +688,6 @@ rules:
     resources: ["drivers"]
     verbs: ["create", "delete", "get", "list", "update", "watch"]
 ---
-# This is required by operator-sdk to map the cluster/clusterrolebindings with SA
-# otherwise operator-sdk will create a individual file for these.
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -1000,9 +1015,11 @@ rules:
     resources:
       - cephclients
       - cephclusters
+      - cephclusters/finalizers
       - cephblockpools
       - cephfilesystems
       - cephnfses
+      - cephnvmeofgateways
       - cephobjectstores
       - cephobjectstoreusers
       - cephobjectrealms
@@ -1392,6 +1409,20 @@ kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: rook-ceph-mgr
+  namespace: rook-ceph # namespace:cluster
+  labels:
+    operator: rook
+    storage-backend: ceph
+    app.kubernetes.io/name: rook-ceph
+    app.kubernetes.io/part-of: rook-ceph-operator
+# imagePullSecrets:
+#   - name: my-registry-secret
+---
+# Service account for NVMe-oF gateway
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: rook-ceph-nvmeof
   namespace: rook-ceph # namespace:cluster
   labels:
     operator: rook
