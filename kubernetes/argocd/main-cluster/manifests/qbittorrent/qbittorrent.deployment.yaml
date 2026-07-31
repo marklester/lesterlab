@@ -41,7 +41,7 @@ spec:
             - name: downloads
               mountPath: /downloads              
         - name: vpn
-          image: qmcgaw/gluetun:v3.41.2
+          image: qmcgaw/gluetun:v3.41.3
           securityContext:
             capabilities:
               add:
