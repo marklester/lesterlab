@@ -1,15 +1,16 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "kubernetes": {
-    "fileMatch": [
-      "kubernetes/argocd/main-cluster/manifests/tunarr/tunarr\\.deployment\\.yaml",
-      "kubernetes/argocd/main-cluster/manifests/bazarr/deployment\\.yml",
-      "kubernetes/argocd/main-cluster/manifests/bitwarden/bitwarden\\.deployment\\.yaml",
-      "kubernetes/argocd/main-cluster/manifests/jackett/jackett\\.deployment\\.yaml",
-      "kubernetes/argocd/main-cluster/manifests/plex/plex\\.deployment\\.yaml",
-      "kubernetes/argocd/main-cluster/manifests/qbittorrent/qbittorrent\\.deployment\\.yaml",
-      "kubernetes/argocd/main-cluster/manifests/radarr/radarr\\.deployment\\.yaml",
-      "kubernetes/argocd/main-cluster/manifests/sonarr/sonarr\\.deployment\\.yaml"
+    "kubernetes": {
+    "managerFilePatterns": [
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/tunarr\\/tunarr\\.deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/bazarr\\/deployment\\.yml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/bitwarden\\/bitwarden\\.deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/jackett\\/jackett\\.deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/plex\\/plex\\.deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/qbittorrent\\/qbittorrent\\.deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/radarr\\/radarr\\.deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/sonarr\\/sonarr\\.deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/home-assistant\\/home-assistant-deployment\\.yaml$/"
     ]
   },
   "argocd": {
@@ -117,12 +118,21 @@
     },
     {
       "matchDatasources": ["docker"],
-      "matchPackageNames": ["linuxserver/sonarr", "lscr.io/linuxserver/sonarr"],
+            "matchPackageNames": ["linuxserver/sonarr", "lscr.io/linuxserver/sonarr"],
       "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/sonarr/sonarr\\.deployment\\.yaml"],
       "versioning": "docker",
       "automerge": false,
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "sonarr image"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["homeassistant/home-assistant"],
+            "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/home-assistant/home-assistant-deployment\\.yaml"],
+            "versioning": "semver",
+            "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "home-assistant image"
     }
   ]
 }
