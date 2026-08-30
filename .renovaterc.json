@@ -10,7 +10,8 @@
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/qbittorrent\\/qbittorrent\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/radarr\\/radarr\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/sonarr\\/sonarr\\.deployment\\.yaml$/",
-      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/home-assistant\\/home-assistant-deployment\\.yaml$/"
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/home-assistant\\/home-assistant-deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/moonbase\\/manifests\\/backrest\\/backrest\\.deployment\\.yaml$/"
     ]
   },
   "argocd": {
