@@ -16,6 +16,29 @@ spec:
       labels:
         app: lidarr
     spec:
+      initContainers:
+      - name: seed-config
+        image: ghcr.io/hotio/lidarr:pr-plugins-3.1.2.4913
+        imagePullPolicy: Always
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+          if [ -f /config/config.xml ]; then
+            echo "config.xml already present, leaving as-is"
+          else
+            cp /cm/config.xml /config/config.xml
+            chown 65534:65534 /config/config.xml
+            chmod 644 /config/config.xml
+            echo "seeded /config/config.xml from ConfigMap"
+          fi
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: config-xml
+          mountPath: /cm
+          readOnly: true
       containers:
       - name: lidarr
         image: ghcr.io/hotio/lidarr:pr-plugins-3.1.2.4913
@@ -30,9 +53,6 @@ spec:
           mountPath: /downloads
         - name: config
           mountPath: /config
-        - name: config-xml
-          mountPath: /config/config.xml
-          subPath: config.xml
         - name: music
           mountPath: /music
         ports:
@@ -47,9 +67,6 @@ spec:
       - name: config
         persistentVolumeClaim:
           claimName: lidarr-config
-      - name: config-xml
-        configMap:
-          name: lidarr-config-xml
       - name: music
         nfs:
           server: ceph-nfs.home
