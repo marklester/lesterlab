@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lidarr
+  namespace: lidarr
+  labels:
+    app: lidarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lidarr
+  template:
+    metadata:
+      name: lidarr
+      labels:
+        app: lidarr
+    spec:
+      containers:
+      - name: lidarr
+        image: ghcr.io/hotio/lidarr:pr-plugins-1.4.1.3564
+        imagePullPolicy: Always
+        env:
+        - name: PUID
+          value: "65534"
+        - name: PGID
+          value: "65534"
+        volumeMounts:
+        - name: downloads
+          mountPath: /downloads
+        - name: config
+          mountPath: /config
+        - name: music
+          mountPath: /music
+        ports:
+        - name: web
+          containerPort: 8686
+          protocol: TCP
+      volumes: 
+      - name: downloads
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/media/downloads
+      - name: config
+        persistentVolumeClaim:
+          claimName: lidarr-config
+      - name: music
+        nfs:
+          server: ceph-nfs.home
+          path: /cephfs/media/Music
