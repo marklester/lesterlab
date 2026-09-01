@@ -2,6 +2,24 @@
 
 Guidance for AI agents working in this repository.
 
+## Design goal: reproducible app deployments
+
+One of the core goals of this repo is to make app deployments as reproducible
+as possible. Prefer manifests that fully describe an app's desired state from
+the repo alone, so a fresh cluster (or a re-sync) can be brought up without
+relying on out-of-band state.
+
+- Where an app's configuration is static and known ahead of time, encode it in
+  the repo (e.g. a `ConfigMap` mounted into the pod) rather than depending on
+  values that only exist in a live PVC or that were set interactively in a UI.
+- Treat the repo as the source of truth for configuration. If a change is made
+  in a running app's UI, reflect it back into the repo so the manifest matches
+  reality.
+- Be aware of the trade-off: a `ConfigMap` mounted as a file is read-only to
+  the pod, so an app that writes its config back at runtime will not persist
+  UI-driven changes. Choose this approach deliberately for apps whose config is
+  meant to be static and repo-managed.
+
 ## Renovate config (`.renovaterc.json`) — validation method
 
 The Renovate config in this repo has been validated using the following steps.
