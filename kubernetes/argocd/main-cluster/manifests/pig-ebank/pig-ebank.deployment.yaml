@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pig-ebank
+  namespace: pig-ebank
+  labels:
+    app: pig-ebank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pig-ebank
+  template:
+    metadata:
+      labels:
+        app: pig-ebank
+    spec:
+      imagePullSecrets:
+        - name: pig-ebank-ghcr-credentials
+      containers:
+      - name: pig-ebank
+        image: ghcr.io/marklester/pig-ebank:main
+        imagePullPolicy: Always
+        env:
+          - name: SPRING_DATASOURCE_URL
+            value: "jdbc:h2:file:/data/appdb"
+          - name: STORAGE_ROOTPATH
+            value: "/data"
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        volumeMounts:
+          - name: pig-ebank-storage
+            mountPath: /data
+      volumes:
+        - name: pig-ebank-storage
+          persistentVolumeClaim:
+            claimName: pig-ebank-storage

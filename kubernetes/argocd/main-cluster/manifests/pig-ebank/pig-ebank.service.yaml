@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pig-ebank
+  namespace: pig-ebank
+spec:
+  type: ClusterIP
+  selector:
+    app: pig-ebank
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
