@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: soulseek
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: soulseek.home
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: soulseek
+            port:
+              number: 5030

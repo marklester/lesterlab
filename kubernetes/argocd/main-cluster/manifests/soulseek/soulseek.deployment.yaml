@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: soulseek
+  labels:
+    app: soulseek
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: soulseek
+  template:
+    metadata:
+      labels:
+        app: soulseek
+    spec:
+      containers:
+        - name: soulseek
+          image: slskd/slskd:latest
+          imagePullPolicy: Always
+          securityContext:
+            runAsUser: 65534
+            runAsGroup: 65534
+          env:
+            - name: SLSKD_NO_AUTH
+              value: "true"
+            - name: SLSKD_REMOTE_CONFIGURATION
+              value: "true"
+            - name: SLSKD_SLSK_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: soulseek-credentials
+                  key: username
+            - name: SLSKD_SLSK_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: soulseek-credentials
+                  key: password
+            - name: SLSKD_DOWNLOADS_DIR
+              value: /downloads/soulseek/downloads
+            - name: SLSKD_INCOMPLETE_DIR
+              value: /downloads/soulseek/incomplete
+            - name: SLSKD_SHARED_DIR
+              value: /music/YUI
+          ports:
+            - name: http
+              containerPort: 5030
+              protocol: TCP
+            - name: https
+              containerPort: 5031
+              protocol: TCP
+            - name: soulseek
+              containerPort: 50300
+              protocol: TCP
+          volumeMounts:
+            - name: appdata
+              mountPath: /app
+            - name: music
+              mountPath: /music
+              readOnly: true
+            - name: downloads
+              mountPath: /downloads
+        - name: vpn
+          image: qmcgaw/gluetun:v3.40
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          env:
+            - name: VPN_SERVICE_PROVIDER
+              value: nordvpn
+            - name: SERVER_CATEGORIES
+              value: P2P
+            - name: SERVER_COUNTRIES
+              value: "United States"
+            - name: FIREWALL_INPUT_PORTS
+              value: "5030"
+            - name: FIREWALL_OUTBOUND_SUBNETS
+              value: "192.168.0.0/24"
+            - name: OPENVPN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: soulseek-credentials
+                  key: vpn-username
+            - name: OPENVPN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: soulseek-credentials
+                  key: vpn-password
+      volumes:
+        - name: appdata
+          persistentVolumeClaim:
+            claimName: soulseek-appdata
+        - name: music
+          nfs:
+            server: ceph-nfs.home
+            path: /cephfs/media/Music
+        - name: downloads
+          nfs:
+            server: ceph-nfs.home
+            path: /cephfs/media/downloads
