@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: soulseek
-          image: slskd/slskd:latest
+          image: slskd/slskd:0.26.0
           imagePullPolicy: Always
           securityContext:
             runAsUser: 65534
