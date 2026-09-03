@@ -8,7 +8,7 @@ What do I use my homelab for:
 * home-automation
 * self-hosted experiments
 
-## [Specs](docs/node-specs.md)
+## [Inventory](docs/inventory.md)
 
 ## LesterLab History
 
