@@ -16,6 +16,7 @@ spec:
         app: govee2mqtt
     spec:
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: govee2mqtt
         image: ghcr.io/wez/govee2mqtt:2026.03.25-ab9deb66
@@ -45,8 +46,4 @@ spec:
         - name: "TZ"
           value: "US/Eastern"
         - name: "GOVEE_LAN_SCAN"
-          value: "192.168.0.40"          
-        ports:
-        - name: mqtt
-          containerPort: 1883
-          protocol: TCP
+          value: "192.168.0.40"
