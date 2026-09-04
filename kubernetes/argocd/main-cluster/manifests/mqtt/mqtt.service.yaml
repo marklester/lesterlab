@@ -9,11 +9,7 @@ spec:
   selector:
     app: mqtt
   ports:
-  - name: mqtt
+  - name: mqtt-tcp
     port: 1883
     targetPort: 1883
-    protocol: TCP
-  - name: mqtt2
-    port: 9001
-    targetPort: 9001
     protocol: TCP

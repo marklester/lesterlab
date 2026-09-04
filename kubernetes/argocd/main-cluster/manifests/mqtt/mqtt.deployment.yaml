@@ -17,17 +17,11 @@ spec:
     spec:
       containers:
       - name: mqtt
-        image: eclipse-mosquitto:latest
+        image: eclipse-mosquitto:2.1.2-alpine
         imagePullPolicy: Always
-        securityContext:
-          runAsUser: 65534
-          runAsGroup: 65534
         ports:
-        - name: mqtt
+        - name: mqtt-tcp
           containerPort: 1883
-          protocol: TCP
-        - name: port2
-          containerPort: 9001
           protocol: TCP
         volumeMounts:
         - name: data
