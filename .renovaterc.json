@@ -75,7 +75,10 @@
     {
       "matchDatasources": ["docker"],
       "matchPackageNames": ["qmcgaw/gluetun"],
-      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/qbittorrent/qbittorrent\\.deployment\\.yaml"],
+      "matchFileNames": [
+        "kubernetes/argocd/main-cluster/manifests/qbittorrent/qbittorrent\\.deployment\\.yaml",
+        "kubernetes/argocd/main-cluster/manifests/soulseek/soulseek\\.deployment\\.yaml"
+      ],
       "versioning": "semver",
       "automerge": false,
       "labels": ["renovate", "dependencies"],
@@ -84,7 +87,10 @@
     {
       "matchDatasources": ["helm"],
       "matchPackageNames": ["traefik"],
-      "matchFileNames": ["kubernetes/argocd/main-cluster/apps/traefik\\.app\\.yaml"],
+      "matchFileNames": [
+        "kubernetes/argocd/main-cluster/apps/traefik\\.app\\.yaml",
+        "kubernetes/argocd/moonbase/apps/traefik\\.app\\.yaml"
+      ],
       "versioning": "semver",
       "automerge": false,
       "labels": ["renovate", "dependencies"],
