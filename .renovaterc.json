@@ -11,6 +11,8 @@
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/radarr\\/radarr\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/sonarr\\/sonarr\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/home-assistant\\/home-assistant-deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/mqtt\\/mqtt\\.deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/mqtt\\/govee2mqtt\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/moonbase\\/manifests\\/backrest\\/backrest\\.deployment\\.yaml$/"
     ]
   },
@@ -140,6 +142,24 @@
             "automerge": false,
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "home-assistant image"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["eclipse-mosquitto"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/mqtt/mqtt\\.deployment\\.yaml"],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "mosquitto image"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/wez/govee2mqtt"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/mqtt/govee2mqtt\\.deployment\\.yaml"],
+      "versioning": "docker",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "govee2mqtt image"
     }
   ]
 }
