@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mqtt-config
+  namespace: mqtt
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+    lesterlab.io/description: >-
+      Stores the Mosquitto broker's persistent state, mounted at
+      /mosquitto/data. With `persistence true` in mosquitto.conf, this holds
+      the retained messages (last-value cache for each topic) and the session
+      state of persistent (clean-session=false) clients, so subscriptions,
+      in-flight QoS 1/2 messages, and retained payloads survive broker
+      restarts and container rescheduling.
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Mi
+  storageClassName: rook-cephfs-retain
