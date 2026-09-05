@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: home-assistant
-          image: "homeassistant/home-assistant:2026.8.3"
+          image: "homeassistant/home-assistant:2026.9.1"
           imagePullPolicy: Always
           ports:
             - name: api
