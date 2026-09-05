@@ -100,6 +100,15 @@
     },
     {
       "matchDatasources": ["helm"],
+      "matchPackageNames": ["argo-cd"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/apps/argocd\\.app\\.yaml"],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "argo-cd chart"
+    },
+    {
+      "matchDatasources": ["helm"],
       "matchPackageNames": ["local-path-provisioner"],
       "matchFileNames": ["kubernetes/argocd/moonbase/apps/localpath-provisioner\\.app\\.yaml"],
       "versioning": "semver",
