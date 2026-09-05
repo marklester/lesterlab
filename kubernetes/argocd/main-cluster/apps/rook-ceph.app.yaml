@@ -1,0 +1,38 @@
+# Rook Ceph operator (Helm chart replaces the raw manifests in
+# kubernetes/crds/rook-ceph/):
+#   - crds.yaml               (CRDs)
+#   - common.yaml             (rook-ceph namespace + CSI ClusterRoles)
+#   - operator.yaml           (operator config ConfigMap + Deployment)
+#   - csi-operator.yaml       (CSI operator)
+#   - rbac.yaml               (operator RBAC)
+#   - ceph-monitoring-rbac.yaml (monitoring RBAC; monitoring stays disabled)
+# Everything else in that folder (CephCluster, filesystem, objectstore,
+# storage classes, toolbox, dashboard ingress, nfs) remains plain manifests.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rook-ceph
+  namespace: argocd
+spec:
+  destination:
+    namespace: rook-ceph
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: rook-ceph
+    repoURL: https://charts.rook.io/release
+    targetRevision: 1.19.11
+    # No values overrides: everything runs on chart defaults (image
+    # rook/ceph:v1.19.11, crds.enabled, rbacEnable, logLevel INFO, monitoring
+    # disabled, discovery daemon off, CSI drivers/snapshotter on, fsGroup
+    # policies "File" — the default since Rook 1.9).
+
+  syncPolicy:
+    automated:
+      prune: true       # Automatically delete resources no longer in Git
+      selfHeal: true    # Correct manual changes made in the cluster (drift detection)
+    syncOptions:
+      - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
+      - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
+      - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
+      - ServerSideApply=true
