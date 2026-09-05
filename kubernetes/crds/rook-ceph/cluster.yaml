@@ -67,7 +67,7 @@ spec:
   # enable prometheus alerting for cluster
   monitoring:
     # requires Prometheus to be pre-installed
-    enabled: true
+    enabled: false
   network:
     # enable host networking
     #provider: host
