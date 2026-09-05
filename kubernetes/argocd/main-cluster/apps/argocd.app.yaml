@@ -1,0 +1,53 @@
+# ArgoCD self-management Application.
+#
+# ArgoCD was originally installed on the main cluster with a manual Helm
+# release (chart argo-cd 9.2.2, appVersion v3.2.3, namespace argocd). This
+# Application converts that release to GitOps so the repo is the source of
+# truth for ArgoCD's desired state.
+#
+# The values below mirror the live `helm get values` output, plus
+# `server.ingress.ingressClassName: traefik` to match the live Ingress
+# (the chart default is empty, so it must be set explicitly to stay
+# drift-free).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argo-cd
+    targetRevision: 9.2.2
+    helm:
+      valuesObject:
+        configs:
+          cm:
+            ui.title: Main Cluster ArgoCD
+          params:
+            server.insecure: true
+        global:
+          domain: argocd.home
+        server:
+          ingress:
+            enabled: true
+            ingressClassName: traefik
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - PrunePropagationPolicy=foreground
+      - ServerSideApply=true
