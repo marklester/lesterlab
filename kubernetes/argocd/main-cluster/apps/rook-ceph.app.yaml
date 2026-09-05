@@ -21,7 +21,7 @@ spec:
   source:
     chart: rook-ceph
     repoURL: https://charts.rook.io/release
-    targetRevision: 1.19.11
+    targetRevision: v1.20.7
     # No values overrides: everything runs on chart defaults (image
     # rook/ceph:v1.19.11, crds.enabled, rbacEnable, logLevel INFO, monitoring
     # disabled, discovery daemon off, CSI drivers/snapshotter on, fsGroup
