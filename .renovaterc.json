@@ -112,6 +112,18 @@
     },
     {
       "matchDatasources": ["helm"],
+      "matchPackageNames": ["cert-manager"],
+      "matchFileNames": [
+        "kubernetes/argocd/main-cluster/apps/cert-manager\\.app\\.yaml",
+        "kubernetes/argocd/moonbase/apps/cert-manager\\.app\\.yaml"
+      ],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "cert-manager chart"
+    },
+    {
+      "matchDatasources": ["helm"],
       "matchPackageNames": ["local-path-provisioner"],
       "matchFileNames": ["kubernetes/argocd/moonbase/apps/localpath-provisioner\\.app\\.yaml"],
       "versioning": "semver",
