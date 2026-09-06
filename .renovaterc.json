@@ -101,7 +101,10 @@
     {
       "matchDatasources": ["helm"],
       "matchPackageNames": ["argo-cd"],
-      "matchFileNames": ["kubernetes/argocd/main-cluster/apps/argocd\\.app\\.yaml"],
+      "matchFileNames": [
+        "kubernetes/argocd/main-cluster/apps/argocd\\.app\\.yaml",
+        "kubernetes/argocd/moonbase/apps/argocd\\.app\\.yaml"
+      ],
       "versioning": "semver",
       "automerge": false,
       "labels": ["renovate", "dependencies"],
