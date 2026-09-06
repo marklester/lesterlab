@@ -90,37 +90,67 @@
       "matchDatasources": ["helm"],
       "matchPackageNames": ["traefik"],
       "matchFileNames": [
-        "kubernetes/argocd/main-cluster/apps/traefik\\.app\\.yaml",
+        "kubernetes/argocd/main-cluster/apps/traefik\\.app\\.yaml"
+      ],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "traefik chart (main-cluster)"
+    },
+    {
+      "matchDatasources": ["helm"],
+      "matchPackageNames": ["traefik"],
+      "matchFileNames": [
         "kubernetes/argocd/moonbase/apps/traefik\\.app\\.yaml"
       ],
       "versioning": "semver",
       "automerge": false,
       "labels": ["renovate", "dependencies"],
-      "commitMessageTopic": "traefik chart"
+      "commitMessageTopic": "traefik chart (moonbase)"
     },
     {
       "matchDatasources": ["helm"],
       "matchPackageNames": ["argo-cd"],
       "matchFileNames": [
-        "kubernetes/argocd/main-cluster/apps/argocd\\.app\\.yaml",
+        "kubernetes/argocd/main-cluster/apps/argocd\\.app\\.yaml"
+      ],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "argo-cd chart (main-cluster)"
+    },
+    {
+      "matchDatasources": ["helm"],
+      "matchPackageNames": ["argo-cd"],
+      "matchFileNames": [
         "kubernetes/argocd/moonbase/apps/argocd\\.app\\.yaml"
       ],
       "versioning": "semver",
       "automerge": false,
       "labels": ["renovate", "dependencies"],
-      "commitMessageTopic": "argo-cd chart"
+      "commitMessageTopic": "argo-cd chart (moonbase)"
     },
     {
       "matchDatasources": ["helm"],
       "matchPackageNames": ["cert-manager"],
       "matchFileNames": [
-        "kubernetes/argocd/main-cluster/apps/cert-manager\\.app\\.yaml",
+        "kubernetes/argocd/main-cluster/apps/cert-manager\\.app\\.yaml"
+      ],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "cert-manager chart (main-cluster)"
+    },
+    {
+      "matchDatasources": ["helm"],
+      "matchPackageNames": ["cert-manager"],
+      "matchFileNames": [
         "kubernetes/argocd/moonbase/apps/cert-manager\\.app\\.yaml"
       ],
       "versioning": "semver",
       "automerge": false,
       "labels": ["renovate", "dependencies"],
-      "commitMessageTopic": "cert-manager chart"
+      "commitMessageTopic": "cert-manager chart (moonbase)"
     },
     {
       "matchDatasources": ["helm"],
