@@ -20,6 +20,23 @@ relying on out-of-band state.
   UI-driven changes. Choose this approach deliberately for apps whose config is
   meant to be static and repo-managed.
 
+## ArgoCD Helm apps use `helm template` (no Helm release state)
+
+ArgoCD renders Helm charts client-side with `helm template` and applies the
+resulting manifests as plain Kubernetes objects. It does **not** create or
+update Helm release secrets (`sh.helm.release.v1.<name>.*`), so:
+
+- `helm list` will not show ArgoCD-managed releases — that is expected, not a
+  problem.
+- If a release was previously installed/upgraded with the `helm` CLI, its
+  release secrets are orphaned. Delete them
+  (`kubectl delete secret -n <ns> -l owner=helm`) so `helm` no longer thinks it
+  owns the release; otherwise a future `helm upgrade`/`uninstall` could delete
+  or clobber resources that ArgoCD now owns.
+- Never run `helm upgrade`/`uninstall` against an ArgoCD-managed chart — make
+  changes to the ArgoCD Application's `valuesObject`/`targetRevision` in the
+  repo instead.
+
 ## Renovate config (`.renovaterc.json`) — validation method
 
 The Renovate config in this repo has been validated using the following steps.
