@@ -15,21 +15,17 @@ spec:
     chart: metallb
     repoURL: https://metallb.github.io/metallb
     targetRevision: 0.15.2
-    # The chart does not create its namespace, so attach it here. The
-    # privileged pod-security labels are required for the speaker pods
-    # (NET_ADMIN/NET_RAW) when Pod Security Admission enforcement is active.
-    additionalManifests:
-      - |
-        apiVersion: v1
-        kind: Namespace
-        metadata:
-          name: metallb-system
+    helm:
+      valuesObject:
+        # The chart creates the namespace itself. The privileged pod-security
+        # labels are required for the speaker pods (NET_ADMIN/NET_RAW) when
+        # Pod Security Admission enforcement is active.
+        namespace:
+          create: true
           labels:
             pod-security.kubernetes.io/enforce: privileged
             pod-security.kubernetes.io/audit: privileged
             pod-security.kubernetes.io/warn: privileged
-    helm:
-      valuesObject:
         speaker:
           frr:
             enabled: false
