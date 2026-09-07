@@ -30,10 +30,6 @@ spec:
             pod-security.kubernetes.io/warn: privileged
     helm:
       valuesObject:
-        # Keep the default `metallb-*` resource names even though the app is
-        # named `metallb-moonbase` (the chart otherwise derives names from the
-        # release/app name).
-        nameOverride: metallb
         speaker:
           frr:
             enabled: false
