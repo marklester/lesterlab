@@ -1,0 +1,76 @@
+# Ceph CSI drivers (new requirement in Rook v1.20).
+#
+# In v1.20 Rook no longer deploys the CSI drivers itself — they are
+# admin-managed via the standalone `ceph-csi-drivers` chart. The operator
+# (and its CRDs) is still installed by the `rook-ceph` chart's
+# `ceph-csi-operator` subchart; this chart only adds the driver
+# deployments, RBAC, and the OperatorConfig/Driver CRs.
+#
+# Per the Rook upgrade guide, charts are upgraded in this order:
+#   1. rook-ceph
+#   2. ceph-csi-drivers   (this app)
+#   3. rook-ceph-cluster
+#
+# The values below are the Rook-recommended defaults
+# (deploy/charts/ceph-csi-drivers/values.yaml in the rook repo). The driver
+# names MUST match the provisioner names used by Rook in the StorageClasses
+# and VolumeSnapshotClass (rook-ceph.cephfs.csi.ceph.com, etc.). If the
+# operator is ever moved out of the `rook-ceph` namespace, replace the
+# `rook-ceph` prefix in the driver names and operatorConfig.namespace.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rook-ceph-csi-drivers
+  namespace: argocd
+spec:
+  destination:
+    namespace: rook-ceph
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: ceph-csi-drivers
+    repoURL: https://ceph.github.io/ceph-csi-operator
+    targetRevision: 1.0.4
+    helm:
+      valuesObject:
+        operatorConfig:
+          namespace: rook-ceph # namespace:operator
+          driverSpecDefaults:
+            # Pin the CSI sidecar images (provisioner, attacher, resizer,
+            # snapshotter, registrar) to the versions Rook tested, via the
+            # ConfigMap the rook-ceph chart creates. Default "" lets the
+            # operator use its own built-in image set instead.
+            imageSet:
+              name: rook-csi-operator-image-set-configmap
+            # Mark the CSI node-plugin DaemonSets (which mount your volumes)
+            # critical so they aren't evicted under node pressure.
+            nodePlugin:
+              priorityClassName: system-node-critical
+            # Same protection for the controller-plugin pods (provisioning,
+            # snapshotting).
+            controllerPlugin:
+              priorityClassName: system-cluster-critical
+        drivers:
+          # rbd/cephfs are enabled by chart default, so only the name override
+          # (rook-ceph prefix) is set. nfs/nvmeof are enabled by default and must
+          # be explicitly disabled.
+          rbd:
+            name: rook-ceph.rbd.csi.ceph.com # csi-provisioner-name
+          cephfs:
+            name: rook-ceph.cephfs.csi.ceph.com # csi-provisioner-name
+          nfs:
+            enabled: false
+            name: rook-ceph.nfs.csi.ceph.com # csi-provisioner-name
+          nvmeof:
+            enabled: false
+            name: rook-ceph.nvmeof.csi.ceph.com # csi-provisioner-name
+
+  syncPolicy:
+    automated:
+      prune: true       # Automatically delete resources no longer in Git
+      selfHeal: true    # Correct manual changes made in the cluster (drift detection)
+    syncOptions:
+      - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
+      - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
+      - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
+      - ServerSideApply=true
