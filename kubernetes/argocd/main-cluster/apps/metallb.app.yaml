@@ -1,0 +1,44 @@
+# MetalLB (Helm chart). Deploys the controller + speaker + CRDs into
+# metallb-system. The address pool / L2 advertisement config lives in the
+# companion `metallb-config` app (manifests/metallb-config).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb
+  namespace: argocd
+spec:
+  destination:
+    namespace: metallb-system
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: metallb
+    repoURL: https://metallb.github.io/metallb
+    targetRevision: 0.15.2
+    # The chart does not create its namespace, so attach it here. The
+    # privileged pod-security labels are required for the speaker pods
+    # (NET_ADMIN/NET_RAW) when Pod Security Admission enforcement is active.
+    additionalManifests:
+      - |
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: metallb-system
+          labels:
+            pod-security.kubernetes.io/enforce: privileged
+            pod-security.kubernetes.io/audit: privileged
+            pod-security.kubernetes.io/warn: privileged
+    helm:
+      valuesObject:
+        speaker:
+          frr:
+            enabled: false
+  syncPolicy:
+    automated:
+      prune: true       # Automatically delete resources no longer in Git
+      selfHeal: true    # Correct manual changes made in the cluster (drift detection)
+    syncOptions:
+      - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
+      - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
+      - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
+      - ServerSideApply=true
