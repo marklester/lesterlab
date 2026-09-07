@@ -1,0 +1,26 @@
+# MetalLB config: the default IP address pool + L2 advertisement for the
+# moonbase cluster. The metallb-system namespace is created by the `metallb`
+# app.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb-config-moonbase
+  namespace: argocd
+spec:
+  destination:
+    namespace: metallb-system
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: kubernetes/argocd/moonbase/manifests/metallb-config
+    repoURL: https://github.com/marklester/lesterlab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - PrunePropagationPolicy=foreground
+      - ServerSideApply=true
