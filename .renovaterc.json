@@ -162,6 +162,28 @@
       "commitMessageTopic": "local-path-provisioner chart"
     },
     {
+      "matchDatasources": ["helm"],
+      "matchPackageNames": ["metallb"],
+      "matchFileNames": [
+        "kubernetes/argocd/main-cluster/apps/metallb\\.app\\.yaml"
+      ],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "metallb chart (main-cluster)"
+    },
+    {
+      "matchDatasources": ["helm"],
+      "matchPackageNames": ["metallb"],
+      "matchFileNames": [
+        "kubernetes/argocd/moonbase/apps/metallb\\.app\\.yaml"
+      ],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "metallb chart (moonbase)"
+    },
+    {
       "matchDatasources": ["docker"],
       "matchPackageNames": ["garethgeorge/backrest"],
       "matchFileNames": ["kubernetes/argocd/moonbase/manifests/backrest/backrest\\.deployment\\.yaml"],
