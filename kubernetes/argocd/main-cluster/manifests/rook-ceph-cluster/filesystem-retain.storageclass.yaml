@@ -17,6 +17,13 @@ parameters:
 
   # The secrets contain Ceph admin credentials. These are generated automatically by the operator
   # in the same namespace as the cluster.
+  #
+  # These csi.storage.k8s.io/*-secret-* parameters are REQUIRED: ceph-csi does not
+  # auto-discover the operator-created secrets, and provisioning fails with
+  # "provided secret is empty" if they are absent (see
+  # https://github.com/ceph/ceph-csi/blob/devel/internal/util/credentials.go).
+  # Matches the upstream Rook example:
+  # https://github.com/rook/rook/blob/master/deploy/examples/csi/cephfs/storageclass.yaml
   csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
   csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph # namespace:cluster
   csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
