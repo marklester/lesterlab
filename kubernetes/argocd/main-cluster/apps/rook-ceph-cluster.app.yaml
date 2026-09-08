@@ -1,0 +1,43 @@
+# Rook Ceph cluster resources (plain manifests, not Helm).
+#
+# This app deploys the CephCluster and everything built on top of it. The
+# rook-ceph operator + CRDs are installed separately by the `rook-ceph` app
+# (Helm chart), and the CSI drivers by the `rook-ceph-csi-drivers` app.
+#
+# Per the Rook upgrade guide, charts are upgraded in this order:
+#   1. rook-ceph
+#   2. ceph-csi-drivers
+#   3. rook-ceph-cluster   (this app)
+#
+# Contents (all in the rook-ceph namespace):
+#   - cluster.yaml                      CephCluster CR
+#   - filesystem.yaml                   CephFilesystem CR
+#   - filesystem-*.storageclass.yaml    rook-cephfs / rook-cephfs-retain StorageClasses
+#   - snapshotclass.yaml                csi-cephfsplugin-snapclass VolumeSnapshotClass
+#   - toolbox.yaml                      rook-ceph-tools Deployment
+#   - dashboard.ingress.yaml            ceph-dashboard-ingress Ingress
+#   - nfs/cephnfs.yaml                  CephNFS CR
+#   - nfs/nfs.service.yaml              rook-ceph-nfs-lb LoadBalancer Service
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rook-ceph-cluster
+  namespace: argocd
+spec:
+  destination:
+    namespace: rook-ceph
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: kubernetes/argocd/main-cluster/manifests/rook-ceph-cluster
+    repoURL: https://github.com/marklester/lesterlab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true       # Automatically delete resources no longer in Git
+      selfHeal: true    # Correct manual changes made in the cluster (drift detection)
+    syncOptions:
+      - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
+      - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
+      - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
+      - ServerSideApply=true
