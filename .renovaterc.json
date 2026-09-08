@@ -13,7 +13,9 @@
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/home-assistant\\/home-assistant-deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/mqtt\\/mqtt\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/mqtt\\/govee2mqtt\\.deployment\\.yaml$/",
-      "/kubernetes\\/argocd\\/moonbase\\/manifests\\/backrest\\/backrest\\.deployment\\.yaml$/"
+      "/kubernetes\\/argocd\\/moonbase\\/manifests\\/backrest\\/backrest\\.deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/rook-ceph-cluster\\/cluster\\.yaml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/rook-ceph-cluster\\/toolbox\\.yaml$/"
     ]
   },
   "argocd": {
@@ -235,7 +237,17 @@
       "versioning": "docker",
       "automerge": false,
       "labels": ["renovate", "dependencies"],
-      "commitMessageTopic": "govee2mqtt image"
-    }
+      "commitMessageTopic": "govee2mqtt image"    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["quay.io/ceph/ceph"],
+      "matchFileNames": [
+        "kubernetes/argocd/main-cluster/manifests/rook-ceph-cluster/cluster\\.yaml",
+        "kubernetes/argocd/main-cluster/manifests/rook-ceph-cluster/toolbox\\.yaml"
+      ],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "ceph image"    }
   ]
 }
