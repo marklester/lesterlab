@@ -247,6 +247,7 @@
       ],
       "versioning": "semver",
       "automerge": false,
+      "ignoreUnstable": true,
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "ceph image"    }
   ]
