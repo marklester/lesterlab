@@ -81,6 +81,15 @@ spec:
     # port: 8443
     # serve the dashboard using SSL
     ssl: false
+    # Point the dashboard's Prometheus proxy at the moonbase Prometheus
+    # server so the dashboard can query Ceph metrics. Rook maps this to the
+    # mgr/dashboard/PROMETHEUS_API_HOST mgr config key (and
+    # prometheusEndpointSSLVerify to PROMETHEUS_API_SSL_VERIFY) on reconcile.
+    # Must be a full URL (scheme + host + port).
+    prometheusEndpoint: https://prometheus.moonbase.home:443
+    # The moonbase ingress cert is cert-manager-issued; disable verification
+    # to match the live cluster state.
+    prometheusEndpointSSLVerify: false
   # enable prometheus alerting for cluster
   monitoring:
     # requires Prometheus to be pre-installed
