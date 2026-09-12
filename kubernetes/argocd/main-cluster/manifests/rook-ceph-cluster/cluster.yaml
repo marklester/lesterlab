@@ -26,6 +26,18 @@ spec:
     # Future versions such as `pacific` would require this to be set to `true`.
     # Do not set to true in production.
     allowUnsupported: false
+  # CVE-2025-30156: rotate CephX daemon keys (mon, mgr, osd, mds, admin, and
+  # child daemons) from the insecure aes type to aes256k. Rook restarts the
+  # affected daemons as part of the rotation; PVCs remain active.
+  # CSI and RBD-mirror peer keys are NOT rotated by this block (see the
+  # csi:/rbdMirrorPeer: sub-blocks in the Rook docs) - their
+  # AUTH_INSECURE_CLIENT_KEY_TYPE warnings persist until handled separately.
+  # See: https://rook.io/docs/rook/latest/Storage-Configuration/Advanced/cephx-key-rotation/
+  security:
+    cephx:
+      daemon:
+        keyRotationPolicy: KeyGeneration
+        keyGeneration: 2
   # The path on the host where configuration files will be persisted. Must be specified.
   # Important: if you reinstall the cluster, make sure you delete this directory from each host or else the mons will fail to start on the new cluster.
   # In Minikube, the '/data' directory is configured to persist across reboots. Use "/data/rook" in Minikube environment.
