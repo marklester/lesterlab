@@ -16,6 +16,50 @@
         content: |
           [ NFSMount_Global_Options ]
           Defaultvers=4.1
+    - name: Configure NFS directory delegation workaround
+      tags: [nfs-directory-delegations]
+      block:
+        # Ganesha bundled with Ceph rejects newer Linux directory delegation
+        # requests with EREMOTEIO. Remove once the deployed Ganesha is fixed:
+        # https://github.com/nfs-ganesha/nfs-ganesha/issues/1385
+        - name: Check supported NFSv4 module parameters
+          ansible.builtin.command: modinfo -p nfsv4
+          register: nfsv4_parameters
+          changed_when: false
+          check_mode: false
+
+        - name: Persist disabled directory delegations on supported kernels
+          ansible.builtin.copy:
+            dest: /etc/modprobe.d/nfs-nodirdelegation.conf
+            owner: root
+            group: root
+            mode: '0644'
+            content: |
+              # Work around NFS-Ganesha issue #1385 (Remote I/O error).
+              options nfsv4 directory_delegations=N
+          when: "'directory_delegations:' in nfsv4_parameters.stdout"
+          register: nfs_directory_delegations_config
+
+        - name: Include NFS module configuration in initramfs
+          ansible.builtin.command: update-initramfs -u -k all
+          when: nfs_directory_delegations_config is changed
+
+        - name: Check whether the running kernel exposes directory delegations
+          ansible.builtin.stat:
+            path: /sys/module/nfsv4/parameters/directory_delegations
+          register: nfs_directory_delegations_parameter
+
+        - name: Read current directory delegation setting
+          ansible.builtin.slurp:
+            src: /sys/module/nfsv4/parameters/directory_delegations
+          register: nfs_directory_delegations_current
+          when: nfs_directory_delegations_parameter.stat.exists
+
+        - name: Disable directory delegations immediately without remounting
+          ansible.builtin.shell: echo N > /sys/module/nfsv4/parameters/directory_delegations
+          when:
+            - nfs_directory_delegations_parameter.stat.exists
+            - (nfs_directory_delegations_current.content | b64decode | trim) != 'N'
     - name: update-sysctl-settings
       ansible.builtin.copy:
         dest: /etc/sysctl.d/local.conf
