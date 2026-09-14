@@ -30,16 +30,18 @@
         path: /etc/systemd/system/systemd-networkd-wait-online.service.d
         state: directory
         mode: '0755'
-    - name: Create a drop-in file to set the timeout to 5 seconds
+    - name: Create a drop-in file to cap the wait-online timeout at 30 seconds
       ansible.builtin.copy:
         content: |
           [Service]
           ExecStart=
-          ExecStart=/lib/systemd/systemd-networkd-wait-online --any --timeout=5
+          ExecStart=/lib/systemd/systemd-networkd-wait-online --any -o routable --timeout=30
         dest: /etc/systemd/system/systemd-networkd-wait-online.service.d/10-timeout-override.conf
         mode: '0644'
       # The 'ExecStart=' line is necessary to clear the default ExecStart command before
-      # specifying the new one with the --timeout option.
+      # specifying the new one. '-o routable' waits for any routable interface (works on
+      # all nodes regardless of interface name, e.g. bond0 vs eno4) and the 30s timeout
+      # avoids the 120s default hang when the network isn't up at boot.
     - name: Reload systemd daemon to apply changes
       ansible.builtin.systemd:
         daemon_reload: true
