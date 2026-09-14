@@ -42,9 +42,9 @@ spec:
         keyRotationPolicy: KeyGeneration
         keyGeneration: 2
         keyType: aes256k
-        # Existing PVC mounts still use the previous credentials. Keep them
-        # until every node's CSI volumes have been fully unmounted/remounted.
-        keepPriorKeyCountMax: 1
+        # All nodes were drained and every CSI volume was remounted with
+        # generation 2, so no prior CSI key generations need to remain active.
+        keepPriorKeyCountMax: 0
   # The path on the host where configuration files will be persisted. Must be specified.
   # Important: if you reinstall the cluster, make sure you delete this directory from each host or else the mons will fail to start on the new cluster.
   # In Minikube, the '/data' directory is configured to persist across reboots. Use "/data/rook" in Minikube environment.

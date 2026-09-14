@@ -4,26 +4,25 @@ Jot down things needed to make ceph work well for the the home lab
 
 ## Main-cluster CephX rotation (September 2026)
 
-The CephCluster manifest keeps daemon and CSI rotation at generation 2.
-CSI uses `aes256k` with `keepPriorKeyCountMax: 1`, so existing mounts can
-continue using their previous credentials while new mounts adopt the new keys.
-This requires Ceph-CSI 3.17.1+ and Linux 7.0+ (7.2+ if FIPS is enabled).
+The daemon and CSI rotation to generation 2 completed on September 14, 2026.
+All three nodes were drained one at a time, all previous CephFS mounts were
+fully removed, and every active mount was verified to use
+`csi-cephfs-node.2`. The CephCluster now uses `aes256k` with
+`keepPriorKeyCountMax: 0`.
 
-After ArgoCD syncs the manifest:
+The migration was validated as follows:
 
-1. Check that `status.cephx.csi` reports generation 2, type `aes256k`, and
-   one prior key generation retained:
+1. `status.cephx.csi` reported generation 2 and type `aes256k`:
    ```sh
    kubectl -n rook-ceph get cephcluster rook-ceph -o jsonpath='{.status.cephx.csi}{"\n"}'
    ```
-2. Verify a fresh CephFS PVC can be provisioned, mounted, written, and read
-   on each node.
-3. Investigate the existing BlueStore slow-operation warnings before node
-   maintenance. Migrate existing mounts one node at a time, waiting for Ceph
-   and workloads to recover between nodes. All old CSI mounts must be fully
-   unmounted/remounted; restarting CSI pods alone does not accomplish this.
-4. Only after all existing mounts have migrated, change
-   `keepPriorKeyCountMax` to `0` in the manifest and sync it.
+2. A fresh CephFS PVC was provisioned, mounted, written, and read on each node.
+3. Helium, gimli, and lithium were drained one at a time with temporary
+   `noout`, `noscrub`, and `nodeep-scrub` flags. The cluster returned to all
+   409 placement groups `active+clean` between nodes.
+4. After all workloads recovered, every active CephFS mount used the
+   generation-2 identity. No RBD PVs existed, and the prior CSI keys were
+   removed by setting `keepPriorKeyCountMax` to `0`.
 
 Keep AES authentication allowed until remaining NFS and other client identities
 have been audited. Do not delete old-looking NFS identities without confirming
