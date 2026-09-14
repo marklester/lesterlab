@@ -2,6 +2,35 @@
 
 Jot down things needed to make ceph work well for the the home lab
 
+## Main-cluster CephX rotation (September 2026)
+
+The CephCluster manifest keeps daemon and CSI rotation at generation 2.
+CSI uses `aes256k` with `keepPriorKeyCountMax: 1`, so existing mounts can
+continue using their previous credentials while new mounts adopt the new keys.
+This requires Ceph-CSI 3.17.1+ and Linux 7.0+ (7.2+ if FIPS is enabled).
+
+After ArgoCD syncs the manifest:
+
+1. Check that `status.cephx.csi` reports generation 2, type `aes256k`, and
+   one prior key generation retained:
+   ```sh
+   kubectl -n rook-ceph get cephcluster rook-ceph -o jsonpath='{.status.cephx.csi}{"\n"}'
+   ```
+2. Verify a fresh CephFS PVC can be provisioned, mounted, written, and read
+   on each node.
+3. Investigate the existing BlueStore slow-operation warnings before node
+   maintenance. Migrate existing mounts one node at a time, waiting for Ceph
+   and workloads to recover between nodes. All old CSI mounts must be fully
+   unmounted/remounted; restarting CSI pods alone does not accomplish this.
+4. Only after all existing mounts have migrated, change
+   `keepPriorKeyCountMax` to `0` in the manifest and sync it.
+
+Keep AES authentication allowed until remaining NFS and other client identities
+have been audited. Do not delete old-looking NFS identities without confirming
+they are unused. NFS per-export keys are not automatically rotated by Rook.
+
+Reference: https://rook.io/docs/rook/latest/Storage-Configuration/Advanced/cephx-key-rotation/
+
 
 
 ## Setup space for ceph
