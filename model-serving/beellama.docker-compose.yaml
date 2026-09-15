@@ -1,13 +1,16 @@
 services:
   llama:
     image: ghcr.io/anbeeld/beellama.cpp:server-cuda13
-    container_name: beellama-server
+    container_name: beellama-server-cuda13
     environment:
       - LLAMA_ARG_CHAT_TEMPLATE_KWARGS={"preserve-thinking":true,"reasoning_effort":"medium"}
     ports:
       - "1234:8080"
     volumes:
-      - C:\Users\starf\.lmstudio\models:/models:ro
+      - type: bind
+        source: C:/Users/starf/.lmstudio/models
+        target: /models
+        read_only: true
     deploy:
       resources:
         reservations:
@@ -29,10 +32,13 @@ services:
       --load-mode none
       --no-warmup
       --flash-attn on
-      --ctx-size 94208
+      --ctx-size 65536
       --parallel 1
-      --cache-type-k q4_0
-      --cache-type-v q4_0
+
+      --cache-type-k kvarn5
+      --cache-type-v kvarn4
+      --kv-tail-tokens 2048
+      --cache-ram 16384
       --batch-size 512
       --ubatch-size 512
       --jinja
