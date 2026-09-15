@@ -46,6 +46,11 @@ spec:
                     expr: ceph_osd_op_w_total
                   - record: ceph_osd_op_r
                     expr: ceph_osd_op_r_total
+                  # Recovery throughput (dashboard: RECOVERYTHROUGHPUT / RECOVERYOPS)
+                  - record: ceph_osd_recovery_bytes
+                    expr: ceph_osd_recovery_bytes_total
+                  - record: ceph_osd_recovery_ops
+                    expr: ceph_osd_recovery_ops_total
 
         alertmanager:
           enabled: false
