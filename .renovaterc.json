@@ -10,6 +10,7 @@
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/qbittorrent\\/qbittorrent\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/radarr\\/radarr\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/sonarr\\/sonarr\\.deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/soulseek\\/soulseek\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/home-assistant\\/home-assistant-deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/mqtt\\/mqtt\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/mqtt\\/govee2mqtt\\.deployment\\.yaml$/",
@@ -75,6 +76,15 @@
       "automerge": false,
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "qbittorrent image"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["slskd/slskd"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/soulseek/soulseek\\.deployment\\.yaml"],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "slskd image"
     },
     {
       "matchDatasources": ["docker"],
