@@ -59,6 +59,32 @@ spec:
             scrapeInterval: 30s
             evaluationInterval: 30s
             maximumStartupDurationSeconds: 600
+            # Recording rules that alias the OTel-remote-written Ceph counters
+            # (which carry a `_total` suffix) back to the plain metric names the
+            # Ceph dashboard's built-in PromQL expects, so the dashboard
+            # IOPS/throughput graphs render. The ceph-exporter sidecars export
+            # plain names (e.g. `ceph_pool_wr`); the OTel collector's
+            # prometheusremotewrite exporter appends `_total` to counters when
+            # remote-writing to this Prometheus, so the dashboard's
+            # `sum(rate(ceph_pool_wr[1m]))` queries otherwise return empty.
+            rules:
+              name: ceph.dashboard-aliases
+              rules:
+                # IOPS (dashboard: WRITEIOPS / READIOPS)
+                - record: ceph_pool_wr
+                  expr: ceph_pool_wr_total
+                - record: ceph_pool_rd
+                  expr: ceph_pool_rd_total
+                # Throughput (dashboard: READTHROUGHPUT / WRITETHROUGHPUT)
+                - record: ceph_pool_rd_bytes
+                  expr: ceph_pool_rd_bytes_total
+                - record: ceph_pool_wr_bytes
+                  expr: ceph_pool_wr_bytes_total
+                # OSD-level op counters (used by some OSD IOPS views)
+                - record: ceph_osd_op_w
+                  expr: ceph_osd_op_w_total
+                - record: ceph_osd_op_r
+                  expr: ceph_osd_op_r_total
             serviceMonitorSelectorNilUsesHelmValues: false
             podMonitorSelectorNilUsesHelmValues: false
             enableRemoteWriteReceiver: true
