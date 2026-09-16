@@ -35,4 +35,5 @@ password rather than saving it in command history:
 
 ```bat
 net use M: \\192.168.0.217\media /user:family *
+net use M: \\samba.home\media /user:family *
 ```
