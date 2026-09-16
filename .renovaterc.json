@@ -93,7 +93,7 @@
         "kubernetes/argocd/main-cluster/manifests/qbittorrent/qbittorrent\\.deployment\\.yaml",
         "kubernetes/argocd/main-cluster/manifests/soulseek/soulseek\\.deployment\\.yaml"
       ],
-      "versioning": "semver",
+      "versioning": "semver-coerced",
       "automerge": false,
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "gluetun image"
