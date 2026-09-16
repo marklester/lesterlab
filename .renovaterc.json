@@ -11,6 +11,7 @@
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/radarr\\/radarr\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/sonarr\\/sonarr\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/soulseek\\/soulseek\\.deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/samba\\/samba\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/home-assistant\\/home-assistant-deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/mqtt\\/mqtt\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/mqtt\\/govee2mqtt\\.deployment\\.yaml$/",
@@ -85,6 +86,15 @@
       "automerge": false,
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "slskd image"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["quay.io/samba.org/samba-server"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/manifests/samba/samba\\.deployment\\.yaml"],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "Samba image"
     },
     {
       "matchDatasources": ["docker"],
