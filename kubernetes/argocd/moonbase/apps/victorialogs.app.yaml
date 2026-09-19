@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: victoria-logs
+  namespace: argocd
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: victoria-logs-single
+    repoURL: https://victoriametrics.github.io/helm-charts
+    targetRevision: 0.13.9
+    helm:
+      releaseName: victoria-logs
+      valuesObject:
+        server:
+          retentionPeriod: 1
+          persistentVolume:
+            storageClassName: local-path
+            accessModes:
+              - ReadWriteOnce
+            size: 10Gi
+          serviceMonitor:
+            enabled: true
+            extraLabels:
+              release: kube-prometheus-stack
+        vector:
+          enabled: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - PrunePropagationPolicy=foreground
+      - ServerSideApply=true

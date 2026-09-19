@@ -259,6 +259,15 @@
       "labels": ["renovate", "dependencies"],
       "commitMessageTopic": "govee2mqtt image"    },
     {
+      "matchDatasources": ["helm"],
+      "matchPackageNames": ["victoria-logs-single"],
+      "matchFileNames": ["kubernetes/argocd/moonbase/apps/victorialogs\\.app\\.yaml"],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "VictoriaLogs chart (moonbase)"
+    },
+    {
       "matchDatasources": ["docker"],
       "matchPackageNames": ["quay.io/ceph/ceph"],
       "matchFileNames": [
