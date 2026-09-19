@@ -10,6 +10,15 @@ What do I use my homelab for:
 
 ## [Inventory](docs/inventory.md)
 
+## Agent skills
+
+Reusable, agent-agnostic skills for this repository live in
+[`.agents/skills`](.agents/skills). The directory can be fetched on its own
+with Git sparse checkout when a full working tree is not needed.
+
+The Tunarr skill includes a small API helper for creating channels from the
+Plex In Cluster libraries: `.agents/skills/tunarr/scripts/tunarr.py --help`.
+
 ## LesterLab History
 
 ### v1: truenas
