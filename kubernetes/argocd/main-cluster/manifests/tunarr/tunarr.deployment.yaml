@@ -41,6 +41,8 @@ spec:
           volumeMounts:
             - name: tunarr-config
               mountPath: /config/tunarr
+            - name: tunarr-logs
+              mountPath: /config/tunarr/logs
             # - name: dri-card
             #   mountPath: /dev/dri/card0
             - name: dri-render
@@ -49,6 +51,36 @@ spec:
               mountPath: /config/tunarr/streams              
           securityContext:
             privileged: true                    
+        - name: tunarr-file-logs
+          image: victoriametrics/vlagent:v1.52.0
+          args:
+            - --envflag.enable
+            - --envflag.prefix=VL_
+            - --fileCollector.glob=/logs/**/*.log*
+            - '--fileCollector.extraFields={"cluster":"main","app":"tunarr","log_source":"file","kubernetes.container_name":"tunarr","kubernetes.pod_name":"%{POD_NAME}","kubernetes.pod_namespace":"tunarr"}'
+            - --fileCollector.streamFields=cluster,app,kubernetes.pod_namespace,kubernetes.pod_name,kubernetes.container_name,file
+            - --fileCollector.decolorizeFields=_msg
+            - '--remoteWrite.headers=AccountID:0^^ProjectID:0'
+            - --remoteWrite.url=http://victorialogs.moonbase.home/insert/native
+            - --tmpDataPath=/var/lib/vlagent
+            - --loggerFormat=json
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: tunarr-logs
+              mountPath: /logs
+              readOnly: true
+            - name: tunarr-file-log-vlagent-data
+              mountPath: /var/lib/vlagent
+          resources:
+            requests:
+              cpu: 25m
+              memory: 128Mi
+            limits:
+              memory: 256Mi
       volumes:
         - name: tunarr-config
           persistentVolumeClaim:
@@ -62,3 +94,7 @@ spec:
         - name: streams
           emptyDir:
             medium: Memory
+        - name: tunarr-logs
+          emptyDir: {}
+        - name: tunarr-file-log-vlagent-data
+          emptyDir: {}

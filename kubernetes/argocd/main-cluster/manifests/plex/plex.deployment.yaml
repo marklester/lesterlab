@@ -82,18 +82,36 @@ spec:
             memory: "4Gi"
           limits:
             memory: "8Gi"
-      # - name: plex-promtail
-      #   image: grafana/promtail:master
-      #   args: 
-      #     - "-config.file=/etc/promtail/promtail.yaml"
-      #     - "-client.url=http://loki.monitoring:3100/api/prom/push"
-      #   volumeMounts:
-      #     - name: logs
-      #       mountPath: "/config/Library/Application Support/Plex Media Server/Logs"
-      #     - name: promtail-config
-      #       mountPath: /etc/promtail/promtail.yaml
-      #       subPath: promtail.yaml
-      #       readOnly: true
+      - name: plex-file-logs
+        image: victoriametrics/vlagent:v1.52.0
+        args:
+        - --envflag.enable
+        - --envflag.prefix=VL_
+        - --fileCollector.glob=/logs/**/*.log*
+        - '--fileCollector.extraFields={"cluster":"main","app":"plex","log_source":"file","kubernetes.container_name":"plex","kubernetes.pod_name":"%{POD_NAME}","kubernetes.pod_namespace":"plex"}'
+        - --fileCollector.streamFields=cluster,app,kubernetes.pod_namespace,kubernetes.pod_name,kubernetes.container_name,file
+        - --fileCollector.decolorizeFields=_msg
+        - '--remoteWrite.headers=AccountID:0^^ProjectID:0'
+        - --remoteWrite.url=http://victorialogs.moonbase.home/insert/native
+        - --tmpDataPath=/var/lib/vlagent
+        - --loggerFormat=json
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: logs
+          mountPath: /logs
+          readOnly: true
+        - name: plex-file-log-vlagent-data
+          mountPath: /var/lib/vlagent
+        resources:
+          requests:
+            cpu: 25m
+            memory: 128Mi
+          limits:
+            memory: 256Mi
       volumes:
         - name: media
           nfs:
@@ -104,44 +122,5 @@ spec:
             claimName: plex-config 
         - name: logs
           emptyDir: {}
-        # - name: dri
-        #   hostPath:
-        #     path: /dev/dri
-        # - name: promtail-config
-        #   configMap:
-        #     name: plex-promtail
----
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: plex-promtail
-  namespace: plex
-  labels:
-data:
-  promtail.yaml: |
-    server:
-      http_listen_port: 9080
-      grpc_listen_port: 0
-    positions:
-      filename: /tmp/positions.yaml
-    client:
-      url: http://loki.monitoring:3100/loki/api/v1/push
-    scrape_configs:
-    - job_name: promtail/plex
-      static_configs:
-      - targets:
-          - localhost
-        labels:
-          job: promtail/plex
-          app: plex
-          __path__: "/config/Library/Application Support/Plex Media Server/Logs/*.log"
-    - job_name: promtail/plex/plugins
-      static_configs:
-      - targets:
-          - localhost
-        labels:
-          job: promtail/plex/plugins
-          app: plex
-          __path__: "/config/Library/Application Support/Plex Media Server/Logs/PMS Plugin Logs/*.log"          
----
+        - name: plex-file-log-vlagent-data
+          emptyDir: {}
