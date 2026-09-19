@@ -2,6 +2,11 @@
 
 Guidance for AI agents working in this repository.
 
+## Repository search tools
+
+When available, use `fd` to find files and `rg` to search file contents. Fall
+back to `find` or `grep` only when those tools are unavailable.
+
 ## Design goal: reproducible app deployments
 
 One of the core goals of this repo is to make app deployments as reproducible
