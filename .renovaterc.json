@@ -270,7 +270,7 @@
     {
       "matchDatasources": ["helm"],
       "matchPackageNames": ["victoria-logs-collector"],
-      "matchFileNames": ["kubernetes/argocd/main-cluster/apps/plex-tunarr-log-collector\\.app\\.yaml"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/apps/main-log-collector\\.app\\.yaml"],
       "versioning": "semver",
       "automerge": false,
       "labels": ["renovate", "dependencies"],
