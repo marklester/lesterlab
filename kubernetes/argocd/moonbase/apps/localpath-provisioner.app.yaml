@@ -19,6 +19,7 @@ spec:
             storageClass:
               create: true
               defaultClass: true
+              defaultVolumeType: hostPath
               reclaimPolicy: Delete
               volumeBindingMode: WaitForFirstConsumer
             nodePathMap:
@@ -29,6 +30,7 @@ spec:
             storageClass:
               create: true
               defaultClass: false
+              defaultVolumeType: hostPath
               reclaimPolicy: Retain
               volumeBindingMode: WaitForFirstConsumer
             nodePathMap:
