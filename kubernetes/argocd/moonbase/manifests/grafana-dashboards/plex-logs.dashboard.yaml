@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: plex-logs-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  plex-logs.json: |
+    {
+      "annotations": {"list": []},
+      "editable": true,
+      "graphTooltip": 1,
+      "panels": [
+        {
+          "datasource": {"type": "victoriametrics-logs-datasource", "uid": "victorialogs"},
+          "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"drawStyle": "line", "fillOpacity": 10, "lineWidth": 1}, "unit": "ops"}, "overrides": []},
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
+          "id": 1,
+          "options": {"legend": {"displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "single"}},
+          "targets": [
+            {"datasource": {"type": "victoriametrics-logs-datasource", "uid": "victorialogs"}, "editorMode": "code", "expr": "cluster:main kubernetes.pod_namespace:plex kubernetes.container_name:plex | stats () rate()", "legendFormat": "Plex", "queryType": "statsRange", "refId": "A"}
+          ],
+          "title": "Plex log rate",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "victoriametrics-logs-datasource", "uid": "victorialogs"},
+          "gridPos": {"h": 16, "w": 24, "x": 0, "y": 8},
+          "id": 2,
+          "options": {"dedupStrategy": "none", "enableLogDetails": true, "prettifyJSON": true, "showCommonLabels": false, "showLabels": false, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true},
+          "targets": [
+            {"datasource": {"type": "victoriametrics-logs-datasource", "uid": "victorialogs"}, "editorMode": "code", "expr": "cluster:main kubernetes.pod_namespace:plex kubernetes.container_name:plex", "queryType": "logs", "refId": "A"}
+          ],
+          "title": "Plex logs",
+          "type": "logs"
+        }
+      ],
+      "refresh": "30s",
+      "schemaVersion": 41,
+      "tags": ["logs", "plex"],
+      "templating": {"list": []},
+      "time": {"from": "now-6h", "to": "now"},
+      "timezone": "browser",
+      "title": "Plex Logs",
+      "uid": "plex-logs",
+      "version": 1
+    }

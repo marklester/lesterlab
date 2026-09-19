@@ -22,6 +22,14 @@ spec:
             accessModes:
               - ReadWriteOnce
             size: 10Gi
+          ingress:
+            enabled: true
+            ingressClassName: traefik
+            hosts:
+              - name: victorialogs.moonbase.home
+                path:
+                  - /insert/native
+                port: http
           serviceMonitor:
             enabled: true
             extraLabels:

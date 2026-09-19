@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: plex-tunarr-log-collector
+  namespace: argocd
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: victoria-logs-collector
+    repoURL: https://victoriametrics.github.io/helm-charts
+    targetRevision: 0.3.7
+    helm:
+      releaseName: plex-tunarr-log-collector
+      valuesObject:
+        remoteWrite:
+          - url: http://victorialogs.moonbase.home
+        collector:
+          extraFields: '{"cluster":"main"}'
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - PrunePropagationPolicy=foreground
+      - ServerSideApply=true

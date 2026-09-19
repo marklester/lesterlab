@@ -268,6 +268,15 @@
       "commitMessageTopic": "VictoriaLogs chart (moonbase)"
     },
     {
+      "matchDatasources": ["helm"],
+      "matchPackageNames": ["victoria-logs-collector"],
+      "matchFileNames": ["kubernetes/argocd/main-cluster/apps/plex-tunarr-log-collector\\.app\\.yaml"],
+      "versioning": "semver",
+      "automerge": false,
+      "labels": ["renovate", "dependencies"],
+      "commitMessageTopic": "Plex and Tunarr VictoriaLogs collector chart"
+    },
+    {
       "matchDatasources": ["docker"],
       "matchPackageNames": ["quay.io/ceph/ceph"],
       "matchFileNames": [
