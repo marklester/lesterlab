@@ -24,9 +24,28 @@ The migration was validated as follows:
    generation-2 identity. No RBD PVs existed, and the prior CSI keys were
    removed by setting `keepPriorKeyCountMax` to `0`.
 
-Keep AES authentication allowed until remaining NFS and other client identities
-have been audited. Do not delete old-looking NFS identities without confirming
-they are unused. NFS per-export keys are not automatically rotated by Rook.
+On September 16, the remaining NFS identities were audited against monitor
+sessions and the live `.nfs` RADOS configuration. Six unused identities from
+the previous `nfs-ganesha` deployment were backed up and removed. The only
+remaining `AUTH_INSECURE_CLIENT_KEY_TYPE` identity is the active export key:
+
+```text
+client.nfs.nfs-cluster.1
+```
+
+Keep `aes` authentication allowed while this export exists. Do not remove this
+identity or configure `auth_allowed_ciphers` to allow only `aes256k`.
+
+Rook does not automatically rotate NFS per-export keys. An in-place migration
+was tested by reapplying export 1 without its generated `user_id`. Ceph created
+`client.nfs.nfs-cluster.cephfs.2ad1871a` with an `aes256k` key and capabilities
+identical to the working identity, but NFS-Ganesha 5.9 from the Ceph 20.2.4
+image could not mount CephFS with it and logged `Operation not permitted`. The
+export was restored from backup, NFS-Ganesha was restarted, and Plex access was
+verified. The failed replacement identity was removed.
+
+The remaining warning must stay until upstream supports rotating this export
+key or a later Ceph/NFS-Ganesha version is verified to accept the replacement.
 
 Reference: https://rook.io/docs/rook/latest/Storage-Configuration/Advanced/cephx-key-rotation/
 
@@ -73,10 +92,12 @@ https://docs.ceph.com/en/octopus/cephfs/fs-nfs-exports/#set-customized-nfs-ganes
 `ceph nfs export create cephfs cephfs nfs-cluster /cephfs`
 
 ## Debugging Configuration
-nfs puts config in rados in it's own pull here are some common commands
+NFS stores its current configuration in the `.nfs` RADOS pool. The old
+`nfs-ganesha` pool contains legacy objects and is not the source for the live
+export.
 
-`rados -p nfs-ganesha ls --all`
-`rados -p nfs-ganesha get -n nfs-cluster <objectname> <filetooutputto> --all`
+`rados -p .nfs ls --all`
+`rados -p .nfs get -n nfs-cluster <objectname> <filetooutputto> --all`
 
 ### Update Placement
 
