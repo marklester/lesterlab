@@ -173,6 +173,32 @@ def search_all(
     return client.search_all(library_id=library_id, media_source_id=media_source_id, limit=limit)
 
 
+def resolve_show(
+    client: TunarrClient,
+    source_name: str | None,
+    all_sources: bool,
+    library_id: str | None,
+    title: str,
+    limit: int = 20000,
+) -> Program:
+    """Resolve a show by exact (case-insensitive) title.
+
+    Shows are not directly fetchable by id (``GET /api/programs/{id}`` 404s
+    for a show record), so they are resolved by walking the catalog and
+    filtering to ``type == "show"``.
+    """
+    programs = search_all(client, source_name, all_sources, library_id, limit=limit)
+    wanted = title.strip().lower()
+    matches = [
+        p
+        for p in programs
+        if p.type == "show" and (p.sort_title or p.title).strip().lower() == wanted
+    ]
+    if len(matches) != 1:
+        raise TunarrError(f"show {title!r} matched {len(matches)} shows; expected exactly one")
+    return matches[0]
+
+
 # ---------------------------------------------------------- identifier mapping
 
 
@@ -564,6 +590,94 @@ def cmd_channels_verify(ctx: click.Context, channel: str) -> None:
             "badState": len(bad_state),
             "badSourceIds": bad_source[:20],
             "badStateIds": bad_state[:20],
+        }
+    )
+
+
+@channels_group.command("schedule")
+@click.argument("channel")
+@click.option(
+    "--show",
+    "shows",
+    multiple=True,
+    help="Show title to schedule; repeat for multiple shows. Resolved by exact "
+    "(case-insensitive) title against the selected source.",
+)
+@click.option(
+    "--order",
+    default="shuffle",
+    show_default=True,
+    type=click.Choice(["next", "shuffle", "ordered_shuffle", "alphanumeric", "chronological"]),
+    help="Playback order within each show slot.",
+)
+@click.option("--period", default="day", show_default=True, type=click.Choice(["day", "week"]))
+@click.option("--max-days", default=365, show_default=True, type=click.IntRange(min=1))
+@click.option("--tz-offset", default=240, show_default=True, type=int, help="Timezone offset in minutes (240 = UTC-4).")
+@click.option("--dry-run", is_flag=True)
+@click.pass_context
+def cmd_channels_schedule(
+    ctx: click.Context,
+    channel: str,
+    shows: tuple[str, ...],
+    order: str,
+    period: str,
+    max_days: int,
+    tz_offset: int,
+    dry_run: bool,
+) -> None:
+    """Program a channel with a time-based schedule of show slots.
+
+    Each --show becomes a show slot; a single show fills the whole period
+    (startTime 0), multiple shows are spaced evenly across the period.
+    The programs list is the union of each show's descendant episodes.
+    """
+    state = get_ctx(ctx)
+    client = state.client
+    channel_id = resolve_channel_id(client, channel)
+    if not shows:
+        raise TunarrError("schedule requires at least one --show")
+    period_ms = 86_400_000 if period == "day" else 604_800_000
+    slots: list[dict[str, Any]] = []
+    programs: list[str] = []
+    for index, title in enumerate(shows):
+        show = resolve_show(client, state.source_name, state.all_sources, None, title)
+        start_time = (period_ms // len(shows)) * index if len(shows) > 1 else 0
+        slots.append(
+            {
+                "startTime": start_time,
+                "type": "show",
+                "showId": show.uuid,
+                "seasonFilter": [],
+                "seasonExcludeFilter": [],
+                "order": order,
+                "direction": "asc",
+                "id": str(uuid_module.uuid4()),
+                "rerunOverflow": "flex",
+            }
+        )
+        descendants = client.descendants(show.uuid)
+        programs.extend(d["id"] for d in descendants)
+    schedule = {
+        "type": "time",
+        "flexPreference": "distribute",
+        "latenessMs": 0,
+        "maxDays": max_days,
+        "padMs": 1,
+        "period": period,
+        "timeZoneOffset": tz_offset,
+        "slots": slots,
+    }
+    payload: dict[str, Any] = {"type": "time", "programs": programs, "schedule": schedule}
+    if dry_run:
+        print_json({"channel": channel_id, "payload": payload})
+        return
+    response = client.post(f"channels/{channel_id}/programming", payload)
+    print_json(
+        {
+            "channel": channel_id,
+            "shows": list(shows),
+            "programs": len(programs),
+            "response": response,
         }
     )
 

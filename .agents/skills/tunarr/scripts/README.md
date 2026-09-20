@@ -76,7 +76,7 @@ The CLI is a small uv project: `pyproject.toml` declares the dependencies
 ### 2. click for the CLI
 
 - **Grouped subcommands** mirror the API's resource hierarchy:
-  `channels list|get|programs|create|add-programs|verify|convert`,
+  `channels list|get|programs|create|add-programs|verify|schedule|convert`,
   `programs search|search-by`, `media-sources list`, `libraries list`,
   `transcode-configs list`.
 - **Typed options for free**: `click.Choice` for stream modes and convert
@@ -179,7 +179,12 @@ Model tests (`test_models.py`) are pure unit tests: round-tripping through
   `{"type": "time", "programs": [...], "schedule": {...}}`.
 - In a time schedule, a **movie slot's `id` field is the movie's program
   uuid**; show slots carry the show uuid in `showId`; flex slots have neither.
-- `GET /api/programs/{id}` works for shows (parents) as well as episodes and
-  movies — `convert --mode time` uses it to resolve show slots.
+- `GET /api/programs/{id}` works for episodes and movies but **404s for
+  shows** — a show record is not directly fetchable. `channels schedule`
+  therefore resolves shows by exact title via `search_all` (filtering
+  `type == "show"`), not via `client.program()`.
+- A show's episode list comes from `GET /api/programs/{showId}/descendants`
+  (each entry is a content entry whose `id` is the episode uuid); that is the
+  source of the `programs` field in a time-schedule POST.
 - A title search for a *show* name returns its episodes/movies, not the show
   itself; exact-title matching on a show name can legitimately return `[]`.

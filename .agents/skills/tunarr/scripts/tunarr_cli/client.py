@@ -97,6 +97,15 @@ class TunarrClient:
     def program(self, program_id: str) -> Program:
         return Program.from_dict(self.get(f"programs/{program_id}"))
 
+    def descendants(self, program_id: str) -> list[dict[str, Any]]:
+        """Fetch the descendant programs of a show (its episodes).
+
+        Each entry is a content entry: ``{"type": "content", "duration":
+        <ms>, "id": <episode uuid>, "program": {...}}``. The ``id`` values
+        are the episode uuids to pass in a time-schedule ``programs`` list.
+        """
+        return self.get(f"programs/{program_id}/descendants")
+
     def search_programs(
         self,
         query: str | None,

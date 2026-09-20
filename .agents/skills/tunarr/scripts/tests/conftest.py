@@ -81,6 +81,9 @@ class _Handler(BaseHTTPRequestHandler):
                 self._send(200, state["programming"][cid])
             else:
                 self._send(404, {"error": "channel not found"})
+        elif path.startswith("/api/programs/") and path.endswith("/descendants"):
+            pid = path.split("/")[3]
+            self._send(200, state["descendants"].get(pid, []))
         elif path.startswith("/api/programs/"):
             pid = path.rsplit("/", 1)[1]
             for program in state["all_programs"]:
@@ -168,6 +171,7 @@ def fake_tunarr():
         "programming": {},
         "all_programs": [],
         "search_results": [],
+        "descendants": {},
         "posts": [],
         "created_channel": None,
     }

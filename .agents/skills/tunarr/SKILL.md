@@ -90,6 +90,27 @@ catalog for the selected source and matches on exact title or identifier
 show's title returns its episodes, not the show record — use `search-by`
 when you need the parent show.
 
+## Schedule a channel by time
+
+```bash
+scripts/tunarr.py channels schedule 12 --show "Phineas and Ferb"
+scripts/tunarr.py channels schedule 12 --show "Bluey" --show "Paw Patrol" \
+  --order shuffle --period day --max-days 365 --tz-offset 240 --dry-run
+```
+
+Posts a time-based schedule (`POST /api/channels/{id}/programming` with
+`{type: "time", programs, schedule}`) that plays the named shows in show
+slots. Each `--show` is resolved by exact title against the selected source
+(must match exactly one show). With a single show the slot starts at midnight;
+with several shows the slots are spaced evenly across the period. `--order`
+sets the slot's play order (`shuffle` is the default; also `next`,
+`ordered_shuffle`, `alphanumeric`, `chronological`). `--period` is `day` or
+`week`; `--max-days` is how many days of schedule to pregenerate; `--tz-offset`
+is the timezone offset in minutes (240 = UTC-4). The `programs` list is the
+union of each show's descendant episodes (fetched from
+`GET /api/programs/{showId}/descendants`). Use `--dry-run` to inspect the
+payload before writing.
+
 ## Verify a channel
 
 ```bash

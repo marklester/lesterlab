@@ -381,6 +381,149 @@ def test_channels_convert_time_requires_schedule(fake_tunarr, capsys) -> None:
     assert "not time-programmed" in err
 
 
+# --------------------------------------------------------------------- schedule
+
+
+def _show_program(uuid: str, title: str, source: str) -> dict:
+    return {
+        "uuid": uuid,
+        "title": title,
+        "sortTitle": title,
+        "type": "show",
+        "duration": None,
+        "state": "ok",
+        "mediaSourceId": source,
+        "identifiers": [],
+    }
+
+
+def _episode(pid: str, duration: int = 60000) -> dict:
+    return {"type": "content", "duration": duration, "id": pid, "program": {"uuid": pid}}
+
+
+def test_channels_schedule_single_show_dry_run(fake_tunarr, capsys) -> None:
+    state = fake_tunarr.server.state
+    state["search_results"] = [_show_program("show-1", "Phineas and Ferb", NEW_SOURCE_ID)]
+    state["descendants"]["show-1"] = [_episode("ep-1"), _episode("ep-2"), _episode("ep-3")]
+    code, out, _ = run_cli(
+        capsys,
+        "--url",
+        fake_tunarr.url,
+        "channels",
+        "schedule",
+        "1",
+        "--show",
+        "Phineas and Ferb",
+        "--dry-run",
+    )
+    assert code == 0
+    result = parse(out)
+    assert result["channel"] == CHANNEL_ID
+    payload = result["payload"]
+    assert payload["type"] == "time"
+    assert payload["programs"] == ["ep-1", "ep-2", "ep-3"]
+    schedule = payload["schedule"]
+    assert schedule["type"] == "time"
+    assert schedule["period"] == "day"
+    assert schedule["maxDays"] == 365
+    assert schedule["flexPreference"] == "distribute"
+    assert schedule["latenessMs"] == 0
+    assert schedule["padMs"] == 1
+    assert schedule["timeZoneOffset"] == 240
+    slots = schedule["slots"]
+    assert len(slots) == 1
+    assert slots[0]["type"] == "show"
+    assert slots[0]["showId"] == "show-1"
+    assert slots[0]["startTime"] == 0
+    assert slots[0]["order"] == "shuffle"
+    assert slots[0]["direction"] == "asc"
+    assert slots[0]["seasonFilter"] == []
+    assert slots[0]["seasonExcludeFilter"] == []
+    assert slots[0]["rerunOverflow"] == "flex"
+    assert slots[0]["id"]  # a fresh uuid
+
+
+def test_channels_schedule_multiple_shows_even_spacing(fake_tunarr, capsys) -> None:
+    state = fake_tunarr.server.state
+    state["search_results"] = [
+        _show_program("show-1", "Show A", NEW_SOURCE_ID),
+        _show_program("show-2", "Show B", NEW_SOURCE_ID),
+    ]
+    state["descendants"]["show-1"] = [_episode("ep-a")]
+    state["descendants"]["show-2"] = [_episode("ep-b")]
+    code, out, _ = run_cli(
+        capsys,
+        "--url",
+        fake_tunarr.url,
+        "channels",
+        "schedule",
+        "1",
+        "--show",
+        "Show A",
+        "--show",
+        "Show B",
+        "--dry-run",
+    )
+    assert code == 0
+    payload = parse(out)["payload"]
+    slots = payload["schedule"]["slots"]
+    assert [s["showId"] for s in slots] == ["show-1", "show-2"]
+    # day period: 86400000 // 2 = 43200000 spacing
+    assert [s["startTime"] for s in slots] == [0, 43200000]
+    assert payload["programs"] == ["ep-a", "ep-b"]
+
+
+def test_channels_schedule_posts(fake_tunarr, capsys) -> None:
+    state = fake_tunarr.server.state
+    state["search_results"] = [_show_program("show-1", "Phineas and Ferb", NEW_SOURCE_ID)]
+    state["descendants"]["show-1"] = [_episode("ep-1")]
+    code, out, _ = run_cli(
+        capsys,
+        "--url",
+        fake_tunarr.url,
+        "channels",
+        "schedule",
+        "1",
+        "--show",
+        "Phineas and Ferb",
+    )
+    assert code == 0
+    result = parse(out)
+    assert result["channel"] == CHANNEL_ID
+    assert result["programs"] == 1
+    assert result["response"] == {"ok": True}
+    programming_posts = [
+        (path, body) for path, body in state["posts"] if path.endswith("/programming")
+    ]
+    assert len(programming_posts) == 1
+    path, body = programming_posts[0]
+    assert path == f"/api/channels/{CHANNEL_ID}/programming"
+    assert body["type"] == "time"
+
+
+def test_channels_schedule_requires_show(fake_tunarr, capsys) -> None:
+    code, out, err = run_cli(capsys, "--url", fake_tunarr.url, "channels", "schedule", "1")
+    assert code == 1
+    assert "requires at least one --show" in err
+
+
+def test_channels_schedule_show_not_found(fake_tunarr, capsys) -> None:
+    state = fake_tunarr.server.state
+    state["search_results"] = [_show_program("show-1", "Other Show", NEW_SOURCE_ID)]
+    code, out, err = run_cli(
+        capsys,
+        "--url",
+        fake_tunarr.url,
+        "channels",
+        "schedule",
+        "1",
+        "--show",
+        "Missing Show",
+    )
+    assert code == 1
+    assert "matched 0 shows" in err
+
+
 # ------------------------------------------------------------------- error paths
 
 
