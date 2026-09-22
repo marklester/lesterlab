@@ -16,6 +16,7 @@
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/mqtt\\/mqtt\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/mqtt\\/govee2mqtt\\.deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/moonbase\\/manifests\\/backrest\\/backrest\\.deployment\\.yaml$/",
+      "/kubernetes\\/argocd\\/moonbase\\/manifests\\/rest-server\\/deployment\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/rook-ceph-cluster\\/cluster\\.yaml$/",
       "/kubernetes\\/argocd\\/main-cluster\\/manifests\\/rook-ceph-cluster\\/toolbox\\.yaml$/"
     ]
