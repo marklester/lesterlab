@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry
+  namespace: registry
+  labels:
+    app: registry
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: registry
+  template:
+    metadata:
+      labels:
+        app: registry
+    spec:
+      securityContext:
+        fsGroup: 10001
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+        - name: zot
+          image: ghcr.io/project-zot/zot:v2.1.21
+          imagePullPolicy: IfNotPresent
+          args:
+            - serve
+            - /etc/zot/config.json
+          ports:
+            - name: registry
+              containerPort: 5000
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /v2/
+              port: registry
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /v2/
+              port: registry
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: config
+              mountPath: /etc/zot/config.json
+              subPath: config.json
+              readOnly: true
+            - name: storage
+              mountPath: /var/lib/zot
+      volumes:
+        - name: config
+          configMap:
+            name: registry-config
+        - name: storage
+          persistentVolumeClaim:
+            claimName: registry-storage
