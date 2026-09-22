@@ -3,10 +3,16 @@ kind: Ingress
 metadata:
   name: registry
   namespace: registry
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: traefik
+  tls:
+    - hosts:
+        - registry.lester.network
+      secretName: registry-tls
   rules:
-    - host: registry.home
+    - host: registry.lester.network
       http:
         paths:
           - path: /
