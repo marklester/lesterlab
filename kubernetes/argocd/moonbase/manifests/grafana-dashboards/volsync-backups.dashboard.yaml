@@ -96,6 +96,38 @@ data:
           ],
           "title": "Missed intervals (cumulative)",
           "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "thresholds"},
+              "custom": {"align": "auto", "displayMode": "basic", "filterable": true},
+              "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}
+            },
+            "overrides": [
+              {
+                "matcher": {"id": "byName", "options": "Value"},
+                "properties": [
+                  {"id": "displayName", "value": "Last sync"},
+                  {"id": "mappings", "value": {"group": [], "mappings": [{"id": 1, "type": "value", "options": {"0": {"text": "Out of sync"}, "1": {"text": "In sync"}}}]}}
+                ]
+              }
+            ]
+          },
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 20},
+          "id": 8,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {"countRows": false, "fields": "", "reducer": null, "show": "hide"},
+            "showHeader": true,
+            "sortBy": [{"desc": false, "displayName": "obj_name"}]
+          },
+          "targets": [
+            {"datasource": {"type": "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "sum by (obj_name, obj_namespace) (1 - volsync_volume_out_of_sync{cluster=\"main\"})", "format": "table", "instant": true, "refId": "A"}
+          ],
+          "title": "Last sync status by policy",
+          "type": "table"
         }
       ],
       "refresh": "30s",
