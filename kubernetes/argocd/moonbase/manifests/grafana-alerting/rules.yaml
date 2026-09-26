@@ -388,3 +388,548 @@ data:
             annotations:
               summary: "Moonbase local-path PVC backing storage is over 85% full"
             isPaused: false
+
+      # VolSync backup monitoring. Metrics are scraped on main by the OTel
+      # collector (job "volsync") and remote-written here with cluster="main".
+      # Expected policies: jackett-config, plex-config, sonarr-config,
+      # radarr-config, lidarr-config (see main-cluster/manifests/*/
+      # *.volsync-restic.replicationsource.yaml).
+      - orgId: 1
+        name: volsync-backups
+        folder: Backups
+        interval: 1m
+        rules:
+          # --- VolSync controller metrics missing: source outage. The
+          # controller pod is down, the scrape job is broken, or remote-write
+          # is down. Fires even though every other backup alert goes quiet. ---
+          - uid: volsync-metrics-missing
+            title: VolSync metrics missing (main)
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: count(volsync_volume_out_of_sync{cluster="main"})
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: A
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  reducer: last
+                  refId: B
+                  type: reduce
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params:
+                          - 0
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: B
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: C
+                  type: threshold
+            noDataState: NoData
+            execErrState: Error
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "No VolSync metrics from main for 5m - controller, scrape, or remote-write outage"
+            isPaused: false
+
+          # --- Expected policy missing: a ReplicationSource that should be
+          # reporting is absent from the metrics (deleted, or its namespace
+          # gone). ---
+          - uid: volsync-policy-missing
+            title: Expected VolSync policy missing
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: count(volsync_volume_out_of_sync{cluster="main",obj_name=~"jackett-config|plex-config|sonarr-config|radarr-config|lidarr-config"})
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: A
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  reducer: last
+                  refId: B
+                  type: reduce
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params:
+                          - 5
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: B
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: C
+                  type: threshold
+            noDataState: NoData
+            execErrState: Error
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Fewer than 5 expected VolSync policies are reporting (jackett/plex/sonarr/radarr/lidarr-config)"
+            isPaused: false
+
+          # --- Backup age: no completed sync for a policy in 12h (policies
+          # run every 6h, so this allows one full missed cycle). ---
+          - uid: volsync-backup-stale
+            title: VolSync backup stale (no sync in 12h)
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: increase(volsync_sync_duration_seconds_count{cluster="main"}[12h]) == 0
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: A
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  reducer: last
+                  refId: B
+                  type: reduce
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params:
+                          - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: B
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: C
+                  type: threshold
+            noDataState: NoData
+            execErrState: Error
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "VolSync policy {{ $labels.obj_name }} has had no completed sync in 12h"
+            isPaused: false
+
+          # --- Missed intervals: VolSync skipped a scheduled sync (job
+          # failure, stall, or the previous run still running). ---
+          - uid: volsync-missed-intervals
+            title: VolSync missed scheduled sync
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: increase(volsync_missed_intervals_total{cluster="main"}[10m]) > 0
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: A
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  reducer: last
+                  refId: B
+                  type: reduce
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params:
+                          - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: B
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: C
+                  type: threshold
+            noDataState: NoData
+            execErrState: Error
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "VolSync policy {{ $labels.obj_name }} missed a scheduled sync interval"
+            isPaused: false
+
+          # --- Volume out of sync: the last sync did not complete within the
+          # policy's allowed window. ---
+          - uid: volsync-volume-out-of-sync
+            title: VolSync volume out of sync
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: max by (obj_name, obj_namespace) (volsync_volume_out_of_sync{cluster="main"} == 1)
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: A
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  reducer: last
+                  refId: B
+                  type: reduce
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params:
+                          - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: B
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: C
+                  type: threshold
+            noDataState: NoData
+            execErrState: Error
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "VolSync policy {{ $labels.obj_name }} ({{ $labels.obj_namespace }}) is out of sync"
+            isPaused: false
+
+          # --- Destination: the ZFS-backed repository mount is gone. A
+          # missing mountpoint makes node_filesystem_* disappear, which also
+          # indicates the ZFS pool/dataset is no longer mounted. ---
+          - uid: moonbase-zfs-mount-missing
+            title: Moonbase ZFS repository mount missing
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: count(node_filesystem_avail_bytes{mountpoint="/tank/local-path-provisioner",fstype="zfs"})
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: A
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  reducer: last
+                  refId: B
+                  type: reduce
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params:
+                          - 0
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: B
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: C
+                  type: threshold
+            noDataState: NoData
+            execErrState: Error
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Moonbase /tank/local-path-provisioner ZFS mount is not visible to node-exporter"
+            isPaused: false
+
+          # --- Destination: the rest-server pod is not running, so backups
+          # cannot reach the repository even if VolSync is healthy. ---
+          - uid: rest-server-pod-down
+            title: Restic REST server pod not running
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: max(kube_pod_status_ready{namespace="rest-server",pod=~"rest-server-.*"})
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: A
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  reducer: last
+                  refId: B
+                  type: reduce
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params:
+                          - 0.99
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: B
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: C
+                  type: threshold
+            noDataState: NoData
+            execErrState: Error
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "The rest-server pod on Moonbase is not ready"
+            isPaused: false
