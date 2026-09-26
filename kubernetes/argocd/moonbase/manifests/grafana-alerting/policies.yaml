@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-alerting-policies
+  namespace: monitoring
+  labels:
+    grafana_alert: "1"
+data:
+  policies.yaml: |
+    apiVersion: 1
+    policies:
+      - orgId: 1
+        receiver: email
+        group_by:
+          - alertname
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 4h
+        routes: []

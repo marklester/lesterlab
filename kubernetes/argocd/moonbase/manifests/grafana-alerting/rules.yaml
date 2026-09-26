@@ -1,0 +1,315 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-alerting-rules
+  namespace: monitoring
+  labels:
+    grafana_alert: "1"
+data:
+  rules.yaml: |
+    apiVersion: 1
+    groups:
+      - orgId: 1
+        name: lesterlab-infrastructure
+        folder: Infrastructure
+        interval: 1m
+        rules:
+          # --- Ceph OSD down: any OSD reports down (ceph_osd_up == 0) ---
+          - uid: ceph-osd-down
+            title: Ceph OSD down
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: min(ceph_osd_up)
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: A
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  reducer: last
+                  refId: B
+                  type: reduce
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params:
+                          - 0.5
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: B
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: C
+                  type: threshold
+            noDataState: NoData
+            execErrState: Error
+            for: 2m
+            labels:
+              severity: critical
+            annotations:
+              summary: "A Ceph OSD is down"
+            isPaused: false
+
+          # --- Ceph low space: cluster free space below 10% ---
+          - uid: ceph-low-space
+            title: Ceph cluster low space
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: min((ceph_cluster_total_bytes - ceph_cluster_total_used_bytes) / ceph_cluster_total_bytes)
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: A
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  reducer: last
+                  refId: B
+                  type: reduce
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params:
+                          - 0.10
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: B
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: C
+                  type: threshold
+            noDataState: NoData
+            execErrState: Error
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Ceph cluster free space below 10%"
+            isPaused: false
+
+          # --- Disk unhealthy on either cluster: SMART failure or any NVMe critical warning ---
+          - uid: disk-unhealthy
+            title: Disk unhealthy (SMART)
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: count(smartctl_device_smart_status == 0 or smartctl_device_critical_warning > 0) or (0 * count(smartctl_device_smart_status))
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: A
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  reducer: last
+                  refId: B
+                  type: reduce
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params:
+                          - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: B
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: C
+                  type: threshold
+            noDataState: NoData
+            execErrState: Error
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "A disk reports unhealthy (SMART)"
+            isPaused: false
+
+          # --- PVC low space: provisioned PVC over 85% full (both clusters) ---
+          - uid: pvc-low-space
+            title: PVC low space
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: max(kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes)
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: A
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  reducer: last
+                  refId: B
+                  type: reduce
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params:
+                          - 0.85
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: B
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: C
+                  type: threshold
+            noDataState: NoData
+            execErrState: Error
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "A provisioned PVC is over 85% full"
+            isPaused: false

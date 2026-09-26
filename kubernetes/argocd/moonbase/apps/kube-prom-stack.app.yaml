@@ -91,6 +91,13 @@ spec:
           prometheusOperator:
             certManager:
               enabled: true
+          # Alerts sidecar: watches ConfigMaps/Secrets labeled `grafana_alert`
+          # and writes each key to /etc/grafana/provisioning/alerting/, where
+          # Grafana's unified alerting auto-loads them. The ConfigMaps live in
+          # the standalone `grafana-alerting` ArgoCD app (manifests/grafana-alerting).
+          sidecar:
+            alerts:
+              enabled: true
 
         prometheus:
           ingress:
