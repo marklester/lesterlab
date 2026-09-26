@@ -65,6 +65,7 @@ spec:
         volumeMounts:
         - name: media
           mountPath: /media/
+          subPath: media
         - name: plex-config
           mountPath: /config
         - name: logs
@@ -114,9 +115,8 @@ spec:
             memory: 256Mi
       volumes:
         - name: media
-          nfs:
-            server: ceph-nfs.home
-            path: /cephfs/media
+          persistentVolumeClaim:
+            claimName: plex-media-cephfs
         - name: plex-config
           persistentVolumeClaim:
             claimName: plex-config 
