@@ -19,7 +19,7 @@ data:
           "id": 1,
           "options": {"colorMode": "background", "graphMode": "none", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
           "targets": [
-            {"datasource": {"type": "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "count(volsync_volume_out_of_sync{cluster=\"main\"} == 1)", "instant": true, "refId": "A"}
+            {"datasource": {"type": "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "sum(volsync_volume_out_of_sync{cluster=\"main\"})", "instant": true, "refId": "A"}
           ],
           "title": "Policies out of sync",
           "type": "stat"
@@ -31,7 +31,7 @@ data:
           "id": 2,
           "options": {"colorMode": "background", "graphMode": "none", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
           "targets": [
-            {"datasource": {"type": "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "count(volsync_missed_intervals_total{cluster=\"main\"} > 0)", "instant": true, "refId": "A"}
+            {"datasource": {"type": "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "sum(volsync_missed_intervals_total{cluster=\"main\"} > 0)", "instant": true, "refId": "A"}
           ],
           "title": "Policies with missed intervals",
           "type": "stat"
@@ -43,7 +43,7 @@ data:
           "id": 3,
           "options": {"colorMode": "background", "graphMode": "none", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
           "targets": [
-            {"datasource": {"type": "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "count(volsync_sync_duration_seconds_count{cluster=\"main\"} > 0)", "instant": true, "refId": "A"}
+            {"datasource": {"type": "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "sum(volsync_sync_duration_seconds_count{cluster=\"main\"} > 0)", "instant": true, "refId": "A"}
           ],
           "title": "Policies with completed syncs",
           "type": "stat"
