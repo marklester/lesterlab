@@ -27,6 +27,14 @@ spec:
           repository: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib"
         config:
           receivers:
+            # Kubelet volume stats include CephFS PVC usage, which the default
+            # kubeletMetrics preset omits from its node/pod/container groups.
+            kubeletstats:
+              metric_groups:
+                - node
+                - pod
+                - container
+                - volume
             prometheus:                 
               api_server:
                 enabled: true
@@ -71,4 +79,4 @@ spec:
       - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
       - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
       - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
-      - ServerSideApply=true  
+      - ServerSideApply=true
