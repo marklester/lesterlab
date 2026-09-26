@@ -23,18 +23,15 @@ spec:
         serviceAccount:
           create: false
           name: otel-collector-sa
+        clusterRole:
+          rules:
+            - apiGroups: [""]
+              resources: ["nodes/metrics"]
+              verbs: ["get"]
         image:
           repository: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib"
         config:
           receivers:
-            # Kubelet volume stats include CephFS PVC usage, which the default
-            # kubeletMetrics preset omits from its node/pod/container groups.
-            kubeletstats:
-              metric_groups:
-                - node
-                - pod
-                - container
-                - volume
             prometheus:                 
               api_server:
                 enabled: true
@@ -50,6 +47,22 @@ spec:
                       - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
                         action: keep
                         regex: true
+                  # Each DaemonSet pod scrapes its own kubelet. Native kubelet
+                  # volume stats retain the PVC namespace/name labels.
+                  - job_name: 'kubelet-pvc-stats'
+                    scrape_interval: 30s
+                    scheme: https
+                    metrics_path: /metrics
+                    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+                    tls_config:
+                      insecure_skip_verify: true
+                    static_configs:
+                      - targets:
+                          - '${env:K8S_NODE_IP}:10250'
+                    metric_relabel_configs:
+                      - source_labels: [__name__]
+                        regex: 'kubelet_volume_stats_(used|capacity|available)_bytes'
+                        action: keep
           exporters:
             prometheusremotewrite:
               endpoint: "http://prometheus.moonbase.home/api/v1/write"
