@@ -4,6 +4,9 @@
 * setup plex 
 * create a tunarr mcp
 
+* finish volsync plan
+  * remove backrest backups potentially remove it entirely and just use grafana
+
 * setup alerts for
     * os upgrades
     * k8s upgrades
