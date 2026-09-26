@@ -98,6 +98,7 @@ spec:
           sidecar:
             alerts:
               enabled: true
+              resourceName: secret/grafana-alerting-contact-points,configmap/grafana-alerting-policies,configmap/grafana-alerting-rules
 
         prometheus:
           ingress:
