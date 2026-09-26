@@ -26,8 +26,8 @@ grafana:
       from_address: mlester+grafana@gmail.com
       
   smtp:
-    existingSecret: "grafana-smtp-credentials"
-    userKey: "user"
+    existingSecret: "grafana-smtp-credentials-eso"
+    userKey: "username"
     passwordKey: "password"
   initChownData:
     enabled: false
