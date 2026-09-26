@@ -1,10 +1,11 @@
 # BeeLlama model serving
 
 The Compose defaults are a tuning candidate for Qwen3.8-27B UD-IQ3_S on the
-RTX 5060 Ti 16 GB: 81,920 total context tokens, medium reasoning, KVarN 5/4
-KV cache, a 1,024-token precision tail, 256-token microbatches, and a 4 GiB
-RAM prompt-cache limit. Context includes input, thinking, and final output.
-The model directory is mounted from the Windows host through Docker Desktop.
+RTX 5060 Ti 16 GB: BeeLlama v0.4.7, 81,920 total context tokens, medium
+reasoning, KVarN 5/4 KV cache, a 1,024-token precision tail, 512-token target
+microbatches, 128-token draft microbatches, and a 4 GiB RAM prompt-cache limit.
+Context includes input, thinking, and final output. The model directory is
+mounted from the Windows host through Docker Desktop.
 
 These defaults have not been performance- or quality-qualified. The previous
 65,536-token configuration produced about 37–40 generation tokens/sec at

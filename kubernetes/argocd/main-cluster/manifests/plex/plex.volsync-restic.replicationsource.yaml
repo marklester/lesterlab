@@ -1,23 +1,18 @@
 apiVersion: volsync.backube/v1alpha1
 kind: ReplicationSource
 metadata:
-  name: jackett-config-backup
-  namespace: jackett
+  name: plex-config-backup
+  namespace: plex
   annotations:
-    # The ExternalSecret must first create jackett-restic-config.
     argocd.argoproj.io/sync-wave: "1"
 spec:
-  sourcePVC: jackett-config
+  sourcePVC: plex-config
   trigger:
-    # Staggered behind Plex, Sonarr, Radarr, and Lidarr to keep one mover active
-    # at a time under normal conditions.
-    schedule: "57 1,7,13,19 * * *"
+    schedule: "17 1,7,13,19 * * *"
   restic:
-    repository: jackett-restic-config
+    repository: plex-restic-config
     copyMethod: Snapshot
     volumeSnapshotClassName: csi-cephfsplugin-snapclass
-    # Temporary PiT and cache PVCs are disposable; do not inherit the source
-    # claim's Retain storage class.
     storageClassName: rook-cephfs
     cacheStorageClassName: rook-cephfs
     cacheCapacity: 1Gi

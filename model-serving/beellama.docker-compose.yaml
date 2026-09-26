@@ -1,6 +1,6 @@
 services:
   llama:
-    image: ghcr.io/anbeeld/beellama.cpp:server-cuda13
+    image: ghcr.io/anbeeld/beellama.cpp:server-cuda13-v0.4.7
     pull_policy: always
     container_name: beellama-server-cuda13
     environment:
@@ -27,6 +27,7 @@ services:
       --gpu-layers-draft all
       --spec-type draft-mtp
       --spec-draft-n-max ${BEELLAMA_DRAFT_MAX:-3}
+      --spec-draft-ubatch-size ${BEELLAMA_DRAFT_UBATCH:-128}
       --n-gpu-layers all
       --threads 6
       --fit off
@@ -41,7 +42,7 @@ services:
       --kv-tail-tokens ${BEELLAMA_KV_TAIL:-1024}
       --cache-ram ${BEELLAMA_CACHE_RAM:-4096}
       --batch-size 512
-      --ubatch-size ${BEELLAMA_UBATCH:-256}
+      --ubatch-size ${BEELLAMA_UBATCH:-512}
       --jinja
       --temp 1
       --top-p 0.95
