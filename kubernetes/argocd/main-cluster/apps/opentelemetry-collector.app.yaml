@@ -65,10 +65,12 @@ spec:
                         regex: volsync-controller
                       # The receiver does not apply the prometheus.io/port
                       # annotation to the target address, so build it from the
-                      # pod IP and the port annotation (8443) explicitly.
-                      - source_labels: [__meta_kubernetes_pod_ip, __meta_kubernetes_pod_annotation_prometheus_io_port]
-                        regex: '([^;]+);(\d+)'
-                        replacement: '${1}:${2}'
+                      # pod IP and the fixed metrics port (8443) explicitly.
+                      # $$ is the OTel config escape for a literal $ (Prometheus
+                      # replacement syntax).
+                      - source_labels: [__meta_kubernetes_pod_ip]
+                        regex: (.+)
+                        replacement: '$$1:8443'
                         target_label: __address__
                   # Each DaemonSet pod scrapes its own kubelet. Native kubelet
                   # volume stats retain the PVC namespace/name labels.
