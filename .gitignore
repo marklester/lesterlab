@@ -3,3 +3,10 @@
 .vars.yml
 .garden.vars.yaml
 **/.garden
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+*.egg-info/

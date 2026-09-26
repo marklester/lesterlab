@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rest-server-repositories
+  namespace: rest-server
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  # Existing Moonbase provisioner stores data under /tank/local-path-provisioner.
+  # Retain the backing directory if the claim is ever deleted.
+  storageClassName: local-path-retain
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # Local-path does not enforce capacity; monitor actual ZFS free space.
+      storage: 100Gi

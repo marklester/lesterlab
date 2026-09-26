@@ -1,0 +1,33 @@
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: lidarr-config-backup
+  namespace: lidarr
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  sourcePVC: lidarr-config
+  trigger:
+    schedule: "47 1,7,13,19 * * *"
+  restic:
+    repository: lidarr-restic-config
+    copyMethod: Snapshot
+    volumeSnapshotClassName: csi-cephfsplugin-snapclass
+    storageClassName: rook-cephfs
+    cacheStorageClassName: rook-cephfs
+    cacheCapacity: 1Gi
+    moverSecurityContext:
+      runAsUser: 65534
+      runAsGroup: 65534
+    moverResources:
+      requests:
+        cpu: 250m
+        memory: 256Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
+    pruneIntervalDays: 14
+    retain:
+      daily: 7
+      weekly: 4
+      monthly: 6

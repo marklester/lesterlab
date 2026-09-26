@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rest-server
+  namespace: argocd
+spec:
+  destination:
+    namespace: rest-server
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: kubernetes/argocd/moonbase/manifests/rest-server
+    repoURL: https://github.com/marklester/lesterlab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - PrunePropagationPolicy=foreground
+      - ServerSideApply=true

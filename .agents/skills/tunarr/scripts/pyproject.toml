@@ -1,0 +1,22 @@
+[project]
+name = "tunarr-cli"
+version = "0.1.0"
+description = "CLI for managing Tunarr live-TV channels"
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+]
+
+[project.scripts]
+tunarr = "tunarr_cli.cli:main"
+
+[tool.uv]
+package = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

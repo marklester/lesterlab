@@ -19,7 +19,7 @@ spec:
           "feature.node.kubernetes.io/amd-apu": "true"
       containers:
         - name: tunarr
-          image: ghcr.io/chrisbenincasa/tunarr:1.3.15
+          image: registry.home/tunarr:1.3.15-patch
           imagePullPolicy: Always
           env:
             - name: TZ
@@ -30,14 +30,27 @@ spec:
             - name: http
               containerPort: 8000
               protocol: TCP
+          # Tunarr is a single-threaded Node process that blocks the event
+          # loop during heavy work (XMLTV guide generation, search-index
+          # purging, large lineups). A liveness probe on "/" would time out
+          # during those windows and kill a healthy pod, so we probe the
+          # dedicated health endpoint and give it a generous tolerance window.
           livenessProbe:
             httpGet:
-              path: /
+              path: /api/system/health
               port: http
             initialDelaySeconds: 30
-            periodSeconds: 10
+            periodSeconds: 15
             timeoutSeconds: 10
-            failureThreshold: 6
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /api/system/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           volumeMounts:
             - name: tunarr-config
               mountPath: /config/tunarr

@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rest-server
+  namespace: rest-server
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: restic.moonbase.home
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rest-server
+                port:
+                  name: http

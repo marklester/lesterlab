@@ -116,6 +116,17 @@
             - 'bind-address=0.0.0.0' 
           kubelet-arg:
             - 'allowed-unsafe-sysctls=net.ipv4.conf.all.src_valid_mark,net.ipv6.conf.all.disable_ipv6'
+    - name: Configure the internal container registry mirror
+      ansible.builtin.copy:
+        dest: /etc/rancher/rke2/registries.yaml
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          mirrors:
+            registry.home:
+              endpoint:
+                - 'http://registry.home'
     - name: Enable and start a rke2 server
       ansible.builtin.service:
         name: rke2-server
