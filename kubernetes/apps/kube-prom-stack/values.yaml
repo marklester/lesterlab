@@ -9,6 +9,10 @@ alertmanager:
 grafana:
   enabled: true
   namespaceOverride: monitoring
+  admin:
+    existingSecret: grafana-admin-credentials-eso
+    userKey: admin-user
+    passwordKey: admin-password
   persistence:
     enabled: true
     type: pvc
