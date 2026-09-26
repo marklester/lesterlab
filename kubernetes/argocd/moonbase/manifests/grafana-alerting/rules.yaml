@@ -239,9 +239,9 @@ data:
               summary: "A disk reports unhealthy (SMART)"
             isPaused: false
 
-          # --- PVC low space: provisioned PVC over 85% full (both clusters) ---
+          # --- Main-cluster CephFS PVC over 85% full ---
           - uid: pvc-low-space
-            title: PVC low space
+            title: PVC low space (main)
             condition: C
             data:
               - refId: A
@@ -250,7 +250,7 @@ data:
                   to: 0
                 datasourceUid: prometheus
                 model:
-                  expr: max(kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes)
+                  expr: max by (cluster, namespace, persistentvolumeclaim) (kubelet_volume_stats_used_bytes{cluster="main"} / kubelet_volume_stats_capacity_bytes{cluster="main"})
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -311,5 +311,80 @@ data:
             labels:
               severity: warning
             annotations:
-              summary: "A provisioned PVC is over 85% full"
+              summary: "Main-cluster PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is over 85% full"
+            isPaused: false
+
+          # --- Moonbase local-path PVCs share this ZFS backing filesystem ---
+          - uid: moonbase-pvc-storage-low
+            title: Moonbase PVC backing storage low space
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: max(1 - node_filesystem_avail_bytes{mountpoint="/tank/local-path-provisioner",fstype="zfs"} / node_filesystem_size_bytes{mountpoint="/tank/local-path-provisioner",fstype="zfs"})
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: A
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  reducer: last
+                  refId: B
+                  type: reduce
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params:
+                          - 0.85
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: B
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: C
+                  type: threshold
+            noDataState: NoData
+            execErrState: Error
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Moonbase local-path PVC backing storage is over 85% full"
             isPaused: false
