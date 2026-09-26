@@ -42,10 +42,10 @@ For a future Jackett repository Secret in main, the required values are:
 
 The example repository is stored at `/data/jackett-config` inside the pod's
 repository PVC. Give each source PVC its own repository. The shared repository
-encryption password is retained in Moonbase's private secret store as
-`restic/main-backups/password` for disaster recovery. VolSync also needs the
-same value in a source-cluster Secret; it is independent of REST-server access
-control.
+encryption password is stored in main's private secret store as
+`restic/main-backups/password`. An ExternalSecret in each source PVC's namespace
+creates its per-PVC Restic configuration Secret; it is independent of REST-server
+access control.
 
 Append-only mode is intentionally not enabled: the proposed VolSync policies own
 retention and need to forget/prune. Configure ZFS snapshots with retention managed
