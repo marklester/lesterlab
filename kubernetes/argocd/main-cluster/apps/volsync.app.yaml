@@ -19,6 +19,18 @@ spec:
       releaseName: volsync
       valuesObject:
         manageCRDs: true
+        # The main cluster has no Prometheus operator; the OTel collector
+        # (daemonset) scrapes pods carrying prometheus.io annotations and
+        # remote-writes them to Moonbase. VolSync's metrics endpoint is
+        # normally protected by kube-auth-proxy, so auth is disabled to let
+        # the collector scrape it directly.
+        metrics:
+          disableAuth: true
+        podAnnotations:
+          prometheus.io/scrape: "true"
+          prometheus.io/port: "8443"
+          prometheus.io/path: "/metrics"
+          prometheus.io/scheme: "https"
         resources:
           requests:
             cpu: 100m

@@ -47,6 +47,22 @@ spec:
                       - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
                         action: keep
                         regex: true
+                  # VolSync controller metrics (volsync_missed_intervals_total,
+                  # volsync_sync_duration_seconds, volsync_volume_out_of_sync).
+                  # Served over HTTPS with a self-signed cert; auth is disabled
+                  # in the VolSync chart (metrics.disableAuth) so no bearer
+                  # token is needed.
+                  - job_name: 'volsync'
+                    scrape_interval: 30s
+                    scheme: https
+                    tls_config:
+                      insecure_skip_verify: true
+                    kubernetes_sd_configs:
+                      - role: pod
+                    relabel_configs:
+                      - source_labels: [__meta_kubernetes_pod_label_control_plane]
+                        action: keep
+                        regex: volsync-controller
                   # Each DaemonSet pod scrapes its own kubelet. Native kubelet
                   # volume stats retain the PVC namespace/name labels.
                   - job_name: 'kubelet-pvc-stats'
