@@ -412,7 +412,7 @@ data:
                   to: 0
                 datasourceUid: prometheus
                 model:
-                  expr: count(volsync_volume_out_of_sync{cluster="main"})
+                  expr: count(volsync_volume_out_of_sync{cluster="main"}) or vector(0)
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -448,7 +448,7 @@ data:
                   conditions:
                     - evaluator:
                         params:
-                          - 0
+                          - 1
                         type: lt
                       operator:
                         type: and
@@ -488,7 +488,7 @@ data:
                   to: 0
                 datasourceUid: prometheus
                 model:
-                  expr: increase(volsync_sync_duration_seconds_count{cluster="main"}[12h]) == 0
+                  expr: increase(volsync_sync_duration_seconds_count{cluster="main"}[12h]) == bool 0
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -564,7 +564,7 @@ data:
                   to: 0
                 datasourceUid: prometheus
                 model:
-                  expr: increase(volsync_missed_intervals_total{cluster="main"}[10m]) > 0
+                  expr: increase(volsync_missed_intervals_total{cluster="main"}[10m]) > bool 0
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -640,7 +640,7 @@ data:
                   to: 0
                 datasourceUid: prometheus
                 model:
-                  expr: max by (obj_name, obj_namespace) (volsync_volume_out_of_sync{cluster="main"} == 1)
+                  expr: max by (obj_name, obj_namespace) (volsync_volume_out_of_sync{cluster="main"})
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
