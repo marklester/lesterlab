@@ -88,19 +88,18 @@ spec:
         args:
         - --envflag.enable
         - --envflag.prefix=VL_
-        - --fileCollector.glob=/logs/**/*.log*
-        - '--fileCollector.extraFields={"cluster":"main","app":"plex","log_source":"file","kubernetes.container_name":"plex","kubernetes.pod_name":"%{POD_NAME}","kubernetes.pod_namespace":"plex"}'
-        - --fileCollector.streamFields=cluster,app,kubernetes.pod_namespace,kubernetes.pod_name,kubernetes.container_name,file
+        - --fileCollector.glob=/logs/**/*.log
+        # The v1.52.0 file collector mislabels files with five or more extra fields.
+        # Plex Transcoder Statistics files are XML; rotated logs are tracked
+        # automatically and must not be re-ingested after a collector restart.
+        - '--fileCollector.excludeGlob=/logs/**/{Plex Transcoder Statistics*,*.[0-9]*.log}'
+        - '--fileCollector.extraFields={"cluster":"main","log_source":"file","kubernetes.container_name":"plex","kubernetes.pod_namespace":"plex"}'
+        - --fileCollector.streamFields=cluster,log_source,kubernetes.pod_namespace,kubernetes.container_name,file
         - --fileCollector.decolorizeFields=_msg
         - '--remoteWrite.headers=AccountID:0^^ProjectID:0'
         - --remoteWrite.url=http://victorialogs.moonbase.home/insert/native
         - --tmpDataPath=/var/lib/vlagent
         - --loggerFormat=json
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
         volumeMounts:
         - name: logs
           mountPath: /logs
