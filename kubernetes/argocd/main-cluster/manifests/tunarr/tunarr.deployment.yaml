@@ -65,7 +65,7 @@ spec:
           securityContext:
             privileged: true                    
         - name: tunarr-file-logs
-          image: victoriametrics/vlagent:v1.52.0
+          image: victoriametrics/vlagent:v1.53.0
           args:
             - --envflag.enable
             - --envflag.prefix=VL_
