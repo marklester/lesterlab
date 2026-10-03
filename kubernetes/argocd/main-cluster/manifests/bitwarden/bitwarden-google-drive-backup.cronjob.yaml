@@ -1,0 +1,84 @@
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: bitwarden-google-drive-backup
+  namespace: bitwarden
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  schedule: "17 3 * * *"
+  timeZone: America/New_York
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 7200
+      template:
+        spec:
+          restartPolicy: Never
+          initContainers:
+            - name: stage
+              image: python:3.13.13-alpine3.22
+              command: ["python3", "/scripts/stage.py"]
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: "1"
+                  memory: 1Gi
+              volumeMounts:
+                - name: source
+                  mountPath: /source
+                - name: stage
+                  mountPath: /stage
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+          containers:
+            - name: backup
+              image: tofran/restic-rclone:0.19.1_1.75.1
+              command:
+                - /bin/sh
+                - -ec
+                - |
+                  if ! restic snapshots >/dev/null 2>&1; then
+                    restic init
+                  fi
+                  restic backup /stage/data --tag bitwarden --host bitwarden
+                  restic forget --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --prune
+                  restic check
+              envFrom:
+                - secretRef:
+                    name: bitwarden-google-drive-backup
+              env:
+                - name: HOME
+                  value: /tmp
+                - name: RESTIC_CACHE_DIR
+                  value: /tmp/restic-cache
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: "1"
+                  memory: 1Gi
+              volumeMounts:
+                - name: stage
+                  mountPath: /stage
+                  readOnly: true
+          volumes:
+            - name: source
+              persistentVolumeClaim:
+                claimName: bitwarden-config
+            - name: stage
+              emptyDir:
+                medium: Memory
+                sizeLimit: 512Mi
+            - name: scripts
+              configMap:
+                name: bitwarden-google-drive-backup

@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bitwarden-google-drive-backup
+  namespace: bitwarden
+data:
+  stage.py: |
+    from contextlib import closing
+    from pathlib import Path
+    import shutil
+    import sqlite3
+
+    source = Path("/source")
+    target = Path("/stage/data")
+    target.mkdir(parents=True, exist_ok=True)
+
+    database = source / "db.sqlite3"
+    if not database.is_file():
+        raise SystemExit("Vaultwarden SQLite database is missing")
+
+    # SQLite's backup API includes committed transactions still in the WAL.
+    with closing(sqlite3.connect(f"file:{database}?mode=ro", uri=True)) as live:
+        with closing(sqlite3.connect(target / "db.sqlite3")) as backup:
+            live.backup(backup)
+            result = backup.execute("PRAGMA quick_check").fetchone()
+            if result != ("ok",):
+                raise SystemExit(f"SQLite backup failed quick_check: {result}")
+
+    for item in source.iterdir():
+        name = item.name
+        if name in {"db.sqlite3", "db.sqlite3-wal", "db.sqlite3-shm", "tmp"}:
+            continue
+        if name.startswith("db_") and name.endswith(".sqlite3"):
+            continue
+        destination = target / name
+        if item.is_symlink():
+            destination.symlink_to(item.readlink())
+        elif item.is_dir():
+            shutil.copytree(item, destination, symlinks=True)
+        else:
+            shutil.copy2(item, destination)
