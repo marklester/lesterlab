@@ -72,6 +72,25 @@ spec:
                         regex: (.+)
                         replacement: '$$1:8443'
                         target_label: __address__
+                  # Cluster object health and ReplicationSource.lastSyncTime.
+                  # Scrape only the KSM pod on this collector's node: this
+                  # collector is a DaemonSet, and scraping the Service from
+                  # every node would remote-write duplicate time series.
+                  - job_name: 'kube-state-metrics'
+                    scrape_interval: 30s
+                    kubernetes_sd_configs:
+                      - role: pod
+                    relabel_configs:
+                      - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
+                        action: keep
+                        regex: kube-state-metrics
+                      - source_labels: [__meta_kubernetes_pod_node_name]
+                        action: keep
+                        regex: '${env:K8S_NODE_NAME}'
+                      - source_labels: [__meta_kubernetes_pod_ip]
+                        regex: (.+)
+                        replacement: '$$1:8080'
+                        target_label: __address__
                   # Each DaemonSet pod scrapes its own kubelet. Native kubelet
                   # volume stats retain the PVC namespace/name labels.
                   - job_name: 'kubelet-pvc-stats'

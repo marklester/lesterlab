@@ -1,0 +1,75 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-state-metrics
+  namespace: argocd
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: kube-state-metrics
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 8.5.0
+    helm:
+      releaseName: kube-state-metrics
+      valuesObject:
+        fullnameOverride: kube-state-metrics
+        # Cluster object health and workload availability. Node/volume usage
+        # comes from node-exporter and kubelet via the OTel collector instead.
+        collectors:
+          - nodes
+          - namespaces
+          - pods
+          - deployments
+          - daemonsets
+          - statefulsets
+          - replicasets
+          - horizontalpodautoscalers
+          - jobs
+          - cronjobs
+          - persistentvolumeclaims
+          - persistentvolumes
+          - poddisruptionbudgets
+          - endpointslices
+        rbac:
+          extraRules:
+            - apiGroups: [volsync.backube]
+              resources: [replicationsources]
+              verbs: [list, watch]
+        customResourceState:
+          enabled: true
+          config:
+            kind: CustomResourceStateMetrics
+            spec:
+              resources:
+                - groupVersionKind:
+                    group: volsync.backube
+                    version: v1alpha1
+                    kind: ReplicationSource
+                  labelsFromPath:
+                    namespace: [metadata, namespace]
+                    name: [metadata, name]
+                  metrics:
+                    - name: volsync_replicationsource_last_sync_time_seconds
+                      help: Last successful VolSync ReplicationSource sync, from status.lastSyncTime, as Unix seconds.
+                      each:
+                        type: Gauge
+                        gauge:
+                          path: [status, lastSyncTime]
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - PrunePropagationPolicy=foreground
+      - ServerSideApply=true
