@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: home-assistant-2
+  namespace: home-assistant-2
+  labels:
+    app: home-assistant-2
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: home-assistant-2
+  template:
+    metadata:
+      labels:
+        app: home-assistant-2
+    spec:
+      containers:
+        - name: home-assistant
+          image: homeassistant/home-assistant:2026.9.4
+          ports:
+            - name: http
+              containerPort: 8123
+              protocol: TCP
+          env:
+            - name: TZ
+              value: America/New_York
+          volumeMounts:
+            - name: data
+              mountPath: /config
+            - name: config
+              mountPath: /config/configuration.yaml
+              subPath: configuration.yaml
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: home-assistant-2-config
+        - name: config
+          configMap:
+            name: home-assistant-2-config
+            items:
+              - key: configuration.yaml
+                path: configuration.yaml

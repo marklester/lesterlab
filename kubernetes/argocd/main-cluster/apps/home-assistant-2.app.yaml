@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: home-assistant-2
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/marklester/lesterlab.git
+    targetRevision: HEAD
+    path: kubernetes/argocd/main-cluster/manifests/home-assistant-2
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: home-assistant-2
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - PrunePropagationPolicy=foreground
+      - ServerSideApply=true
