@@ -9,9 +9,8 @@ metadata:
 spec:
   sourcePVC: jackett-config
   trigger:
-    # Staggered behind Plex, Sonarr, Radarr, and Lidarr to keep one mover active
-    # at a time under normal conditions.
-    schedule: "57 1,7,13,19 * * *"
+    # Weekly on Sunday at 01:57 UTC, staggered behind the other backups.
+    schedule: "57 1 * * 0"
   restic:
     repository: jackett-restic-config
     copyMethod: Snapshot

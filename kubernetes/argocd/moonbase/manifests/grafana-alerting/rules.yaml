@@ -412,7 +412,7 @@ data:
                   to: 0
                 datasourceUid: prometheus
                 model:
-                  expr: count(volsync_volume_out_of_sync{cluster="main"}) or vector(0)
+                  expr: count(volsync_volume_out_of_sync{cluster="main",role="source"}) or vector(0)
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -476,10 +476,11 @@ data:
               summary: "No VolSync metrics from main for 5m - controller, scrape, or remote-write outage"
             isPaused: false
 
-          # --- Backup age: no completed sync for a policy in 12h (policies
-          # run every 6h, so this allows one full missed cycle). ---
+          # --- Backup age: daily sources allow a 48h window (one missed cycle).
+          # Exclude one-time restore destinations and weekly Jackett backups.
+          # Combine collector instances so old series cannot fire separately. ---
           - uid: volsync-backup-stale
-            title: VolSync backup stale (no sync in 12h)
+            title: VolSync backup stale (no sync in 48h)
             condition: C
             data:
               - refId: A
@@ -488,7 +489,7 @@ data:
                   to: 0
                 datasourceUid: prometheus
                 model:
-                  expr: increase(volsync_sync_duration_seconds_count{cluster="main"}[12h]) == bool 0
+                  expr: sum by (obj_name, obj_namespace) (increase(volsync_sync_duration_seconds_count{cluster="main",role="source",obj_name!="jackett-config-backup"}[48h])) == bool 0
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -549,7 +550,82 @@ data:
             labels:
               severity: critical
             annotations:
-              summary: "VolSync policy {{ $labels.obj_name }} has had no completed sync in 12h"
+              summary: "VolSync policy {{ $labels.obj_name }} has had no completed sync in 48h"
+            isPaused: false
+
+          # --- Jackett runs weekly; allow one extra day for completion. ---
+          - uid: volsync-jackett-backup-stale
+            title: Jackett backup stale (no sync in 8d)
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: sum by (obj_name, obj_namespace) (increase(volsync_sync_duration_seconds_count{cluster="main",role="source",obj_namespace="jackett",obj_name="jackett-config-backup"}[8d])) == bool 0
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: A
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  reducer: last
+                  refId: B
+                  type: reduce
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                    - evaluator:
+                        params:
+                          - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                        reducer:
+                          params: []
+                          type: last
+                        type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  expression: B
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: C
+                  type: threshold
+            noDataState: NoData
+            execErrState: Error
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "VolSync policy {{ $labels.obj_name }} has had no completed sync in 8d"
             isPaused: false
 
           # --- Missed intervals: VolSync skipped a scheduled sync (job
@@ -564,7 +640,7 @@ data:
                   to: 0
                 datasourceUid: prometheus
                 model:
-                  expr: increase(volsync_missed_intervals_total{cluster="main"}[10m]) > bool 0
+                  expr: increase(volsync_missed_intervals_total{cluster="main",role="source"}[10m]) > bool 0
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -640,7 +716,7 @@ data:
                   to: 0
                 datasourceUid: prometheus
                 model:
-                  expr: max by (obj_name, obj_namespace) (volsync_volume_out_of_sync{cluster="main"})
+                  expr: max by (obj_name, obj_namespace) (volsync_volume_out_of_sync{cluster="main",role="source"})
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
