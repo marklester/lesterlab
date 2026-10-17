@@ -25,7 +25,11 @@ spec:
             - name: TZ
               value: "America/New_York"
             - name: TUNARR_SERVER_TRUST_PROXY
-              value: "true"                         
+              value: "true"
+            # AMD's hardware pad produces zeroed chroma (green bars).
+            # Keep hardware encoding and use software for black letterboxing.
+            - name: TUNARR_DISABLE_VAAPI_PAD
+              value: "true"
           ports:
             - name: http
               containerPort: 8000
