@@ -1,0 +1,298 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tunarr-holidays
+  namespace: tunarr
+data:
+  holidays.mjs: |
+    import assert from 'node:assert/strict';
+    import { createHash } from 'node:crypto';
+    import { readFileSync } from 'node:fs';
+
+    const settings = process.env.HOLIDAYS_CONFIG
+      ? JSON.parse(readFileSync(process.env.HOLIDAYS_CONFIG, 'utf8')) : {};
+    const channelName = settings.channelName || 'Holidays';
+    const channelNumber = settings.channelNumber || 14;
+    const zone = 'America/New_York';
+    const base = (process.env.TUNARR_URL || 'http://tunarr.tunarr.svc.cluster.local').replace(/\/$/, '') + '/api';
+    const channelId = 'd5a8e869-3b41-4cd5-b2bf-370fe6ea450e';
+    const sourceId = '6d9f2dfd-27e2-4590-888f-aa2d73c0cae3';
+
+    function localDate(now) {
+      const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+        timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit',
+      }).formatToParts(now).map(p => [p.type, p.value]));
+      return `${parts.year}-${parts.month}-${parts.day}`;
+    }
+
+    function category(date) {
+      const md = date.slice(5);
+      if (md >= '05-01' && md <= '07-31') return 'Summer';
+      if (md >= '08-01' && md <= '09-14') return 'Back to School';
+      if (md >= '09-15' && md <= '10-31') return 'Halloween';
+      if (md >= '11-01' && md <= '11-30') return 'Thanksgiving';
+      if (md >= '12-01') return 'Christmas';
+      return 'Sitcoms';
+    }
+
+    function dailyId(date, collectionId, filter = null) {
+      const key = `${settings.channelName || channelId}:${date}:${collectionId}`;
+      const hex = createHash('sha256').update(settings.allowedMovieRatings ? `${key}:${JSON.stringify(filter)}` : key).digest('hex');
+      return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+    }
+
+    function offsetMinutes(now) {
+      const offsetName = new Intl.DateTimeFormat('en-US', {
+        timeZone: zone, timeZoneName: 'longOffset',
+      }).formatToParts(now).find(p => p.type === 'timeZoneName').value;
+      const offset = /^GMT([+-])(\d{2}):(\d{2})$/.exec(offsetName);
+      assert(offset, `Unrecognized Eastern offset: ${offsetName}`);
+      return (offset[1] === '-' ? 1 : -1) * (+offset[2] * 60 + +offset[3]);
+    }
+
+    function midnight(date) {
+      const utc = Date.parse(`${date}T00:00:00Z`);
+      let result = utc;
+      for (let i = 0; i < 3; i++) result = utc + offsetMinutes(new Date(result)) * 60000;
+      return result;
+    }
+
+    function scheduleFor(collection, date, now, movieCollection = null) {
+      const slot = (item, weight) => ({
+        type: 'smart-collection', smartCollectionId: item.uuid,
+        durationSpec: { type: 'dynamic', programCount: 1 },
+        cooldownMs: 0, weight, order: 'shuffle', direction: 'asc',
+        id: dailyId(date, item.uuid, item.filter), rerunOverflow: 'flex',
+      });
+      return {
+        type: 'random', flexPreference: 'end', randomDistribution: 'none',
+        maxDays: 7, padMs: 1, padStyle: 'episode',
+        timeZoneOffset: offsetMinutes(now),
+        slots: movieCollection ? [slot(collection, 3), slot(movieCollection, 1)] : [slot(collection, 1)],
+      };
+    }
+
+    async function api(path, method = 'GET', body) {
+      const response = await fetch(base + path, {
+        method, signal: AbortSignal.timeout(240000),
+        headers: body === undefined ? {} : { 'content-type': 'application/json' },
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
+      const text = await response.text();
+      if (!response.ok) throw new Error(`${method} ${path}: ${response.status} ${text.slice(0, 1000)}`);
+      return text ? JSON.parse(text) : null;
+    }
+
+    function checkProgramming(result, season) {
+      const programs = Object.values(result.programs || {}).map(p => p.program || p);
+      assert(programs.length > 0, 'Schedule contains no playable programs');
+      const flex = (result.lineup || []).filter(p => p.type === 'flex').reduce((sum, p) => sum + p.duration, 0);
+      assert(flex < 60000, `Unexpected blank time in schedule: ${flex}ms`);
+      for (const p of programs) {
+        assert.equal(p.mediaSourceId, sourceId, `Wrong source for ${p.title}`);
+        assert.equal(p.state, 'ok', `Unavailable program: ${p.title}`);
+        assert(['movie', 'episode'].includes(p.type), `Unexpected program type: ${p.type}`);
+        if (settings.allowedRatings) {
+          if (p.type === 'episode') {
+            assert(settings.allowedRatings.includes(p.rating || p.show?.rating), `Unapproved rating for ${p.title}`);
+            assert(settings.allowedShows.includes(p.show?.title), `Unapproved show for ${p.title}`);
+          } else {
+            assert(settings.movieCollections?.[season], `Unexpected movie in ${season}: ${p.title}`);
+            assert(settings.allowedMovieRatings.includes(p.rating), `Unapproved movie rating for ${p.title}`);
+          }
+        }
+      }
+      return { programs: programs.length, movies: programs.filter(p => p.type === 'movie').length };
+    }
+
+    function value(key, name, values, op = 'in', type = 'faceted_string') {
+      return { type: 'value', fieldSpec: { key, name, type, op, value: values } };
+    }
+
+    async function ensureKidsCollections(collections) {
+      if (!settings.allowedRatings) return collections;
+      for (const [season, name] of Object.entries(settings.collections)) {
+        const episodeChildren = [
+          value('mediaSourceId', 'media_source_id', [sourceId], '=', 'string'),
+          value('type', 'type', ['episode'], '='),
+          value('rating', 'rating', settings.allowedRatings),
+          value('grandparent.title', 'show_title', settings.allowedShows, 'in', 'string'),
+        ];
+        if (season === 'Thanksgiving') {
+          episodeChildren.push(value('title', 'title', settings.thanksgivingTitles, 'in', 'string'));
+        } else if (season !== 'Sitcoms') {
+          episodeChildren.push(value('tags', 'tags', [season, `${season} Episodes`]));
+        }
+        const desired = [{ name, keywords: '', filter: { type: 'op', op: 'and', children: episodeChildren } }];
+        const movieTag = settings.movieCollections?.[season];
+        if (movieTag) {
+          desired.push({
+            name: `${name} Movies`, keywords: '', filter: { type: 'op', op: 'and', children: [
+              value('mediaSourceId', 'media_source_id', [sourceId], '=', 'string'),
+              value('type', 'type', ['movie'], '='),
+              value('rating', 'rating', settings.allowedMovieRatings),
+              value('tags', 'tags', [movieTag]),
+            ] },
+          });
+        }
+        for (const payload of desired) {
+          const existing = collections.filter(c => c.name === payload.name);
+          assert(existing.length <= 1, `Duplicate smart collection ${payload.name}`);
+          if (!existing.length || JSON.stringify(existing[0].filter) !== JSON.stringify(payload.filter)) {
+            await api(existing.length ? `/smart_collections/${existing[0].uuid}` : '/smart_collections',
+              existing.length ? 'PUT' : 'POST', payload);
+          }
+        }
+      }
+      return api('/smart_collections');
+    }
+
+    async function main() {
+      const now = new Date();
+      const date = localDate(now);
+      let collections = await api('/smart_collections');
+      if (!process.argv.includes('--plan')) collections = await ensureKidsCollections(collections);
+      const desiredName = settings.collections?.[category(date)] || category(date);
+      const collection = collections.find(c => c.name === desiredName);
+      if (process.argv.includes('--plan') && settings.allowedRatings) {
+        console.log(JSON.stringify({ action: 'kids-plan', channelName, channelNumber, category: desiredName, settings }));
+        return;
+      }
+      assert(collection?.filter, `Missing smart collection ${category(date)}`);
+      assert(collection.filterString?.includes(sourceId), 'Collection is not scoped to Plex In Cluster');
+      const movieCollection = settings.movieCollections?.[category(date)]
+        ? collections.find(c => c.name === `${desiredName} Movies`) : null;
+      if (settings.movieCollections?.[category(date)]) {
+        assert(movieCollection?.filter, `Missing movie collection ${desiredName} Movies`);
+        assert(movieCollection.filterString?.includes(sourceId), 'Movie collection is not scoped to Plex In Cluster');
+        assert(movieCollection.filterString?.includes(settings.movieCollections[category(date)]),
+          'Movie collection has the wrong seasonal tag');
+      }
+      const channels = await api('/channels');
+      const matching = channels.filter(c => c.name === channelName);
+      assert(matching.length <= 1, `Multiple channels named ${channelName}`);
+      let channel = matching[0];
+      if (!channel) {
+        assert(!channels.some(c => c.number === channelNumber), `Channel ${channelNumber} is already in use`);
+        const profiles = await api('/transcode_configs');
+        const profile = profiles.find(p => p.isDefault);
+        assert(profile, 'No default transcode profile');
+        const payload = {
+          type: 'new', channel: {
+            id: channelId, name: channelName, number: channelNumber, startTime: midnight(date),
+            duration: 0, groupTitle: 'tunarr', guideMinimumDuration: 30000,
+            disableFillerOverlay: false, stealth: false, streamMode: 'hls',
+            transcodeConfigId: profile.id, subtitlesEnabled: false,
+            icon: { path: '', width: 0, duration: 0, position: 'bottom-right' },
+            offline: { picture: '', soundtrack: '', mode: 'pic' },
+          },
+        };
+        console.log(JSON.stringify({ action: 'create-channel', payload }));
+        if (process.argv.includes('--plan')) return;
+        channel = await api('/channels', 'POST', payload);
+      }
+      const schedule = scheduleFor(collection, date, now, movieCollection);
+      if (process.argv.includes('--plan')) {
+        console.log(JSON.stringify({ action: 'schedule-plan', channel: channel.id, category: collection.name, schedule }));
+        return;
+      }
+      const existing = await api(`/channels/${channel.id}/programming?offset=0&limit=1`);
+      const savedSlots = existing.schedule?.slots || [];
+      if (!process.argv.includes('--preview-all') && savedSlots.length === schedule.slots.length &&
+          savedSlots.every((slot, i) => slot.id === schedule.slots[i].id &&
+            slot.smartCollectionId === schedule.slots[i].smartCollectionId) && existing.totalPrograms > 0) {
+        console.log(JSON.stringify({ action: 'unchanged', channel: channel.number, category: collection.name, date }));
+        return;
+      }
+      // Anchor previews and the saved lineup to local midnight, avoiding a blank
+      // first day when a station is created or recovered after midnight.
+      if (channel.startTime !== midnight(date)) {
+        const properties = await api(`/channels/${channel.id}`);
+        channel = await api(`/channels/${channel.id}`, 'PUT', { ...properties, startTime: midnight(date) });
+      }
+      const previewCollections = process.argv.includes('--preview-all')
+        ? ['Sitcoms', 'Summer', 'Back to School', 'Halloween', 'Thanksgiving', 'Christmas'].map(season => {
+          const c = collections.find(c => c.name === (settings.collections?.[season] || season));
+          assert(c?.filter, `Missing collection ${season}`);
+          const movie = settings.movieCollections?.[season]
+            ? collections.find(item => item.name === `${c.name} Movies`) : null;
+          if (settings.movieCollections?.[season]) {
+            assert(movie?.filter, `Missing movie collection for ${season}`);
+            assert(movie.filterString?.includes(settings.movieCollections[season]),
+              `Wrong movie collection tag for ${season}`);
+          }
+          return { season, collection: c, movie };
+        }) : [{ season: category(date), collection, movie: movieCollection }];
+      for (const { season, collection: c, movie } of previewCollections) {
+        const previewSchedule = { ...scheduleFor(c, date, now, movie), maxDays: 1 };
+        const preview = await api(`/channels/${channel.id}/schedule-slots`, 'POST', { schedule: previewSchedule });
+        console.log(JSON.stringify({ action: 'preview', category: c.name, ...checkProgramming(preview, season) }));
+      }
+      if (process.argv.includes('--preview-all')) return;
+      const result = await api(`/channels/${channel.id}/programming`, 'POST', {
+        type: 'random', programs: [], schedule,
+      });
+      const count = checkProgramming(result, category(date));
+      const saved = await api(`/channels/${channel.id}/programming?offset=0&limit=1`);
+      assert.deepEqual(saved.schedule?.slots?.map(slot => slot.smartCollectionId),
+        schedule.slots.map(slot => slot.smartCollectionId));
+      console.log(JSON.stringify({ action: 'scheduled', channel: channel.number, id: channel.id, category: collection.name, date, ...count, lineupEntries: saved.totalPrograms }));
+    }
+
+    if (process.argv.includes('--self-test')) {
+      for (const year of [2024, 2026, 2027]) {
+        for (const [md, expected] of Object.entries({
+          '01-01': 'Sitcoms', '04-30': 'Sitcoms', '05-01': 'Summer',
+          '07-31': 'Summer', '08-01': 'Back to School', '09-14': 'Back to School',
+          '09-15': 'Halloween', '10-31': 'Halloween', '11-01': 'Thanksgiving',
+          '11-30': 'Thanksgiving', '12-01': 'Christmas', '12-31': 'Christmas',
+        })) assert.equal(category(`${year}-${md}`), expected);
+      }
+      assert.equal(category('2024-02-29'), 'Sitcoms');
+      assert.equal(category(localDate(new Date('2026-09-15T03:59:59Z'))), 'Back to School');
+      assert.equal(category(localDate(new Date('2026-09-15T04:00:00Z'))), 'Halloween');
+      assert.equal(category(localDate(new Date('2027-01-01T04:59:59Z'))), 'Christmas');
+      assert.equal(category(localDate(new Date('2027-01-01T05:00:00Z'))), 'Sitcoms');
+      const sample = { uuid: channelId, filter: null };
+      assert.equal(scheduleFor(sample, '2026-07-01', new Date('2026-07-01T12:00:00Z')).timeZoneOffset, 240);
+      assert.equal(scheduleFor(sample, '2026-01-01', new Date('2026-01-01T12:00:00Z')).timeZoneOffset, 300);
+      assert.equal(scheduleFor(sample, '2026-11-01', new Date('2026-11-01T05:59:59Z')).timeZoneOffset, 240);
+      assert.equal(scheduleFor(sample, '2026-11-01', new Date('2026-11-01T06:00:00Z')).timeZoneOffset, 300);
+      assert.equal(new Date(midnight('2026-11-01')).toISOString(), '2026-11-01T04:00:00.000Z');
+      assert.equal(new Date(midnight('2026-03-08')).toISOString(), '2026-03-08T05:00:00.000Z');
+      console.log('Passed calendar boundary, leap year, Eastern midnight, and DST checks');
+    } else {
+      await main();
+    }
+  kids.json: |
+    {
+      "channelName": "Kids Holidays",
+      "channelNumber": 15,
+      "allowedRatings": ["TV-Y", "TV-G", "TV-Y7"],
+      "allowedMovieRatings": ["G", "PG"],
+      "movieCollections": {
+        "Summer": "Summer Movies",
+        "Halloween": "Halloween",
+        "Christmas": "Christmas"
+      },
+      "allowedShows": [
+        "Avatar: The Last Airbender", "Batwheels", "Bluey (2018)",
+        "Daniel Tiger's Neighborhood", "Danny Phantom", "Dexter's Laboratory",
+        "Dora the Explorer", "Ed, Edd n Eddy", "Kim Possible", "The Magic School Bus",
+        "Paw Patrol", "Phineas and Ferb", "Pokémon", "The Powerpuff Girls", "Recess",
+        "Scooby-Doo, Where Are You!", "What's New Scooby-Doo?"
+      ],
+      "collections": {
+        "Sitcoms": "Kids Shows",
+        "Summer": "Kids Summer",
+        "Back to School": "Kids Back to School",
+        "Halloween": "Kids Halloween",
+        "Thanksgiving": "Kids Thanksgiving",
+        "Christmas": "Kids Christmas"
+      },
+      "thanksgivingTitles": [
+        "Margaret's First Thank You Day",
+        "Dora's Thanksgiving Day Parade",
+        "Recess S01E21E22 - Rainy Days / The Great Can Drive"
+      ]
+    }
