@@ -1,0 +1,214 @@
+[
+  {
+    "id": "b739398e-5681-4f59-8cc7-cc7f202e287f",
+    "number": 1,
+    "name": "Cartoons",
+    "file": "cartoons.jpg",
+    "sourceUrl": "http://tunarr.home/images/uploads/b739398e-5681-4f59-8cc7-cc7f202e287f_icon.png",
+    "sha256": "efd45fd6bc3c103f7ba374631f151e7fee360805e9235bc04b97f09a2e9c9e28",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/cartoons.jpg",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right",
+      "useDefaultIconFallback": true
+    }
+  },
+  {
+    "id": "5b9a51b1-63c7-4894-9427-8fc11093885d",
+    "number": 2,
+    "name": "Stephanie Special",
+    "file": "stephanie-special.jpg",
+    "sourceUrl": "http://tunarr.home/images/uploads/5b9a51b1-63c7-4894-9427-8fc11093885d_icon.png",
+    "sha256": "25f4b7ebc7bb8d78afab8ea4fd917f7c16ad26728c6496419f9e2a5d5f3433b3",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/stephanie-special.jpg",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right"
+    }
+  },
+  {
+    "id": "5366f0da-5d13-4424-9ba1-49167d2752b0",
+    "number": 3,
+    "name": "The Night Stream",
+    "file": "the-night-stream.jpg",
+    "sourceUrl": "http://tunarr.home/images/uploads/5366f0da-5d13-4424-9ba1-49167d2752b0_icon.png",
+    "sha256": "300b1c5910d23816d0a272e2956c6ba3a24fe844709078b52af31131f9fb0aff",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/the-night-stream.jpg",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right"
+    }
+  },
+  {
+    "id": "36aacc13-0a26-4a0f-b828-b1b4fecdc93d",
+    "number": 4,
+    "name": "Sitcoms",
+    "file": "sitcoms.png",
+    "sourceUrl": "http://tunarr.home/images/uploads/ab2dc225-1d60-468f-b3fa-4354f0189ae5_icon.png",
+    "sha256": "5e306ccb2d44ea243a06b0dc6b6468c639d27a77d60d48ce73879b556a451c24",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/sitcoms.png",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right"
+    }
+  },
+  {
+    "id": "192797dd-4a08-411f-ab1c-965f6dd655c8",
+    "number": 5,
+    "name": "Anime",
+    "file": "anime.png",
+    "sourceUrl": "http://tunarr.home/images/uploads/192797dd-4a08-411f-ab1c-965f6dd655c8_icon.png",
+    "sha256": "7d9dbb1b5a1394c53f9dd931775924c166c3f7e628d730fa169b6fb22fe2ede3",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/anime.png",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right"
+    }
+  },
+  {
+    "id": "44da8a42-aee7-45f4-a6f9-217be3d5a855",
+    "number": 6,
+    "name": "Family Movies",
+    "file": "family-movies.png",
+    "sourceUrl": "http://tunarr.home/images/uploads/44da8a42-aee7-45f4-a6f9-217be3d5a855_icon.png",
+    "sha256": "7079603925d6007b5d8125e0e99965d5677a1025b7a06947316828832ca275d4",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/family-movies.png",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right"
+    }
+  },
+  {
+    "id": "26cd9f25-bfe6-4aac-801a-87ffbc0edcac",
+    "number": 7,
+    "name": "Kids Movies ",
+    "file": "kids-movies.png",
+    "sourceUrl": "http://tunarr.home/images/uploads/26cd9f25-bfe6-4aac-801a-87ffbc0edcac_icon.png",
+    "sha256": "4302a15e4094f105c48d01a14300e9f83c53ee554c7a1569846a5a07bbde7496",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/kids-movies.png",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right"
+    }
+  },
+  {
+    "id": "0faf32e2-59de-4ea3-943e-07410e922dac",
+    "number": 8,
+    "name": "Sitcoms 2",
+    "file": "sitcoms.png",
+    "sourceUrl": "http://tunarr.home/images/uploads/ab2dc225-1d60-468f-b3fa-4354f0189ae5_icon.png",
+    "sha256": "5e306ccb2d44ea243a06b0dc6b6468c639d27a77d60d48ce73879b556a451c24",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/sitcoms.png",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right"
+    }
+  },
+  {
+    "id": "ce90f52c-c9b7-41a9-a705-843a80193adc",
+    "number": 9,
+    "name": "Action Movies",
+    "file": "action-movies.png",
+    "sourceUrl": "http://tunarr.home/images/uploads/ce90f52c-c9b7-41a9-a705-843a80193adc_icon.png",
+    "sha256": "ba6e14878bd8d64abe6fbdb8e200acc57ac348f216140910cd5191b273150496",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/action-movies.png",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right"
+    }
+  },
+  {
+    "id": "d76c1fd9-3e61-4845-a9a1-618f0f03706e",
+    "number": 10,
+    "name": "RomComs",
+    "file": "romcoms.png",
+    "sourceUrl": "http://tunarr.home/images/uploads/d76c1fd9-3e61-4845-a9a1-618f0f03706e_icon.png",
+    "sha256": "1f36f8aca61815f47c6726af94c21472dd1d55792753c7e6e084104b8ea412ca",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/romcoms.png",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right"
+    }
+  },
+  {
+    "id": "08057fdb-6539-4a18-a391-f6e3f7b649ed",
+    "number": 11,
+    "name": "Bluey",
+    "file": "bluey.jpg",
+    "sourceUrl": "http://tunarr.home/images/uploads/f1a6ed75-34fa-4ded-b545-4d80e0b18433_icon.jpg",
+    "sha256": "da10f018877a2b1124cb555fc2c0c8b7412ab24fd63ff4ab2880d25d316a0a41",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/bluey.jpg",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right"
+    }
+  },
+  {
+    "id": "ed5ad5ef-d3ac-4d82-9186-06fb33160743",
+    "number": 12,
+    "name": "Phineas and Ferb",
+    "file": "phineas-and-ferb.png",
+    "sourceUrl": "http://tunarr.home/images/uploads/channel-12.png",
+    "sha256": "192f0cc889d07ced40327b0f747dd127d36a87340b2c1d2971796a12a3607855",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/phineas-and-ferb.png",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right",
+      "useDefaultIconFallback": true
+    }
+  },
+  {
+    "id": "bb2703c2-a69b-4c31-b9f0-dba06d22d325",
+    "number": 13,
+    "name": "Friends",
+    "file": "friends.png",
+    "sourceUrl": "http://tunarr.home/images/uploads/channel-13.png",
+    "sha256": "972e9ea6aff4c213e89286a1d92ebfb656fe036ceb88e0cc018e66a68eec642c",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/friends.png",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right"
+    }
+  },
+  {
+    "id": "04aaa9a0-d499-47da-904d-ffd20f1f49d1",
+    "number": 14,
+    "name": "Holidays",
+    "file": "holidays.png",
+    "sourceUrl": "http://tunarr.home/images/uploads/channel-14.png",
+    "sha256": "164817956dcf8181a3c1cd8bacf67aab69a93c7bcf7898c0b77d77c367b52f85",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/holidays.png",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right"
+    }
+  },
+  {
+    "id": "087c782e-7bf0-48d7-8c43-2b6486fdd253",
+    "number": 15,
+    "name": "Kids Holidays",
+    "file": "kids-holidays.png",
+    "sourceUrl": "http://tunarr.home/images/uploads/channel-15.png",
+    "sha256": "f5a8f5f2f0a58a58da32aa54fe9d711b9b87592c1f45ab0bd1370e487f998b7d",
+    "icon": {
+      "path": "https://raw.githubusercontent.com/marklester/lesterlab/master/images/tunarr/kids-holidays.png",
+      "width": 0,
+      "duration": 0,
+      "position": "bottom-right"
+    }
+  }
+]
