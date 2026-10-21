@@ -7,13 +7,22 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: monitoring
+    namespace: system-upgrade-controller
     server: https://kubernetes.default.svc
   project: default
   source:
     path: kubernetes/argocd/main-cluster/manifests/system-upgrade-plans
     repoURL: https://github.com/marklester/lesterlab.git
     targetRevision: HEAD
+  # The repo-managed CronJob advances only the OS run identifier each week.
+  # Everything else in the Plan remains managed by Git.
+  ignoreDifferences:
+    - group: upgrade.cattle.io
+      kind: Plan
+      name: ubuntu-os
+      namespace: system-upgrade-controller
+      jsonPointers:
+        - /spec/version
   syncPolicy:
     automated:
       prune: true       # Automatically delete resources no longer in Git
@@ -22,4 +31,5 @@ spec:
       - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
       - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
       - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
-      - ServerSideApply=true  
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true

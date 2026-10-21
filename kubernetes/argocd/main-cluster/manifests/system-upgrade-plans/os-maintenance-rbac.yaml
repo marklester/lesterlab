@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: os-maintenance
+  namespace: system-upgrade-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: os-maintenance
+  namespace: system-upgrade-controller
+rules:
+  - apiGroups: [upgrade.cattle.io]
+    resources: [plans]
+    resourceNames: [ubuntu-os]
+    verbs: [get, patch]
+  - apiGroups: [upgrade.cattle.io]
+    resources: [plans]
+    verbs: [list]
+  - apiGroups: [batch]
+    resources: [jobs]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: os-maintenance
+  namespace: system-upgrade-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: os-maintenance
+subjects:
+  - kind: ServiceAccount
+    name: os-maintenance
+    namespace: system-upgrade-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: os-maintenance-health
+rules:
+  - apiGroups: [""]
+    resources: [nodes]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: os-maintenance-health
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: os-maintenance-health
+subjects:
+  - kind: ServiceAccount
+    name: os-maintenance
+    namespace: system-upgrade-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: os-maintenance-health
+  namespace: rook-ceph
+rules:
+  - apiGroups: [ceph.rook.io]
+    resources: [cephclusters]
+    resourceNames: [rook-ceph]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: os-maintenance-health
+  namespace: rook-ceph
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: os-maintenance-health
+subjects:
+  - kind: ServiceAccount
+    name: os-maintenance
+    namespace: system-upgrade-controller
+---
+# Use the controller chart's existing drainer permissions (node cordon and
+# eviction); the maintenance containers do not need cluster-admin access.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: os-maintenance-drainer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system-upgrade-drainer
+subjects:
+  - kind: ServiceAccount
+    name: os-maintenance
+    namespace: system-upgrade-controller

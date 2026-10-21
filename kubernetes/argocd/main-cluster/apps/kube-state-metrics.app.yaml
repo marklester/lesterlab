@@ -38,6 +38,9 @@ spec:
             - apiGroups: [volsync.backube]
               resources: [replicationsources]
               verbs: [list, watch]
+            - apiGroups: [upgrade.cattle.io]
+              resources: [plans]
+              verbs: [list, watch]
         customResourceState:
           enabled: true
           config:
@@ -58,6 +61,23 @@ spec:
                         type: Gauge
                         gauge:
                           path: [status, lastSyncTime]
+                - groupVersionKind:
+                    group: upgrade.cattle.io
+                    version: v1
+                    kind: Plan
+                  labelsFromPath:
+                    namespace: [metadata, namespace]
+                    name: [metadata, name]
+                  metrics:
+                    - name: system_upgrade_plan_complete
+                      help: Whether the latest system-upgrade-controller Plan completed on all selected nodes.
+                      each:
+                        type: Gauge
+                        gauge:
+                          path: [status, conditions]
+                          labelsFromPath:
+                            condition: [type]
+                          valueFrom: [status]
         resources:
           requests:
             cpu: 10m

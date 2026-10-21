@@ -5,6 +5,7 @@ metadata:
   namespace: system-upgrade-controller
 spec:
   concurrency: 1
+  exclusive: true
   cordon: true
   nodeSelector:
     matchExpressions:
@@ -13,6 +14,23 @@ spec:
       values:
       - "true"
   serviceAccountName: system-upgrade
+  # OS maintenance also checks this Plan before draining. Check its applying
+  # nodes before RKE2 starts so the two Plans cannot disrupt different etcd
+  # members simultaneously. Concurrent starts wait rather than lose quorum.
+  prepare:
+    image: rancher/kubectl:v1.36.2
+    command: [sh, -ec]
+    args:
+      - |
+        while true; do
+          os_applying=$(kubectl -n system-upgrade-controller get plans \
+            -o jsonpath='{range .items[?(@.metadata.name=="ubuntu-os")]}{.status.applying[*]}{end}')
+          if [ -z "$os_applying" ]; then
+            break
+          fi
+          echo "Waiting for OS maintenance on: $os_applying"
+          sleep 30
+        done
   upgrade:
     image: rancher/rke2-upgrade
   channel: https://update.rke2.io/v1-release/channels/stable

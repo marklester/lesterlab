@@ -1,0 +1,648 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-os-maintenance-rules
+  namespace: monitoring
+  labels:
+    grafana_alert: '1'
+data:
+  os-maintenance.yaml: |
+    apiVersion: 1
+    groups:
+    - orgId: 1
+      name: os-maintenance
+      folder: Infrastructure
+      interval: 1m
+      rules:
+      - uid: os-main-upcoming
+        title: 'main: OS maintenance starts in 30 minutes'
+        condition: C
+        data:
+        - refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+          datasourceUid: prometheus
+          model:
+            expr: ((min(label_replace((max(kube_cronjob_next_schedule_time{cluster="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+              + 900) > time(), "candidate", "next", "", ".*") or label_replace((max(kube_cronjob_status_last_schedule_time{cluster="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+              + 900) > time(), "candidate", "last", "", ".*")) - time()) <= bool 1800)
+              * ((min(label_replace((max(kube_cronjob_next_schedule_time{cluster="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+              + 900) > time(), "candidate", "next", "", ".*") or label_replace((max(kube_cronjob_status_last_schedule_time{cluster="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+              + 900) > time(), "candidate", "last", "", ".*")) - time()) > bool 0) and
+              (max(kube_cronjob_spec_suspend{cluster="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+              == 0)
+            instant: true
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params: []
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - B
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: A
+            intervalMs: 1000
+            maxDataPoints: 43200
+            reducer: last
+            refId: B
+            type: reduce
+        - refId: C
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - C
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: B
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: C
+            type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          severity: warning
+          cluster: main
+        annotations:
+          summary: main OS updates start within 30 minutes (Sunday 03:00 America/New_York)
+          description: Ubuntu package updates roll through gimli, helium, lithium one
+            at a time; nodes drain and reboot after updates.
+        isPaused: false
+      - uid: os-main-failed
+        title: 'main: OS maintenance failed'
+        condition: C
+        data:
+        - refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+          datasourceUid: prometheus
+          model:
+            expr: max by (job_name, namespace) (kube_job_failed{cluster="main",namespace="system-upgrade-controller",job_name=~"apply-ubuntu-os-on-.*|os-maintenance-[0-9]+",condition="true"})
+            instant: true
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params: []
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - B
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: A
+            intervalMs: 1000
+            maxDataPoints: 43200
+            reducer: last
+            refId: B
+            type: reduce
+        - refId: C
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - C
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: B
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: C
+            type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        labels:
+          severity: critical
+          cluster: main
+        annotations:
+          summary: OS maintenance job {{ $labels.job_name }} failed
+          description: Inspect the system-upgrade-controller namespace Job and logs. Health
+            checks, package removals, drain timeout or reboot failure can stop the run.
+            Failed scheduler jobs are retained; SUC jobs expire after 15 minutes.
+        isPaused: false
+      - uid: os-main-incomplete
+        title: 'main: OS maintenance incomplete'
+        condition: C
+        data:
+        - refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+          datasourceUid: prometheus
+          model:
+            expr: max by (name, namespace) (kube_customresource_system_upgrade_plan_complete{cluster="main",namespace="system-upgrade-controller",name="ubuntu-os",condition="Complete"})
+              == bool 0 and on (namespace) max by (namespace) (kube_cronjob_status_last_successful_time{cluster="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+            instant: true
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params: []
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - B
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: A
+            intervalMs: 1000
+            maxDataPoints: 43200
+            reducer: last
+            refId: B
+            type: reduce
+        - refId: C
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - C
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: B
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: C
+            type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 3h
+        labels:
+          severity: critical
+          cluster: main
+        annotations:
+          summary: OS maintenance Plan {{ $labels.name }} has remained incomplete for
+            3 hours
+          description: Check Plan status, node readiness, Ceph/ZFS health, apt and reboot
+            logs. Jobs may continue after the start window closes. This alert persists
+            even after short-lived SUC Jobs are deleted.
+        isPaused: false
+      - uid: os-main-monitoring-missing
+        title: 'main: OS maintenance schedule metrics missing'
+        condition: C
+        data:
+        - refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+          datasourceUid: prometheus
+          model:
+            expr: absent(kube_cronjob_next_schedule_time{cluster="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+            instant: true
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params: []
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - B
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: A
+            intervalMs: 1000
+            maxDataPoints: 43200
+            reducer: last
+            refId: B
+            type: reduce
+        - refId: C
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - C
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: B
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: C
+            type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        labels:
+          severity: warning
+          cluster: main
+        annotations:
+          summary: No OS maintenance schedule metric for main; advance notification cannot
+            work
+          description: Check that the CronJob exists and kube-state-metrics is scraped.
+            For main, check OTel remote-write to Moonbase.
+        isPaused: false
+      - uid: os-moonbase-upcoming
+        title: 'moonbase: OS maintenance starts in 30 minutes'
+        condition: C
+        data:
+        - refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+          datasourceUid: prometheus
+          model:
+            expr: ((min(label_replace((max(kube_cronjob_next_schedule_time{cluster!="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+              + 900) > time(), "candidate", "next", "", ".*") or label_replace((max(kube_cronjob_status_last_schedule_time{cluster!="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+              + 900) > time(), "candidate", "last", "", ".*")) - time()) <= bool 1800)
+              * ((min(label_replace((max(kube_cronjob_next_schedule_time{cluster!="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+              + 900) > time(), "candidate", "next", "", ".*") or label_replace((max(kube_cronjob_status_last_schedule_time{cluster!="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+              + 900) > time(), "candidate", "last", "", ".*")) - time()) > bool 0) and
+              (max(kube_cronjob_spec_suspend{cluster!="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+              == 0)
+            instant: true
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params: []
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - B
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: A
+            intervalMs: 1000
+            maxDataPoints: 43200
+            reducer: last
+            refId: B
+            type: reduce
+        - refId: C
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - C
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: B
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: C
+            type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          severity: warning
+          cluster: moonbase
+        annotations:
+          summary: moonbase OS updates start within 30 minutes (Saturday 03:00 America/New_York)
+          description: Moonbase Debian/Proxmox package updates may reboot the host. Grafana,
+            Prometheus, backups and Proxmox guests will be unavailable during reboot.
+        isPaused: false
+      - uid: os-moonbase-failed
+        title: 'moonbase: OS maintenance failed'
+        condition: C
+        data:
+        - refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+          datasourceUid: prometheus
+          model:
+            expr: max by (job_name, namespace) (kube_job_failed{cluster!="main",namespace="system-upgrade-controller",job_name=~"apply-debian-os-on-.*|os-maintenance-[0-9]+",condition="true"})
+            instant: true
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params: []
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - B
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: A
+            intervalMs: 1000
+            maxDataPoints: 43200
+            reducer: last
+            refId: B
+            type: reduce
+        - refId: C
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - C
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: B
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: C
+            type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        labels:
+          severity: critical
+          cluster: moonbase
+        annotations:
+          summary: OS maintenance job {{ $labels.job_name }} failed
+          description: Inspect the system-upgrade-controller namespace Job and logs. Health
+            checks, package removals, drain timeout or reboot failure can stop the run.
+            Failed scheduler jobs are retained; SUC jobs expire after 15 minutes.
+        isPaused: false
+      - uid: os-moonbase-incomplete
+        title: 'moonbase: OS maintenance incomplete'
+        condition: C
+        data:
+        - refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+          datasourceUid: prometheus
+          model:
+            expr: max by (name, namespace) (kube_customresource_system_upgrade_plan_complete{cluster!="main",namespace="system-upgrade-controller",name="debian-os",condition="Complete"})
+              == bool 0 and on (namespace) max by (namespace) (kube_cronjob_status_last_successful_time{cluster!="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+            instant: true
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params: []
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - B
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: A
+            intervalMs: 1000
+            maxDataPoints: 43200
+            reducer: last
+            refId: B
+            type: reduce
+        - refId: C
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - C
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: B
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: C
+            type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 3h
+        labels:
+          severity: critical
+          cluster: moonbase
+        annotations:
+          summary: OS maintenance Plan {{ $labels.name }} has remained incomplete for
+            3 hours
+          description: Check Plan status, node readiness, Ceph/ZFS health, apt and reboot
+            logs. Jobs may continue after the start window closes. This alert persists
+            even after short-lived SUC Jobs are deleted.
+        isPaused: false
+      - uid: os-moonbase-monitoring-missing
+        title: 'moonbase: OS maintenance schedule metrics missing'
+        condition: C
+        data:
+        - refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+          datasourceUid: prometheus
+          model:
+            expr: absent(kube_cronjob_next_schedule_time{cluster!="main",namespace="system-upgrade-controller",cronjob="os-maintenance"})
+            instant: true
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params: []
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - B
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: A
+            intervalMs: 1000
+            maxDataPoints: 43200
+            reducer: last
+            refId: B
+            type: reduce
+        - refId: C
+          datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+              operator:
+                type: and
+              query:
+                params:
+                - C
+                reducer:
+                  params: []
+                  type: last
+                type: query
+            datasource:
+              type: __expr__
+              uid: __expr__
+            expression: B
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: C
+            type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        labels:
+          severity: warning
+          cluster: moonbase
+        annotations:
+          summary: No OS maintenance schedule metric for moonbase; advance notification
+            cannot work
+          description: Check that the CronJob exists and kube-state-metrics is scraped.
+            For main, check OTel remote-write to Moonbase.
+        isPaused: false

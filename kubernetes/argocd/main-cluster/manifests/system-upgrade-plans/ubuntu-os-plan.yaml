@@ -1,0 +1,51 @@
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  name: ubuntu-os
+  namespace: system-upgrade-controller
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  concurrency: 1
+  exclusive: true
+  # Weekly run identifier, advanced by os-maintenance. The explicit image tags
+  # below are independent of this identifier.
+  version: initial
+  serviceAccountName: os-maintenance
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/os: linux
+    matchExpressions:
+      - key: kubernetes.io/hostname
+        operator: In
+        values: [gimli, helium, lithium]
+  window:
+    days: [sunday]
+    startTime: "03:00"
+    endTime: "06:00"
+    timeZone: America/New_York
+  jobActiveDeadlineSecs: 7200
+  postCompleteDelay: 5m
+  secrets:
+    - name: os-maintenance-scripts
+      path: /run/system-upgrade/secrets/os-maintenance
+  prepare:
+    image: python:3.13.13-alpine3.22
+    command: [python3]
+    args: [/run/system-upgrade/secrets/os-maintenance/maintenance.py, prepare]
+  drain:
+    ignoreDaemonSets: true
+    deleteEmptydirData: true
+    force: false
+    disableEviction: false
+    timeout: 15m
+  upgrade:
+    image: ubuntu:24.04
+    command: [bash, -ec]
+    args:
+      - |
+        # Use the host's nsenter and enter its root/namespaces so systemd
+        # operations run on the node, including after a container retry.
+        exec chroot /host /usr/bin/nsenter --target 1 --mount --uts --ipc --net --pid --root --wd -- \
+          /bin/bash -s -- "$SYSTEM_UPGRADE_PLAN_LATEST_VERSION" \
+          < /run/system-upgrade/secrets/os-maintenance/upgrade.sh

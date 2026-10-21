@@ -55,6 +55,50 @@ spec:
         alertmanager:
           enabled: false
 
+        kube-state-metrics:
+          namespaceOverride: monitoring
+          rbac:
+            extraRules:
+            - apiGroups:
+              - upgrade.cattle.io
+              resources:
+              - plans
+              verbs:
+              - list
+              - watch
+          customResourceState:
+            enabled: true
+            config:
+              kind: CustomResourceStateMetrics
+              spec:
+                resources:
+                - groupVersionKind:
+                    group: upgrade.cattle.io
+                    version: v1
+                    kind: Plan
+                  labelsFromPath:
+                    namespace:
+                    - metadata
+                    - namespace
+                    name:
+                    - metadata
+                    - name
+                  metrics:
+                  - name: system_upgrade_plan_complete
+                    help: Whether the latest system-upgrade-controller Plan completed on all
+                      selected nodes.
+                    each:
+                      type: Gauge
+                      gauge:
+                        path:
+                        - status
+                        - conditions
+                        labelsFromPath:
+                          condition:
+                          - type
+                        valueFrom:
+                        - status
+
         grafana:
           enabled: true
           namespaceOverride: monitoring
@@ -102,7 +146,7 @@ spec:
           sidecar:
             alerts:
               enabled: true
-              resourceName: secret/grafana-alerting-contact-points,configmap/grafana-alerting-policies,configmap/grafana-alerting-rules
+              resourceName: secret/grafana-alerting-contact-points,configmap/grafana-alerting-policies,configmap/grafana-alerting-rules,configmap/grafana-os-maintenance-rules
 
         prometheus:
           ingress:
@@ -143,8 +187,6 @@ spec:
           namespaceOverride: monitoring
           # extraArgs: []
 
-        kube-state-metrics:
-          namespaceOverride: monitoring
   syncPolicy:
     automated:
       prune: true       # Automatically delete resources no longer in Git

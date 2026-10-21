@@ -1,0 +1,37 @@
+# Used to deploy manifests need to run the otel-collector. RBAC for now but
+# maybe helm template the collector eventually
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: system-upgrade-plans
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  destination:
+    namespace: system-upgrade-controller
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: kubernetes/argocd/moonbase/manifests/system-upgrade-plans
+    repoURL: https://github.com/marklester/lesterlab.git
+    targetRevision: HEAD
+  # The repo-managed CronJob advances only the OS run identifier each week.
+  # Everything else in the Plan remains managed by Git.
+  ignoreDifferences:
+    - group: upgrade.cattle.io
+      kind: Plan
+      name: debian-os
+      namespace: system-upgrade-controller
+      jsonPointers:
+        - /spec/version
+  syncPolicy:
+    automated:
+      prune: true       # Automatically delete resources no longer in Git
+      selfHeal: true    # Correct manual changes made in the cluster (drift detection)
+    syncOptions:
+      - CreateNamespace=true           # Automatically create the target namespace if it doesn't exist
+      - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
+      - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
