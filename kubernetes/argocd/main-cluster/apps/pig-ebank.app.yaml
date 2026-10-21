@@ -11,15 +11,7 @@ spec:
   source:
     path: kubernetes/argocd/main-cluster/manifests/pig-ebank
     repoURL: https://github.com/marklester/lesterlab.git
-    targetRevision: HEAD
-  # The registry poller owns only this rollout marker; the image stays in Git.
-  ignoreDifferences:
-    - group: apps
-      kind: Deployment
-      name: pig-ebank
-      namespace: pig-ebank
-      jsonPointers:
-        - /spec/template/metadata/annotations/pig-ebank.home~1image-digest
+    targetRevision: master
   syncPolicy:
     automated:
       prune: true       # Automatically delete resources no longer in Git
@@ -29,4 +21,3 @@ spec:
       - PruneLast=true                 # Defer resource deletion until after new ones are applied (safer rollouts)
       - PrunePropagationPolicy=foreground # Gracefully delete dependent resources (recommended for safety)
       - ServerSideApply=true
-      - RespectIgnoreDifferences=true

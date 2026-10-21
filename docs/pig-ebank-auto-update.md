@@ -1,45 +1,50 @@
 # pig-ebank image updates
 
-The `pig-ebank-image-update` CronJob checks the private GHCR `main` tag every
-five minutes using the existing `pig-ebank-ghcr-credentials` Secret. It compares
-the registry manifest digest (including multi-platform indexes) with the last
-observed digest on the Deployment's Pod template. A changed digest updates the
-`pig-ebank.home/image-digest` annotation, which triggers a rollout. The existing
-`imagePullPolicy: Always` makes each new Pod resolve and pull `main` again.
+Argo CD Image Updater replaces the custom registry-polling CronJob. The
+`argocd-image-updater` Application installs the pinned upstream Helm chart,
+its CRD, and the configuration in `manifests/argocd-image-updater`.
 
-The first successful check also triggers a rollout to establish the marker.
-Unchanged digests do nothing. Registry/authentication failures fail the Job
-without changing the Deployment. Concurrent changes to the Deployment cause
-the patch to fail and be retried by a later run. Job logs contain digests, never
-credentials. The service account can only get/patch the pig-ebank Deployment;
-the pull Secret is mounted as a file and requires no Kubernetes Secret API access.
+The `pig-ebank` ImageUpdater resource watches only
+`ghcr.io/marklester/pig-ebank:main` using the `digest` strategy, at a five-minute
+interval. Registry access reuses the existing pull Secret in the `pig-ebank`
+namespace through a Role granting access to that single Secret. The controller
+otherwise uses namespace-scoped permissions in `argocd`.
 
-ArgoCD ignores only this runtime annotation and preserves it during sync with
-[`RespectIgnoreDifferences=true`](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-options/#respect-ignore-differences-configs).
-The image tag, application config, schedule,
-script, and RBAC remain repo-managed. All resources are recreated by ArgoCD on
-a fresh cluster. No initial digest or manually created registry secret is needed
-beyond the existing ExternalSecret setup.
+## Git write-back configuration
 
-Merge the manifests and Application change into the default branch and let
-ArgoCD sync to activate the updater. Check it with:
+The configuration writes the digest into pig-ebank's
+`kustomization.yaml` and commits it to `master`. ArgoCD tracks that branch and
+rolls out the resulting immutable image reference. All five existing pig-ebank
+resources are listed in the Kustomization. There are no runtime image overrides
+or ignored Deployment fields; Git contains the selected image digest.
+
+Image Updater fetches the branch before making its commit. A concurrent remote
+commit can cause the push to be rejected; it must retry against the updated
+branch. It does not need to rewrite the branch history. Changes to other
+application settings remain in Git. To hold a rollback digest, disable the
+image's automatic updates first, or a subsequent check may advance it to the
+latest digest behind `main` again.
+
+Git write-back uses a dedicated SSH deploy key with write access to
+`marklester/lesterlab` and permission to push to `master`. The ExternalSecret
+maps `github/lesterlab/image-updater-ssh-private-key` (version `v1`) from the
+existing `main-secret-store` to the controller's `sshPrivateKey` Secret.
+Provision that secret-store entry and register the matching public key as a
+write-enabled deploy key on `lesterlab` before activating the updater. This
+credential has not been provisioned yet. The existing ArgoCD SSH credential
+is for `moonbase-secrets` and is not reused. Keep the private key in the
+existing private secret-store configuration, never in this repository.
+
+After provisioning the credential, merge the branch
+and let ArgoCD sync. The controller's CRD is installed before the ImageUpdater
+resource (sync wave 1). No Helm CLI release installation is needed.
 
 ```sh
-kubectl --context main-cluster -n pig-ebank get cronjob pig-ebank-image-update
-kubectl --context main-cluster -n pig-ebank logs -l job-name=<job-name>
+kubectl --context main-cluster -n argocd get imageupdater pig-ebank -o yaml
+kubectl --context main-cluster -n argocd logs deployment/argocd-image-updater-controller
 kubectl --context main-cluster -n pig-ebank rollout status deployment/pig-ebank
 ```
 
-Set the CronJob's `spec.suspend: true` in Git to stop checks. It also skips
-paused Deployments and images changed away from the exact floating `main` tag,
-so a digest-pinned rollback is left alone. Suspending checks does not freeze
-`main` for future Pod starts: pin the Deployment image to an immutable digest
-for that. This polls the latest image; intermediate builds within five minutes
-may be skipped. It requests the existing Deployment rollout strategy and does
-not provide automatic rollback or guarantee a successful application startup.
-
-Run the isolated rollout-decision tests with:
-
-```sh
-uv run --with pytest --with pyyaml pytest -q kubernetes/tests/test_pig_ebank_auto_update.py
-```
+See the upstream [digest strategy and registry credentials](https://argocd-image-updater.readthedocs.io/en/stable/configuration/images/)
+and [Git write-back](https://argocd-image-updater.readthedocs.io/en/stable/basics/update-methods/)
+documentation.

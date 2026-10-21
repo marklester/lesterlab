@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - pig-ebank.deployment.yaml
+  - pig-ebank.ghcr-credentials.external-secret.yaml
+  - pig-ebank.ingress.yaml
+  - pig-ebank.pvc.yaml
+  - pig-ebank.service.yaml
+# Argo CD Image Updater writes the digest of main here via Git.
+images:
+  - name: ghcr.io/marklester/pig-ebank
+    newTag: main

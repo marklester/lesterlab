@@ -1,0 +1,25 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: pig-ebank
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  writeBackConfig:
+    method: git:secret:argocd/pig-ebank-image-updater-git
+    gitConfig:
+      repository: git@github.com:marklester/lesterlab.git
+      branch: master
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: pig-ebank
+      images:
+        - alias: pigebank
+          imageName: ghcr.io/marklester/pig-ebank:main
+          commonUpdateSettings:
+            updateStrategy: digest
+            pullSecret: pullsecret:pig-ebank/pig-ebank-ghcr-credentials
+          manifestTargets:
+            kustomize:
+              name: ghcr.io/marklester/pig-ebank
