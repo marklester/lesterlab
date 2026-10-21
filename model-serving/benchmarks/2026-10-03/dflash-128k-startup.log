@@ -1,0 +1,41 @@
+0.00.005.450 W Setting 'enable_thinking' via --chat-template-kwargs is deprecated. Use --reasoning on / --reasoning off instead.
+warn: LLAMA_ARG_HOST environment variable is set, but will be overwritten by command line argument --host
+0.00.527.463 I srv  llama_server: initializing ...
+0.00.527.501 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.529.484 W srv  llama_server: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.532.863 I srv    load_model: loading model '/models/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF/Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf'
+1.36.626.701 I cmn          init: llama threadpool init, n_threads = 6
+1.42.446.780 I common_speculative_init_result: loading draft model '/models/analogalok/Qwen3.8-27B-DFlash2-Q2_K-GGUF/Qwen3.8-27B-DFlash2-Q2_K.gguf'
+1.49.317.983 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 131072, kv_unified = 'false'
+1.49.318.119 I common_speculative_impl_draft_dflash: adding speculative implementation 'draft-dflash'
+1.49.318.140 I common_speculative_impl_draft_dflash: - n_max=4, n_min=0, p_min=0.00
+1.49.318.141 I common_speculative_impl_draft_dflash: - block_size=8, mask_token_id=248070, n_extract=5, sample_from_anchor=true
+/app/ggml/src/ggml-cuda/ggml-cuda.cu:109: CUDA error
+1.50.368.813 E CUDA error: device not ready
+1.50.368.835 E   current device: 0, in function alloc at /app/ggml/src/ggml-cuda/ggml-cuda.cu:635
+1.50.368.835 E   cuMemSetAccess(start_ptr, reserve_size, access_descs.data(), access_descs.size())
+libggml-base.so.0(+0x1c4b6)[0x7b1e4f29e4b6]
+libggml-base.so.0(ggml_print_backtrace+0x21a)[0x7b1e4f29e93a]
+libggml-base.so.0(ggml_abort+0x15b)[0x7b1e4f29eb1b]
+/app/libggml-cuda.so(_Z15ggml_cuda_errorPKcS0_S0_iS0_+0xb5)[0x7b1e3dd2eb85]
+/app/libggml-cuda.so(_ZN18ggml_cuda_pool_vmm5allocEmPm+0x474)[0x7b1e3dd4a2a4]
+/app/libggml-cuda.so(_Z24argsort_f32_i32_cuda_cubR14ggml_cuda_poolPKfPiii15ggml_sort_orderP11CUstream_st+0x4a8)[0x7b1e3dae9998]
+/app/libggml-cuda.so(_Z18ggml_cuda_op_top_kR25ggml_backend_cuda_contextP11ggml_tensor+0x216)[0x7b1e3df1aea6]
+/app/libggml-cuda.so(+0x30f593)[0x7b1e3dd46593]
+libggml-base.so.0(ggml_backend_sched_graph_compute_async+0x8a7)[0x7b1e4f2be8e7]
+libllama.so.0(_ZN13llama_context13graph_computeEP11ggml_cgraphb+0xa1)[0x7b1e4f56cd01]
+libllama.so.0(_ZN13llama_context14process_ubatchERK12llama_ubatch14llm_graph_typeP22llama_memory_context_iR11ggml_status+0x134)[0x7b1e4f570a54]
+libllama.so.0(_ZN13llama_context6decodeERK15llama_batch_ext+0x3aa)[0x7b1e4f57931a]
+libllama-common.so.0(_Z25common_context_can_seq_rmP13llama_context+0xdb)[0x7b1e4fb7341b]
+libllama-server-impl.so(_ZN19server_context_impl10load_modelER13common_params+0xcfc)[0x7b1e5046863c]
+libllama-server-impl.so(_Z12llama_serverR13common_paramsiPPc+0x3d33)[0x7b1e503b4473]
+libllama-server-impl.so(_Z12llama_serveriPPc+0x114f)[0x7b1e503b694f]
+/usr/lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca)[0x7b1e4fe411ca]
+/usr/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b)[0x7b1e4fe4128b]
+/app/llama-server(+0x1315)[0x604cfa561315]
+0.00.003.763 W Setting 'enable_thinking' via --chat-template-kwargs is deprecated. Use --reasoning on / --reasoning off instead.
+warn: LLAMA_ARG_HOST environment variable is set, but will be overwritten by command line argument --host
+0.00.542.487 I srv  llama_server: initializing ...
+0.00.542.532 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.544.458 W srv  llama_server: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.546.449 I srv    load_model: loading model '/models/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF/Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf'

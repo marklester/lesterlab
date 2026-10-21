@@ -1,0 +1,97 @@
+# Independent candidate for comparison with beellama.docker-compose.yaml.
+name: qwen38-dflash
+
+services:
+  llama:
+    # llama.cpp b11347 / 5fc4f3c8c7103ffd0b7ff5ee4855bcc78a3ed5cd, CUDA 12.8.1.
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda@sha256:d87b02aafa74797a2d599b281c50468704bd0bcdc57bfcf31b570d593f1d285b
+    platform: linux/amd64
+    pull_policy: missing
+    container_name: qwen38-dflash-server
+    environment:
+      LLAMA_ARG_CHAT_TEMPLATE_KWARGS: '{"enable_thinking":true,"preserve_thinking":true,"reasoning_effort":"medium"}'
+    ports:
+      - "${QWEN_DFLASH_PORT:-1235}:8080"
+    volumes:
+      - type: bind
+        source: ${QWEN_DFLASH_MODELS_DIR:-C:/Users/starf/.lmstudio/models}
+        target: /models
+        read_only: true
+        bind:
+          create_host_path: false
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command:
+      - --model
+      - /models/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF/${QWEN_DFLASH_MODEL:-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf}
+      - --model-draft
+      - /models/analogalok/Qwen3.8-27B-DFlash2-Q2_K-GGUF/Qwen3.8-27B-DFlash2-Q2_K.gguf
+      - --alias
+      - qwen38-gsq-dflash
+      - --no-mmproj
+      - --device
+      - CUDA0
+      - --n-gpu-layers
+      - all
+      - --device-draft
+      - CUDA0
+      - --n-gpu-layers-draft
+      - all
+      - --spec-type
+      - draft-dflash
+      - --spec-draft-n-max
+      - "${QWEN_DFLASH_DRAFT_MAX:-4}"
+      - --flash-attn
+      - "on"
+      - --cache-type-k
+      - q4_0
+      - --cache-type-v
+      - q4_0
+      - --fit
+      - "off"
+      - --ctx-size
+      - "${QWEN_DFLASH_CONTEXT:-98304}"
+      - --parallel
+      - "1"
+      - --batch-size
+      - "512"
+      - --ubatch-size
+      - "${QWEN_DFLASH_UBATCH:-256}"
+      - --cache-ram
+      - "4096"
+      - --threads
+      - "6"
+      - --threads-batch
+      - "6"
+      - --jinja
+      - --reasoning-format
+      - deepseek
+      - --reasoning-preserve
+      - --temp
+      - "1.0"
+      - --top-p
+      - "0.95"
+      - --top-k
+      - "20"
+      - --min-p
+      - "0.0"
+      - --presence-penalty
+      - "0.0"
+      - --repeat-penalty
+      - "1.0"
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, --show-error, http://localhost:8080/health]
+      interval: 10s
+      timeout: 5s
+      start_period: 180s
+      retries: 6
+    restart: unless-stopped

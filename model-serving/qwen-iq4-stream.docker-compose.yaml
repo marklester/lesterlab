@@ -1,0 +1,131 @@
+# Independent IQ4 candidate; builds Raymond's adaptive KV streaming V2 fork.
+name: qwen38-iq4-stream
+
+services:
+  llama:
+    image: local/qwen38-iq4-stream:e5a7b37-cuda128-sm120
+    pull_policy: never
+    platform: linux/amd64
+    build:
+      context: https://github.com/RaymondHuang210129/llama.cpp-adaptive-kv-streaming.git#e5a7b37d9ea26ce97c2882d8fef0485ccf60d971
+      dockerfile_inline: |
+        FROM nvidia/cuda:12.8.1-devel-ubuntu24.04@sha256:520292dbb4f755fd360766059e62956e9379485d9e073bbd2f6e3c20c270ed66 AS build
+        RUN apt-get update && apt-get install -y --no-install-recommends \
+            build-essential cmake git libssl-dev \
+            && rm -rf /var/lib/apt/lists/*
+        WORKDIR /src
+        COPY . .
+        RUN --mount=type=cache,id=qwen38-iq4-e5a7b37-cuda128-sm120,target=/src/build \
+            cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CUDA_ARCHITECTURES=120 \
+            -DCMAKE_EXE_LINKER_FLAGS=-Wl,--allow-shlib-undefined \
+            -DGGML_NATIVE=OFF \
+            -DGGML_CUDA=ON \
+            -DGGML_CUDA_FA_ALL_QUANTS=ON \
+            -DGGML_BACKEND_DL=OFF \
+            -DLLAMA_BUILD_TESTS=OFF \
+            -DLLAMA_BUILD_EXAMPLES=OFF \
+            -DLLAMA_BUILD_APP=OFF \
+            -DLLAMA_BUILD_UI=OFF \
+            -DLLAMA_BUILD_SERVER=ON \
+            && cmake --build build --target llama-server --parallel "${QWEN_IQ4_BUILD_JOBS:-4}" \
+            && mkdir -p /out && cp build/bin/llama-server /out/ \
+            && find build -name '*.so*' -exec cp -P {} /out/ \;
+
+        FROM nvidia/cuda:12.8.1-runtime-ubuntu24.04@sha256:ebef3c171eeef0298e4eb2e4be843105edf3b8b0ac45e0b43acee358e8046867
+        RUN apt-get update && apt-get install -y --no-install-recommends \
+            curl libgomp1 libssl3t64 \
+            && rm -rf /var/lib/apt/lists/*
+        COPY --from=build /out/ /app/
+        WORKDIR /app
+        ENV LD_LIBRARY_PATH=/app:/usr/local/cuda/lib64
+        LABEL org.opencontainers.image.source="https://github.com/RaymondHuang210129/llama.cpp-adaptive-kv-streaming" \
+              org.opencontainers.image.revision="e5a7b37d9ea26ce97c2882d8fef0485ccf60d971"
+        ENTRYPOINT ["/app/llama-server"]
+    container_name: qwen38-iq4-stream-server
+    environment:
+      LLAMA_ARG_CHAT_TEMPLATE_KWARGS: '{"enable_thinking":true,"preserve_thinking":true,"reasoning_effort":"medium"}'
+    ports:
+      - "${QWEN_IQ4_PORT:-1236}:8080"
+    volumes:
+      - type: bind
+        source: ${QWEN_IQ4_MODELS_DIR:-C:/Users/starf/.lmstudio/models}
+        target: /models
+        read_only: true
+        bind:
+          create_host_path: false
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command:
+      - --model
+      - /models/unsloth/Qwen3.8-27B-GGUF/Qwen3.8-27B-UD-IQ4_XS.gguf
+      - --alias
+      - qwen38-iq4-stream
+      - --no-mmproj
+      - --device
+      - CUDA0
+      - --n-gpu-layers
+      - all
+      - --spec-type
+      - draft-mtp
+      - --spec-draft-n-max
+      - "${QWEN_IQ4_DRAFT_MAX:-3}"
+      - --flash-attn
+      - "on"
+      - --cache-type-k
+      - q8_0
+      - --cache-type-v
+      - q4_0
+      - --kv-stream-arena-mib
+      - "${QWEN_IQ4_ARENA_MIB:-2240}"
+      - --fit
+      - "off"
+      - --ctx-size
+      - "${QWEN_IQ4_CONTEXT:-204800}"
+      - --parallel
+      - "1"
+      - --batch-size
+      - "256"
+      - --ubatch-size
+      - "256"
+      - --load-mode
+      - none
+      - --cache-ram
+      - "0"
+      - --threads
+      - "6"
+      - --threads-batch
+      - "6"
+      - --jinja
+      - --reasoning-format
+      - deepseek
+      - --reasoning-preserve
+      - --temp
+      - "1.0"
+      - --top-p
+      - "0.95"
+      - --top-k
+      - "20"
+      - --min-p
+      - "0.0"
+      - --presence-penalty
+      - "0.0"
+      - --repeat-penalty
+      - "1.0"
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, --show-error, http://localhost:8080/health]
+      interval: 10s
+      timeout: 5s
+      start_period: 180s
+      retries: 6
+    restart: unless-stopped
