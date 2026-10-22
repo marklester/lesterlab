@@ -11,7 +11,7 @@ spec:
   source:
     path: kubernetes/argocd/main-cluster/manifests/pig-ebank
     repoURL: https://github.com/marklester/lesterlab.git
-    targetRevision: HEAD
+    targetRevision: master
   syncPolicy:
     automated:
       prune: true       # Automatically delete resources no longer in Git
