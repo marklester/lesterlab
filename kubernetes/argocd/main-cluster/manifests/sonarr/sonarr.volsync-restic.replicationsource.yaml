@@ -17,6 +17,9 @@ spec:
     cacheStorageClassName: rook-cephfs
     cacheCapacity: 1Gi
     moverSecurityContext:
+      # Give the non-root mover write access to its persistent cache volume.
+      fsGroup: 65534
+      fsGroupChangePolicy: OnRootMismatch
       runAsUser: 65534
       runAsGroup: 65534
     moverResources:
