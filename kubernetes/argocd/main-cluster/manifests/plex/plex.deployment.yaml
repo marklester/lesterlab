@@ -8,6 +8,9 @@ metadata:
     app: plex
 spec:
   replicas: 1
+  # Keep a single Plex server writing to its configuration database during updates.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: plex
@@ -68,6 +71,8 @@ spec:
           subPath: media
         - name: plex-config
           mountPath: /config
+        - name: transcode
+          mountPath: "/config/Library/Application Support/Plex Media Server/Cache/Transcode"
         - name: logs
           mountPath: "/config/Library/Application Support/Plex Media Server/Logs"
         securityContext:
@@ -80,9 +85,9 @@ spec:
           timeoutSeconds: 10
         resources:
           requests:
-            memory: "4Gi"
+            memory: "20Gi"
           limits:
-            memory: "8Gi"
+            memory: "24Gi"
       - name: plex-file-logs
         image: victoriametrics/vlagent:v1.53.0
         args:
@@ -119,6 +124,11 @@ spec:
         - name: plex-config
           persistentVolumeClaim:
             claimName: plex-config 
+        # Transcode buffers are disposable and count against Plex's memory limit.
+        - name: transcode
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Gi
         - name: logs
           emptyDir: {}
         - name: plex-file-log-vlagent-data
