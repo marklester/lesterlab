@@ -1,0 +1,120 @@
+# Public Android App Links metadata; application traffic still goes to Spring.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pig-ebank-app-links
+  namespace: pig-ebank
+data:
+  default.conf: |
+    server {
+      listen 8080;
+      server_name _;
+      location = /.well-known/assetlinks.json {
+        root /usr/share/nginx/html;
+        default_type application/json;
+        add_header Cache-Control "public, max-age=300";
+      }
+      location / { return 404; }
+    }
+  assetlinks.json: |
+    [{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.pig_ebank",
+        "sha256_cert_fingerprints": [
+          "F1:02:B6:19:E2:FE:F8:BD:AC:33:33:6B:DC:1A:C6:C2:E2:0D:64:3A:89:A8:7E:40:5E:7A:22:B2:2C:39:B8:07"
+        ]
+      }
+    }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pig-ebank-app-links
+  namespace: pig-ebank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pig-ebank-app-links
+  template:
+    metadata:
+      labels:
+        app: pig-ebank-app-links
+    spec:
+      containers:
+        - name: nginx
+          image: ghcr.io/nginx/nginx-unprivileged:1.28.2-alpine
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /.well-known/assetlinks.json
+              port: http
+          resources:
+            requests:
+              cpu: 5m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            runAsNonRoot: true
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/conf.d
+            - name: statements
+              mountPath: /usr/share/nginx/html/.well-known
+      volumes:
+        - name: config
+          configMap:
+            name: pig-ebank-app-links
+            items:
+              - key: default.conf
+                path: default.conf
+        - name: statements
+          configMap:
+            name: pig-ebank-app-links
+            items:
+              - key: assetlinks.json
+                path: assetlinks.json
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pig-ebank-app-links
+  namespace: pig-ebank
+spec:
+  selector:
+    app: pig-ebank-app-links
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pig-ebank-app-links
+  namespace: pig-ebank
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: pig-ebank.app
+      http:
+        paths:
+          - path: /.well-known/assetlinks.json
+            pathType: Exact
+            backend:
+              service:
+                name: pig-ebank-app-links
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - pig-ebank.app
+      secretName: pig-ebank-tls
