@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pig-ebank-ui
+  namespace: pig-ebank
+spec:
+  selector:
+    app: pig-ebank-ui
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

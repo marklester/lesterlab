@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pig-ebank-ui
+  namespace: pig-ebank
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: app.pig-ebank.app
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pig-ebank-ui
+                port:
+                  number: 80
+    - host: app.pig-ebank.home
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pig-ebank-ui
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - app.pig-ebank.app
+      secretName: pig-ebank-ui-tls
