@@ -1,0 +1,35 @@
+# Root aliases for Flutter. The existing backend ingress owns pig-ebank-tls.
+# Its longer /api/v1 prefix preserves old native clients; App Links metadata
+# keeps its existing exact-path ingress.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pig-ebank-ui-root
+  namespace: pig-ebank
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: pig-ebank.app
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pig-ebank-ui
+            port:
+              number: 80
+  - host: pig-ebank.home
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pig-ebank-ui
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - pig-ebank.app
+    secretName: pig-ebank-tls

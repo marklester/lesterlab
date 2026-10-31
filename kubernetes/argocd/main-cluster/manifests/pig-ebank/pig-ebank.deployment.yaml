@@ -22,6 +22,8 @@ spec:
         image: ghcr.io/marklester/pig-ebank:main
         imagePullPolicy: Always
         env:
+          - name: FAMILY_INVITATION_BASE_URL
+            value: "https://pig-ebank.app"
           - name: SPRING_DATASOURCE_URL
             value: "jdbc:h2:file:/data/appdb"
           - name: STORAGE_ROOTPATH

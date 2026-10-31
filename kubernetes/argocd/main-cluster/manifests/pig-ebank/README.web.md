@@ -31,3 +31,24 @@ out). The UI uses memory-only browser sessions, so reloading requires sign-in.
 Future releases build/push the web image as part of the Pig E-Bank release
 workflow. Rollouts remain explicit: update the image tag here after publishing
 and let Argo CD sync it. Version tags avoid unnoticed updates to running pods.
+
+## Hostnames
+
+- `app.pig-ebank.app` and `app.pig-ebank.home`: Flutter UI.
+- `pig-ebank.app` and `pig-ebank.home`: additional ingress routes for the UI.
+- `api.pig-ebank.app` and `api.pig-ebank.home`: backend.
+- `pig-ebank.lester.network`: legacy backend route retained.
+
+Root-domain `/api/v1/` continues to route to the backend so installed Android
+clients work during migration. Invitation and NFC links keep `pig-ebank.app`,
+including its existing exact `/.well-known/assetlinks.json` route. The backend
+invitation base URL explicitly uses that root domain. Flutter normalizes legacy
+`/createAccount` and `/app/` paths. Web API calls remain same-origin through
+NGINX and the in-cluster backend Service.
+
+Add public DNS for `api.pig-ebank.app` pointing to the same ingress as
+`pig-ebank.app` before distributing Android builds with the new API default.
+The existing Let's Encrypt issuer provisions `pig-ebank-api-tls`; check that
+certificate is ready before releasing the client change. Add local DNS for
+`api.pig-ebank.home` to `192.168.0.200`. All `.home` names still require local
+certificate trust for secure browser use. This change does not modify DNS.
