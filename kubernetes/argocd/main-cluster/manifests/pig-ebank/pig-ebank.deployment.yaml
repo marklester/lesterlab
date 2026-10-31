@@ -22,6 +22,16 @@ spec:
         image: ghcr.io/marklester/pig-ebank:main
         imagePullPolicy: Always
         env:
+          # TLS terminates at Traefik/NGINX. Spring must see the public HTTPS
+          # scheme when issuing its remember-me cookie and redirect URLs.
+          - name: SERVER_FORWARDHEADERSSTRATEGY
+            value: framework
+          - name: SERVER_SERVLET_SESSION_COOKIE_SECURE
+            value: "true"
+          - name: SERVER_SERVLET_SESSION_COOKIE_HTTPONLY
+            value: "true"
+          - name: SERVER_SERVLET_SESSION_COOKIE_SAMESITE
+            value: lax
           - name: FAMILY_INVITATION_BASE_URL
             value: "https://pig-ebank.app"
           - name: SPRING_DATASOURCE_URL

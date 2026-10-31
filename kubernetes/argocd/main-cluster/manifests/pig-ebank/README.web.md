@@ -26,7 +26,24 @@ Before syncing:
 
 After sync, check Deployment readiness, the `pig-ebank-ui-tls` Certificate,
 `/healthz`, a direct `/family` page load, and `/api/v1/auth/me` (401 while signed
-out). The UI uses memory-only browser sessions, so reloading requires sign-in.
+out). The cookie-based UI requires the backend browser-auth endpoints from
+Pig E-Bank PR #92. Web sign-in uses Spring session cookies, and Remember me
+uses the backend's existing 14-day cookie. Authentication tokens are not stored
+in JavaScript storage. Without Remember me, a reload still restores the current
+browser session; returning after the session ends requires sign-in.
+
+Deploy the backend changes before releasing the cookie-based web image. The
+backend Deployment's forwarded-header and cookie settings support HTTPS
+termination at Traefik/NGINX and issue Secure, HttpOnly session cookies with
+SameSite=Lax. Access the UI over HTTPS, including local `.home` deployments.
+Both UI replicas proxy to the same single backend replica; browser sessions are
+held by that backend. Scaling the backend requires shared sessions or deliberate
+session routing. A backend restart ends in-memory sessions, while a valid
+Remember me cookie can reauthenticate the user.
+
+The existing `/api/v1/` proxy forwards cookies, Set-Cookie and CSRF headers.
+All browser calls stay on the UI hostname; no CORS configuration or shared
+cookie domain is needed. Root and `app.*` hostnames have separate cookies.
 
 Future releases build/push the web image as part of the Pig E-Bank release
 workflow. Rollouts remain explicit: update the image tag here after publishing
