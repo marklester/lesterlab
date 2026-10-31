@@ -4,7 +4,7 @@ metadata:
   name: pig-ebank
   namespace: pig-ebank
   annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: traefik
@@ -13,11 +13,14 @@ spec:
     - pig-ebank.lester.network
     - pig-ebank.app
     secretName: pig-ebank-tls
+  - hosts:
+    - api.pig-ebank.app
+    secretName: pig-ebank-api-tls
   rules:
   - host: pig-ebank.home
     http:
       paths:
-      - path: /
+      - path: /api/v1
         pathType: Prefix
         backend:
           service:
@@ -35,6 +38,26 @@ spec:
             port:
               number: 80
   - host: pig-ebank.app
+    http:
+      paths:
+      - path: /api/v1
+        pathType: Prefix
+        backend:
+          service:
+            name: pig-ebank
+            port:
+              number: 80
+  - host: api.pig-ebank.app
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pig-ebank
+            port:
+              number: 80
+  - host: api.pig-ebank.home
     http:
       paths:
       - path: /
