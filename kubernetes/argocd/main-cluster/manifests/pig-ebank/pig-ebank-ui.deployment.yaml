@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pig-ebank-ui
+  namespace: pig-ebank
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pig-ebank-ui
+  template:
+    metadata:
+      labels:
+        app: pig-ebank-ui
+    spec:
+      automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: pig-ebank-ghcr-credentials
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: web
+          image: ghcr.io/marklester/pig-ebank-ui:0.1.15
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: BACKEND_ORIGIN
+              value: http://pig-ebank.pig-ebank.svc.cluster.local:80
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop: [ALL]
