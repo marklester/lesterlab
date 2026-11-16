@@ -89,7 +89,7 @@ spec:
           limits:
             memory: "24Gi"
       - name: plex-file-logs
-        image: victoriametrics/vlagent:v1.53.0
+        image: victoriametrics/vlagent:v1.54.0
         args:
         - --envflag.enable
         - --envflag.prefix=VL_
